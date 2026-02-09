@@ -104,8 +104,6 @@ src/
     button.tsx       # Component implementation
     button.test.tsx  # Component tests
 playground/         # Dev playground with examples
-test/               # Test utilities and setup
-  setup/            # Test configuration
 ```
 
 ## Testing Guidelines

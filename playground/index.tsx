@@ -1,7 +1,7 @@
 import { render } from 'solid-js/web'
 import '@unocss/reset/tailwind-v4.css'
 import 'uno.css'
-import { Button } from '../src/button'
+import { Button } from '../src/button/button'
 
 render(
   () => (

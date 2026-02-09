@@ -2,6 +2,8 @@ import { presetWind4, transformerVariantGroup, presetIcons, defineConfig } from 
 import { presetAnimations } from 'unocss-preset-animations'
 import { presetFunctionCompletion, presetObjectCompletion } from 'unocss-preset-completion'
 
+import { presetTheme } from './src/unocss-preset-theme'
+
 export default defineConfig({
   presets: [
     presetWind4(),
@@ -9,6 +11,7 @@ export default defineConfig({
       scale: 1.2,
     }),
     presetAnimations(),
+    presetTheme(),
     presetObjectCompletion(),
     presetFunctionCompletion(),
   ],
