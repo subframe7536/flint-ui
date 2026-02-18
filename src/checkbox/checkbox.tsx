@@ -5,11 +5,12 @@ import { Show, createMemo, mergeProps, splitProps } from 'solid-js'
 import { useFormField } from '../form-field/form-field-context'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
-import { cn, useId } from '../shared/utils'
+import { useId } from '../shared/utils'
 
 import type { CheckboxVariantProps } from './checkbox.class'
 import {
   checkboxBaseVariants,
+  checkboxCardPaddingVariants,
   checkboxContainerVariants,
   checkboxDescriptionVariants,
   checkboxIconVariants,
@@ -140,13 +141,16 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       readOnly={local.readOnly}
       onChange={onChange}
       data-slot="root"
-      class={cn(
-        checkboxRootVariants({
-          variant: local.variant,
-          indicator: local.indicator,
-          size: resolvedSize(),
+      class={checkboxRootVariants(
+        {
+          variant: local.variant === 'card' ? 'card' : undefined,
+          indicator: local.indicator === 'hidden' ? undefined : local.indicator,
           disabled: disabled(),
-        }),
+        },
+        local.variant === 'card' &&
+          checkboxCardPaddingVariants({
+            size: resolvedSize(),
+          }),
         local.classes?.root,
       )}
       {...rest}
@@ -155,10 +159,10 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
         <>
           <div
             data-slot="container"
-            class={cn(
-              checkboxContainerVariants({
+            class={checkboxContainerVariants(
+              {
                 size: resolvedSize(),
-              }),
+              },
               local.classes?.container,
             )}
           >
@@ -170,21 +174,21 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
             <KobalteCheckbox.Control
               data-slot="base"
-              class={cn(
-                checkboxBaseVariants({
+              class={checkboxBaseVariants(
+                {
                   size: resolvedSize(),
                   disabled: disabled(),
-                }),
+                },
                 local.indicator === 'hidden' && 'sr-only',
                 local.classes?.base,
               )}
             >
               <KobalteCheckbox.Indicator
                 data-slot="indicator"
-                class={cn(
-                  checkboxIndicatorVariants({
+                class={checkboxIndicatorVariants(
+                  {
                     color: resolvedColor(),
-                  }),
+                  },
                   local.classes?.indicator,
                 )}
               >
@@ -194,10 +198,10 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                     <Icon
                       name={local.checkedIcon}
                       classes={{
-                        root: cn(
-                          checkboxIconVariants({
+                        root: checkboxIconVariants(
+                          {
                             size: resolvedSize(),
-                          }),
+                          },
                           local.classes?.icon,
                         ),
                       }}
@@ -207,10 +211,10 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                   <Icon
                     name={local.indeterminateIcon}
                     classes={{
-                      root: cn(
-                        checkboxIconVariants({
+                      root: checkboxIconVariants(
+                        {
                           size: resolvedSize(),
-                        }),
+                        },
                         local.classes?.icon,
                       ),
                     }}
@@ -223,11 +227,11 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
           <Show when={local.label || local.description}>
             <div
               data-slot="wrapper"
-              class={cn(
-                checkboxWrapperVariants({
+              class={checkboxWrapperVariants(
+                {
                   indicator: local.indicator,
                   size: resolvedSize(),
-                }),
+                },
                 local.classes?.wrapper,
               )}
             >
@@ -235,11 +239,11 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                 <label
                   for={inputId()}
                   data-slot="label"
-                  class={cn(
-                    checkboxLabelVariants({
+                  class={checkboxLabelVariants(
+                    {
                       required: local.required,
                       disabled: disabled(),
-                    }),
+                    },
                     local.classes?.label,
                   )}
                 >
@@ -250,10 +254,10 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
               <Show when={local.description}>
                 <p
                   data-slot="description"
-                  class={cn(
-                    checkboxDescriptionVariants({
+                  class={checkboxDescriptionVariants(
+                    {
                       disabled: disabled(),
-                    }),
+                    },
                     local.classes?.description,
                   )}
                 >

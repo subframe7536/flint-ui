@@ -53,7 +53,7 @@ export const InputDemos = () => {
             }
             placeholder="website.com"
             classes={{
-              input: '!ps-0',
+              input: 'ps-0',
             }}
           />
         </div>

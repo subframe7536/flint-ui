@@ -3,38 +3,35 @@ import { cva } from 'cls-variant/cva'
 
 export const checkboxRootVariants = cva('relative flex items-start', {
   defaultVariants: {
-    variant: 'list',
     indicator: 'start',
-    size: 'md',
   },
   variants: {
     variant: {
-      list: '',
       card: 'rounded-lg border border-border',
     },
     indicator: {
       start: 'flex-row',
       end: 'flex-row-reverse',
-      hidden: '',
-    },
-    size: {
-      xs: '',
-      sm: '',
-      md: '',
-      lg: '',
-      xl: '',
     },
     disabled: {
       true: 'opacity-75',
     },
   },
-  compoundVariants: [
-    { variant: 'card', size: 'xs', class: 'p-2.5' },
-    { variant: 'card', size: 'sm', class: 'p-3' },
-    { variant: 'card', size: 'md', class: 'p-3.5' },
-    { variant: 'card', size: 'lg', class: 'p-4' },
-    { variant: 'card', size: 'xl', class: 'p-4.5' },
-  ],
+})
+
+export const checkboxCardPaddingVariants = cva('p-3.5', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'p-2.5',
+      sm: 'p-3',
+      md: 'p-3.5',
+      lg: 'p-4',
+      xl: 'p-4.5',
+    },
+  },
 })
 
 export const checkboxContainerVariants = cva('flex items-center', {
@@ -143,5 +140,14 @@ export const checkboxDescriptionVariants = cva('text-muted-foreground', {
   },
 })
 
-export type CheckboxVariantProps = VariantProps<typeof checkboxRootVariants> &
-  VariantProps<typeof checkboxIndicatorVariants>
+type CheckboxRootVariantProps = Omit<
+  VariantProps<typeof checkboxRootVariants>,
+  'variant' | 'indicator'
+>
+
+export type CheckboxVariantProps = CheckboxRootVariantProps &
+  VariantProps<typeof checkboxContainerVariants> &
+  VariantProps<typeof checkboxIndicatorVariants> & {
+    variant?: 'list' | 'card'
+    indicator?: 'start' | 'end' | 'hidden'
+  }

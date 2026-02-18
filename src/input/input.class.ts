@@ -36,16 +36,12 @@ export const inputRootVariants = cva(
       disabled: {
         true: 'cursor-not-allowed opacity-75',
       },
-      fieldGroup: {
-        horizontal: '',
-        vertical: '',
-      },
     },
     compoundVariants: [
-      { color: 'primary', highlight: 'true', class: 'ring-primary' },
-      { color: 'secondary', highlight: 'true', class: 'ring-secondary' },
-      { color: 'neutral', highlight: 'true', class: 'ring-foreground' },
-      { color: 'error', highlight: 'true', class: 'ring-destructive' },
+      { color: 'primary', highlight: true, class: 'ring-primary' },
+      { color: 'secondary', highlight: true, class: 'ring-secondary' },
+      { color: 'neutral', highlight: true, class: 'ring-foreground' },
+      { color: 'error', highlight: true, class: 'ring-destructive' },
     ],
   },
 )
@@ -61,21 +57,65 @@ export const inputBaseVariants = cva(
   },
 )
 
-export const inputSizePadding = {
-  xs: { start: 'ps-3', end: 'pe-3' },
-  sm: { start: 'ps-3.5', end: 'pe-3.5' },
-  md: { start: 'ps-3.5', end: 'pe-3.5' },
-  lg: { start: 'ps-4', end: 'pe-4' },
-  xl: { start: 'ps-5', end: 'pe-4' },
-} as const
+export const inputStartPaddingNoSlotVariants = cva('ps-3.5', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'ps-3',
+      sm: 'ps-3.5',
+      md: 'ps-3.5',
+      lg: 'ps-4',
+      xl: 'ps-5',
+    },
+  },
+})
 
-export const inputSizeSlotPadding = {
-  xs: { start: 'ps-1', end: 'pe-1' },
-  sm: { start: 'ps-1.5', end: 'pe-1.5' },
-  md: { start: 'ps-2', end: 'pe-2' },
-  lg: { start: 'ps-2', end: 'pe-2' },
-  xl: { start: 'ps-2', end: 'pe-2' },
-} as const
+export const inputStartPaddingWithSlotVariants = cva('ps-2', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'ps-1',
+      sm: 'ps-1.5',
+      md: 'ps-2',
+      lg: 'ps-2',
+      xl: 'ps-2',
+    },
+  },
+})
+
+export const inputEndPaddingNoSlotVariants = cva('pe-3.5', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'pe-3',
+      sm: 'pe-3.5',
+      md: 'pe-3.5',
+      lg: 'pe-4',
+      xl: 'pe-4',
+    },
+  },
+})
+
+export const inputEndPaddingWithSlotVariants = cva('pe-2', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'pe-1',
+      sm: 'pe-1.5',
+      md: 'pe-2',
+      lg: 'pe-2',
+      xl: 'pe-2',
+    },
+  },
+})
 
 export const inputLeadingVariants = cva('flex items-center shrink-0 text-muted-foreground', {
   defaultVariants: {
@@ -145,6 +185,10 @@ export const inputTrailingIconVariants = cva('shrink-0', {
 
 export type InputVariantProps = VariantProps<typeof inputRootVariants> &
   VariantProps<typeof inputBaseVariants> &
+  VariantProps<typeof inputStartPaddingNoSlotVariants> &
+  VariantProps<typeof inputStartPaddingWithSlotVariants> &
+  VariantProps<typeof inputEndPaddingNoSlotVariants> &
+  VariantProps<typeof inputEndPaddingWithSlotVariants> &
   VariantProps<typeof inputLeadingVariants> &
   VariantProps<typeof inputTrailingVariants> &
   VariantProps<typeof inputLeadingIconVariants> &

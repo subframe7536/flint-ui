@@ -5,7 +5,7 @@ import { Show, createMemo, mergeProps, splitProps } from 'solid-js'
 import { useFormField } from '../form-field/form-field-context'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
-import { cn, useId } from '../shared/utils'
+import { useId } from '../shared/utils'
 
 import type { SwitchVariantProps } from './switch.class'
 import {
@@ -130,10 +130,10 @@ export function Switch(props: SwitchProps): JSX.Element {
       readOnly={local.readOnly}
       onChange={onChange}
       data-slot="root"
-      class={cn(
-        switchRootVariants({
+      class={switchRootVariants(
+        {
           disabled: disabled(),
-        }),
+        },
         local.classes?.root,
       )}
       {...rest}
@@ -156,10 +156,10 @@ export function Switch(props: SwitchProps): JSX.Element {
           <>
             <div
               data-slot="container"
-              class={cn(
-                switchContainerVariants({
+              class={switchContainerVariants(
+                {
                   size: resolvedSize(),
-                }),
+                },
                 local.classes?.container,
               )}
             >
@@ -167,21 +167,21 @@ export function Switch(props: SwitchProps): JSX.Element {
 
               <KobalteSwitch.Control
                 data-slot="base"
-                class={cn(
-                  switchBaseVariants({
+                class={switchBaseVariants(
+                  {
                     color: resolvedColor(),
                     size: resolvedSize(),
                     disabled: disabled(),
-                  }),
+                  },
                   local.classes?.base,
                 )}
               >
                 <KobalteSwitch.Thumb
                   data-slot="thumb"
-                  class={cn(
-                    switchThumbVariants({
+                  class={switchThumbVariants(
+                    {
                       size: resolvedSize(),
-                    }),
+                    },
                     local.classes?.thumb,
                   )}
                 >
@@ -190,13 +190,13 @@ export function Switch(props: SwitchProps): JSX.Element {
                       <Icon
                         name={resolvedIconName()}
                         classes={{
-                          root: cn(
-                            switchIconVariants({
+                          root: switchIconVariants(
+                            {
                               color: resolvedColor(),
                               checked: !local.loading && checked(),
                               unchecked: !local.loading && !checked(),
                               loading: local.loading,
-                            }),
+                            },
                             local.classes?.icon,
                           ),
                         }}
@@ -210,10 +210,10 @@ export function Switch(props: SwitchProps): JSX.Element {
             <Show when={local.label || local.description}>
               <div
                 data-slot="wrapper"
-                class={cn(
-                  switchWrapperVariants({
+                class={switchWrapperVariants(
+                  {
                     size: resolvedSize(),
-                  }),
+                  },
                   local.classes?.wrapper,
                 )}
               >
@@ -221,11 +221,11 @@ export function Switch(props: SwitchProps): JSX.Element {
                   <label
                     for={inputId()}
                     data-slot="label"
-                    class={cn(
-                      switchLabelVariants({
+                    class={switchLabelVariants(
+                      {
                         required: local.required,
                         disabled: disabled(),
-                      }),
+                      },
                       local.classes?.label,
                     )}
                   >
@@ -236,10 +236,10 @@ export function Switch(props: SwitchProps): JSX.Element {
                 <Show when={local.description}>
                   <p
                     data-slot="description"
-                    class={cn(
-                      switchDescriptionVariants({
+                    class={switchDescriptionVariants(
+                      {
                         disabled: disabled(),
-                      }),
+                      },
                       local.classes?.description,
                     )}
                   >

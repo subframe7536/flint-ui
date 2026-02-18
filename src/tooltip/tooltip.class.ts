@@ -18,12 +18,4 @@ export const tooltipContentVariants = cva(
   },
 )
 
-export const tooltipTextVariants = cva('text-pretty leading-4')
-
-export const tooltipKbdsVariants = cva('ms-1 inline-flex items-center gap-1')
-
-export const tooltipKbdVariants = cva(
-  'inline-flex items-center rounded border bg-muted px-1 py-0.5 font-mono text-[10px] leading-none text-muted-foreground uppercase',
-)
-
 export type TooltipVariantProps = VariantProps<typeof tooltipContentVariants>

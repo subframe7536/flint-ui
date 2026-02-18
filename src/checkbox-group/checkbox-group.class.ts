@@ -39,52 +39,37 @@ export const checkboxGroupLegendVariants = cva('mb-1 block font-medium text-fore
   },
 })
 
-export const checkboxGroupItemVariants = cva('', {
+export const checkboxGroupTablePaddingVariants = cva('p-3.5', {
   defaultVariants: {
-    variant: 'list',
     size: 'md',
-    orientation: 'vertical',
   },
   variants: {
-    variant: {
-      list: '',
-      card: '',
-      table: 'border border-border',
-    },
     size: {
-      xs: '',
-      sm: '',
-      md: '',
-      lg: '',
-      xl: '',
-    },
-    orientation: {
-      horizontal: '',
-      vertical: '',
-    },
-    disabled: {
-      true: 'cursor-not-allowed',
+      xs: 'p-2.5',
+      sm: 'p-3',
+      md: 'p-3.5',
+      lg: 'p-4',
+      xl: 'p-4.5',
     },
   },
-  compoundVariants: [
-    { variant: 'table', size: 'xs', class: 'p-2.5' },
-    { variant: 'table', size: 'sm', class: 'p-3' },
-    { variant: 'table', size: 'md', class: 'p-3.5' },
-    { variant: 'table', size: 'lg', class: 'p-4' },
-    { variant: 'table', size: 'xl', class: 'p-4.5' },
-    {
-      variant: 'table',
-      orientation: 'horizontal',
-      class: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg -ms-px first:ms-0',
-    },
-    {
-      variant: 'table',
-      orientation: 'vertical',
-      class: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
-    },
-  ],
 })
 
+export const checkboxGroupTableOrientationVariants = cva(
+  'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
+  {
+    defaultVariants: {
+      orientation: 'vertical',
+    },
+    variants: {
+      orientation: {
+        horizontal: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg -ms-px first:ms-0',
+        vertical: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
+      },
+    },
+  },
+)
+
 export type CheckboxGroupVariantProps = VariantProps<typeof checkboxGroupFieldsetVariants> &
-  VariantProps<typeof checkboxGroupLegendVariants> &
-  VariantProps<typeof checkboxGroupItemVariants>
+  VariantProps<typeof checkboxGroupLegendVariants> & {
+    variant?: 'list' | 'card' | 'table'
+  }

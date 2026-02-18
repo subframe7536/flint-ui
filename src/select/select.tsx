@@ -24,23 +24,14 @@ import { cn, useId } from '../shared/utils'
 
 import type { SelectControlVariantProps } from './select.class'
 import {
-  selectTagRemoveClasses,
   selectTagVariants,
-  selectTagsContainerClasses,
   selectClearVariants,
-  selectContentClasses,
   selectControlVariants,
-  selectEmptyClasses,
   selectInputVariants,
-  selectItemDescriptionClasses,
-  selectItemIndicatorClasses,
-  selectItemLabelClasses,
+  selectInputSingleSizeVariants,
+  selectInputMultiSearchSizeVariants,
   selectItemVariants,
   selectLeadingIconVariants,
-  selectListboxClasses,
-  selectRootClasses,
-  selectSectionClasses,
-  selectSectionLabelClasses,
   selectTriggerIconVariants,
 } from './select.class'
 
@@ -634,9 +625,10 @@ export function Select(props: SelectProps): JSX.Element {
         const trailingInput = inputValue.split(sepRegex).at(-1) ?? ''
         const isTrailingTokenCompleted = sepRegex.test(inputValue.at(-1) ?? '')
         const remainder = isTrailingTokenCompleted ? '' : trailingInput
-        const tokens = (isTrailingTokenCompleted
-          ? inputValue.split(sepRegex)
-          : inputValue.split(sepRegex).slice(0, -1)
+        const tokens = (
+          isTrailingTokenCompleted
+            ? inputValue.split(sepRegex)
+            : inputValue.split(sepRegex).slice(0, -1)
         ).filter((t) => t.trim())
 
         const current = allFlatOptions().filter((option) => selectedValueSet().has(option.value))
@@ -819,7 +811,7 @@ export function Select(props: SelectProps): JSX.Element {
     return (
       <Combobox.ItemLabel
         data-slot="item-label"
-        class={cn(selectItemLabelClasses, local.classes?.itemLabel)}
+        class={cn('col-start-1 truncate', local.classes?.itemLabel)}
       >
         <Show when={local.labelRender} fallback={fallbackLabel}>
           {local.labelRender!(option)}
@@ -832,7 +824,7 @@ export function Select(props: SelectProps): JSX.Element {
     return (
       <Combobox.ItemDescription
         data-slot="item-description"
-        class={cn(selectItemDescriptionClasses, local.classes?.itemDescription)}
+        class={cn('col-start-1 text-xs text-muted-foreground', local.classes?.itemDescription)}
       >
         {option.description}
       </Combobox.ItemDescription>
@@ -843,7 +835,10 @@ export function Select(props: SelectProps): JSX.Element {
     return (
       <Combobox.ItemIndicator
         data-slot="item-indicator"
-        class={cn(selectItemIndicatorClasses, local.classes?.itemIndicator)}
+        class={cn(
+          'col-start-2 inline-flex items-center justify-center text-sm',
+          local.classes?.itemIndicator,
+        )}
       >
         <Icon name={indicatorIcon} />
       </Combobox.ItemIndicator>
@@ -920,10 +915,16 @@ export function Select(props: SelectProps): JSX.Element {
   const SelectSectionComponent: Component<ComboboxRootSectionComponentProps<NormalizedGroup>> = (
     sectionProps,
   ) => (
-    <Combobox.Section data-slot="section" class={cn(selectSectionClasses, local.classes?.section)}>
+    <Combobox.Section
+      data-slot="section"
+      class={cn('[&:not(:first-child)]:mt-1.5', local.classes?.section)}
+    >
       <span
         data-slot="section-label"
-        class={cn(selectSectionLabelClasses, local.classes?.sectionLabel)}
+        class={cn(
+          'block px-2 py-1.5 font-medium text-muted-foreground text-xs',
+          local.classes?.sectionLabel,
+        )}
       >
         {sectionProps.section.rawValue.label}
       </span>
@@ -963,10 +964,13 @@ export function Select(props: SelectProps): JSX.Element {
         data-slot="input"
         class={selectInputVariants(
           {
-            size: resolvedSize(),
             mode: isMultiple() ? (isSearchable() ? 'multiSearch' : 'multiHidden') : 'single',
             readOnly: !isSearchable() && !isMultiple(),
           },
+          !isMultiple() && selectInputSingleSizeVariants({ size: resolvedSize() }),
+          isMultiple() &&
+            isSearchable() &&
+            selectInputMultiSearchSizeVariants({ size: resolvedSize() }),
           local.classes?.input,
         )}
         readOnly={!isSearchable()}
@@ -1055,7 +1059,10 @@ export function Select(props: SelectProps): JSX.Element {
         <Show when={isMultiple()} fallback={renderInput()}>
           <div
             data-slot="tags-container"
-            class={cn(selectTagsContainerClasses, local.classes?.tagsContainer)}
+            class={cn(
+              'flex flex-1 cursor-pointer select-none flex-wrap items-center gap-1 p-1.5',
+              local.classes?.tagsContainer,
+            )}
             onPointerDown={(e) => {
               e.preventDefault()
               inputRef?.focus()
@@ -1082,7 +1089,10 @@ export function Select(props: SelectProps): JSX.Element {
                       <button
                         type="button"
                         data-slot="tag-remove"
-                        class={cn(selectTagRemoveClasses, local.classes?.tagRemove)}
+                        class={cn(
+                          'h-full shrink-0 cursor-pointer ps-1 opacity-80 transition-opacity hover:opacity-100',
+                          local.classes?.tagRemove,
+                        )}
                         tabIndex={-1}
                         onClick={(e) => {
                           e.stopPropagation()
@@ -1157,7 +1167,10 @@ export function Select(props: SelectProps): JSX.Element {
       <Combobox.Portal>
         <Combobox.Content
           data-slot="content"
-          class={cn(selectContentClasses, local.classes?.content)}
+          class={cn(
+            'z-50 rounded-lg border bg-popover text-popover-foreground shadow-lg overflow-hidden max-h-(--kb-popper-available-height) min-w-32 origin-(--kb-combobox-content-transform-origin) overflow-y-auto overflow-x-hidden data-[expanded]:(animate-in fade-in-0 zoom-in-95) data-[closed]:(animate-out fade-out-0 zoom-out-95) data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 mt-(--kb-popper-content-overflow-padding)',
+            local.classes?.content,
+          )}
           onInteractOutside={() => {
             closedByInteractOutside = true
             // Prevent hasMatches flash: Kobalte will resetInputValue on close,
@@ -1184,7 +1197,13 @@ export function Select(props: SelectProps): JSX.Element {
               <Show
                 when={typeof local.emptyRender === 'function'}
                 fallback={
-                  <div data-slot="empty" class={cn(selectEmptyClasses, local.classes?.empty)}>
+                  <div
+                    data-slot="empty"
+                    class={cn(
+                      'p-2 text-center text-muted-foreground text-sm',
+                      local.classes?.empty,
+                    )}
+                  >
                     {typeof local.emptyRender === 'string' ? local.emptyRender : 'No options'}
                   </div>
                 }
@@ -1213,14 +1232,20 @@ export function Select(props: SelectProps): JSX.Element {
                 <Combobox.Listbox
                   // ref={bindListboxScroll}
                   data-slot="listbox"
-                  class={cn(selectListboxClasses, local.classes?.listbox)}
+                  class={cn(
+                    'max-h-(--kb-popper-content-available-height) overflow-y-auto p-1 outline-none',
+                    local.classes?.listbox,
+                  )}
                   onScrollEnd={handleListboxScroll}
                 />
               }
             >
               <Combobox.Listbox
                 data-slot="listbox"
-                class={cn(selectListboxClasses, local.classes?.listbox)}
+                class={cn(
+                  'max-h-(--kb-popper-content-available-height) overflow-y-auto p-1 outline-none',
+                  local.classes?.listbox,
+                )}
                 onScrollEnd={handleListboxScroll}
               >
                 {(collection) => (
@@ -1275,7 +1300,7 @@ export function Select(props: SelectProps): JSX.Element {
       closeOnSelection={!isMultiple()}
       removeOnBackspace={isMultiple()}
       data-slot="root"
-      class={cn(selectRootClasses, local.classes?.root)}
+      class={cn('relative inline-flex w-full h-fit', local.classes?.root)}
       {...field.ariaAttrs()}
       {...rest}
       overflowPadding={-6}

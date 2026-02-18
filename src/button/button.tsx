@@ -124,12 +124,6 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
     Boolean(local.loading || (local.loadingAuto && loadingAutoState())),
   )
 
-  const iconSizeClass = createMemo(() => {
-    return buttonIconSizeVariants({
-      size: local.size,
-    })
-  })
-
   const resolvedLeading = createMemo(() => {
     if (isLoading()) {
       return local.loadingIcon ?? local.leading
@@ -191,9 +185,11 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
       <Show when={hasLeading()}>
         <span
           data-slot="leading"
-          class={cn(
+          class={buttonIconSizeVariants(
+            {
+              size: local.size,
+            },
             'flex items-center',
-            iconSizeClass(),
             local.classes?.leading,
             isLoading() && local.classes?.loading,
           )}
@@ -213,7 +209,13 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
         {(trailingResolved) => (
           <span
             data-slot="trailing"
-            class={cn('flex items-center', iconSizeClass(), local.classes?.trailing)}
+            class={buttonIconSizeVariants(
+              {
+                size: local.size,
+              },
+              'flex items-center',
+              local.classes?.trailing,
+            )}
           >
             {trailingResolved()}
           </span>

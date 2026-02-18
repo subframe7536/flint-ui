@@ -18,7 +18,7 @@
     "!**/*.test.*"
   ],
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
@@ -29,7 +29,8 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "play": "vite",
+    "play": "vite serve playground",
+    "play:build": "vite build playground",
     "test": "vitest",
     "lint": "oxlint",
     "format": "oxfmt",
@@ -45,7 +46,7 @@
     "@kobalte/core": "^0.13.11",
     "@solid-primitives/props": "^3.2.2",
     "@solid-primitives/refs": "^1.1.2",
-    "cls-variant": "^1.0.2"
+    "cls-variant": "^1.1.0"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.90",
@@ -70,7 +71,10 @@
     "vitest": "^4.0.18"
   },
   "peerDependencies": {
-    "solid-js": "^1.9.11"
+    "@unocss/preset-wind4": "^66.6.0",
+    "solid-js": "^1.9.11",
+    "typescript": "^5.9.3",
+    "unocss": "^66.6.0"
   },
   "overrides": {
     "@unocss/inspector": "npm:has-flag",

@@ -6,10 +6,14 @@ import { useFieldGroupContext } from '../form-field/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
 import type { ModelModifiers } from '../shared/input-modifiers'
 import { applyInputModifiers } from '../shared/input-modifiers'
-import { callHandler, cn, useId } from '../shared/utils'
+import { callHandler, useId } from '../shared/utils'
 
 import type { TextareaVariantProps } from './textarea.class'
-import { textareaBaseVariants, textareaRootVariants, textareaSizePadding } from './textarea.class'
+import {
+  textareaBaseVariants,
+  textareaPaddingVariants,
+  textareaRootVariants,
+} from './textarea.class'
 
 type TextareaStyleVariantProps = Pick<
   TextareaVariantProps,
@@ -40,6 +44,13 @@ export interface TextareaBaseProps extends TextareaStyleVariantProps {
   maxrows?: number
   modelModifiers?: ModelModifiers<TextareaValue>
   onValueChange?: (value: TextareaValue) => void
+  icon?: string
+  leading?: boolean | JSX.Element
+  leadingIcon?: string
+  trailing?: boolean | JSX.Element
+  trailingIcon?: string
+  loading?: boolean
+  loadingIcon?: string
   classes?: TextareaClasses
   children?: JSX.Element
 }
@@ -109,6 +120,13 @@ export function Textarea(props: TextareaProps): JSX.Element {
     'highlight',
     'modelModifiers',
     'onValueChange',
+    'icon',
+    'leading',
+    'leadingIcon',
+    'trailing',
+    'trailingIcon',
+    'loading',
+    'loadingIcon',
     'onInput',
     'onChange',
     'onBlur',
@@ -142,7 +160,6 @@ export function Textarea(props: TextareaProps): JSX.Element {
   const resolvedVariant = createMemo(() => normalizeTextareaVariant(local.variant))
   const resolvedHighlight = createMemo(() => field.highlight() ?? local.highlight)
   const disabled = createMemo(() => field.disabled())
-  const fieldGroupOrientation = createMemo(() => fieldGroup?.orientation)
   const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
   const isLazy = createMemo(() => Boolean(local.modelModifiers?.lazy))
 
@@ -244,15 +261,14 @@ export function Textarea(props: TextareaProps): JSX.Element {
     <Dynamic
       component={local.as}
       data-slot="root"
-      class={cn(
-        textareaRootVariants({
+      class={textareaRootVariants(
+        {
           color: resolvedColor(),
           size: resolvedSize(),
           variant: resolvedVariant(),
           highlight: resolvedHighlight(),
           disabled: disabled(),
-          fieldGroup: fieldGroupOrientation(),
-        }),
+        },
         local.classes?.root,
       )}
       onclick={() => textareaEl?.focus()}
@@ -267,13 +283,14 @@ export function Textarea(props: TextareaProps): JSX.Element {
         required={local.required}
         disabled={disabled()}
         data-slot="base"
-        class={cn(
-          textareaBaseVariants({
+        class={textareaBaseVariants(
+          {
             size: resolvedSize(),
             autoresize: local.autoresize,
+          },
+          textareaPaddingVariants({
+            size: resolvedSize(),
           }),
-          textareaSizePadding[resolvedSize()].start,
-          textareaSizePadding[resolvedSize()].end,
           local.classes?.base,
         )}
         onInput={onInput}

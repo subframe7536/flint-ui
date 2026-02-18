@@ -15,5 +15,21 @@ These rules apply to all future component ports:
 10. Use `icon-*` aliases (for example `icon-loading`, `icon-check`) for all component default icons.
 11. Do not hardcode provider-specific classes like `i-lucide-*` as component defaults.
 12. Keep raw `i-*` classes only in theme preset icon mapping and in tests/examples that explicitly verify direct icon-class support.
+13. Internal styling classes must only live in JSX `class` props or in `cva()`. Do not wrap class computation with `createMemo`, and do not keep internal `*Classes` string exports in `*.class.ts`.
+14. `cva()` already supports class appending via rest params, so do not wrap variant calls with `cn()`.
+    - Forbidden: `cn(fooVariants({ size: 'md' }), local.classes?.root)`
+    - Preferred: `fooVariants({ size: 'md' }, local.classes?.root)`
+    - Forbidden (conditional): `cn(cond && fooVariants({ size: 'md' }), extra)`
+    - Preferred (conditional): `cond ? fooVariants({ size: 'md' }, extra) : extra`
+15. `classes` props are end-user override APIs and should keep the same semantics. This rule only targets internal component implementation style composition.
+16. Do not use empty-string placeholders in `cva` variant options.
+    - Forbidden: `variants: { size: { sm: '', md: '' } }`
+    - Preferred: move the condition to JSX class composition, or split into non-empty helper `cva`.
+17. Do not use `cva('', {...})`.
+    - For slots with no real variants, inline classes directly in JSX `class`.
+    - If a helper `cva` is still needed, its base class must be non-empty.
+18. Do not call variant generators with an explicit `undefined` first argument.
+    - Forbidden: `fooVariants(undefined, local.classes?.root)`
+    - Preferred: for no-variant slots use JSX `class`; for real variants pass an object.
 
 **Every component should pass `bun run qa` and `bun run test`**

@@ -1,8 +1,6 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const inputNumberRootVariants = cva('relative inline-flex w-full items-center')
-
 export const inputNumberBaseVariants = cva(
   'w-full rounded-md border border-input bg-background text-foreground outline-none transition-shadow placeholder:text-muted-foreground disabled:(cursor-not-allowed opacity-75)',
   {
@@ -11,8 +9,6 @@ export const inputNumberBaseVariants = cva(
       size: 'md',
       variant: 'outline',
       orientation: 'horizontal',
-      increment: true,
-      decrement: true,
     },
     variants: {
       color: {
@@ -42,34 +38,45 @@ export const inputNumberBaseVariants = cva(
       highlight: {
         true: 'ring-1 ring-inset ring-border',
       },
-      increment: {
-        true: '',
-        false: '',
-      },
-      decrement: {
-        true: '',
-        false: '',
-      },
     },
     compoundVariants: [
-      { color: 'primary', highlight: 'true', class: 'ring-primary' },
-      { color: 'secondary', highlight: 'true', class: 'ring-secondary' },
-      { color: 'neutral', highlight: 'true', class: 'ring-foreground' },
-      { color: 'error', highlight: 'true', class: 'ring-destructive' },
-      { orientation: 'horizontal', decrement: 'false', class: 'text-start' },
-      { increment: 'true', size: 'xs', class: 'pe-7' },
-      { increment: 'true', size: 'sm', class: 'pe-8' },
-      { increment: 'true', size: 'md', class: 'pe-9' },
-      { increment: 'true', size: 'lg', class: 'pe-10' },
-      { increment: 'true', size: 'xl', class: 'pe-11' },
-      { decrement: 'true', size: 'xs', class: 'ps-7' },
-      { decrement: 'true', size: 'sm', class: 'ps-8' },
-      { decrement: 'true', size: 'md', class: 'ps-9' },
-      { decrement: 'true', size: 'lg', class: 'ps-10' },
-      { decrement: 'true', size: 'xl', class: 'ps-11' },
+      { color: 'primary', highlight: true, class: 'ring-primary' },
+      { color: 'secondary', highlight: true, class: 'ring-secondary' },
+      { color: 'neutral', highlight: true, class: 'ring-foreground' },
+      { color: 'error', highlight: true, class: 'ring-destructive' },
     ],
   },
 )
+
+export const inputNumberIncrementPaddingVariants = cva('pe-9', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'pe-7',
+      sm: 'pe-8',
+      md: 'pe-9',
+      lg: 'pe-10',
+      xl: 'pe-11',
+    },
+  },
+})
+
+export const inputNumberDecrementPaddingVariants = cva('ps-9', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'ps-7',
+      sm: 'ps-8',
+      md: 'ps-9',
+      lg: 'ps-10',
+      xl: 'ps-11',
+    },
+  },
+})
 
 export const inputNumberIncrementVariants = cva('absolute flex items-center', {
   defaultVariants: {

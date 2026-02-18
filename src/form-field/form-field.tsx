@@ -19,14 +19,8 @@ import { FormFieldProvider, InputIdProvider } from './form-field-context'
 import type { FormFieldVariantProps } from './form-field.class'
 import {
   formFieldContainerVariants,
-  formFieldDescriptionVariants,
-  formFieldErrorVariants,
-  formFieldHelpVariants,
-  formFieldHintVariants,
   formFieldLabelVariants,
-  formFieldLabelWrapperVariants,
-  formFieldRootVariants,
-  formFieldWrapperVariants,
+  formFieldSizeVariants,
 } from './form-field.class'
 
 export interface FormFieldClasses {
@@ -231,36 +225,31 @@ export function FormField(props: FormFieldProps): JSX.Element {
           component={local.as}
           data-slot="root"
           data-orientation={local.orientation}
-          class={cn(
-            formFieldRootVariants({
+          class={formFieldSizeVariants(
+            {
               size: local.size,
-              orientation: local.orientation,
-            }),
+            },
+            local.orientation === 'horizontal' && 'flex items-baseline justify-between gap-2',
             local.classes?.root,
           )}
           {...rest}
         >
           <div
             data-slot="wrapper"
-            class={cn(
-              formFieldWrapperVariants({
-                orientation: local.orientation,
-              }),
-              local.classes?.wrapper,
-            )}
+            class={cn(local.orientation === 'horizontal' && 'flex-1', local.classes?.wrapper)}
           >
             <Show when={local.label}>
               <div
                 data-slot="labelWrapper"
-                class={cn(formFieldLabelWrapperVariants(), local.classes?.labelWrapper)}
+                class={cn('flex items-center justify-between gap-1', local.classes?.labelWrapper)}
               >
                 <label
                   for={inputId()}
                   data-slot="label"
-                  class={cn(
-                    formFieldLabelVariants({
+                  class={formFieldLabelVariants(
+                    {
                       required: local.required,
-                    }),
+                    },
                     local.classes?.label,
                   )}
                 >
@@ -271,7 +260,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
                   <span
                     id={`${ariaId()}-hint`}
                     data-slot="hint"
-                    class={cn(formFieldHintVariants(), local.classes?.hint)}
+                    class={cn('text-muted-foreground', local.classes?.hint)}
                   >
                     {local.hint}
                   </span>
@@ -283,7 +272,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
               <p
                 id={`${ariaId()}-description`}
                 data-slot="description"
-                class={cn(formFieldDescriptionVariants(), local.classes?.description)}
+                class={cn('text-muted-foreground', local.classes?.description)}
               >
                 {local.description}
               </p>
@@ -291,13 +280,16 @@ export function FormField(props: FormFieldProps): JSX.Element {
           </div>
 
           <div
-            class={cn(
-              (local.label || local.description) &&
-                formFieldContainerVariants({
-                  orientation: local.orientation,
-                }),
-              local.classes?.container,
-            )}
+            class={
+              local.label || local.description
+                ? formFieldContainerVariants(
+                    {
+                      orientation: local.orientation,
+                    },
+                    local.classes?.container,
+                  )
+                : local.classes?.container
+            }
           >
             <NormalizedChildren />
 
@@ -308,7 +300,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
                   <div
                     id={`${ariaId()}-help`}
                     data-slot="help"
-                    class={cn(formFieldHelpVariants(), local.classes?.help)}
+                    class={cn('mt-2 text-muted-foreground', local.classes?.help)}
                   >
                     {local.help}
                   </div>
@@ -318,7 +310,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
               <div
                 id={`${ariaId()}-error`}
                 data-slot="error"
-                class={cn(formFieldErrorVariants(), local.classes?.error)}
+                class={cn('mt-2 text-destructive', local.classes?.error)}
               >
                 {resolvedError() as JSX.Element}
               </div>

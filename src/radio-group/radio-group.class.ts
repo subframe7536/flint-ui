@@ -1,8 +1,6 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const radioGroupRootVariants = cva('relative')
-
 export const radioGroupFieldsetVariants = cva('flex gap-x-2', {
   defaultVariants: {
     orientation: 'vertical',
@@ -44,10 +42,7 @@ export const radioGroupLegendVariants = cva('mb-1 block font-medium text-foregro
 export const radioGroupItemVariants = cva('flex items-start', {
   defaultVariants: {
     size: 'md',
-    variant: 'list',
     indicator: 'start',
-    orientation: 'vertical',
-    color: 'primary',
   },
   variants: {
     size: {
@@ -58,71 +53,95 @@ export const radioGroupItemVariants = cva('flex items-start', {
       xl: 'text-base',
     },
     variant: {
-      list: '',
       card: 'rounded-lg border',
       table: 'border',
     },
     indicator: {
       start: 'flex-row',
       end: 'flex-row-reverse',
-      hidden: '',
-    },
-    orientation: {
-      horizontal: '',
-      vertical: '',
-    },
-    color: {
-      primary: '',
-      secondary: '',
-      neutral: '',
-      error: '',
     },
     disabled: {
       true: 'opacity-75 cursor-not-allowed',
     },
   },
-  compoundVariants: [
-    { variant: ['card', 'table'], size: 'xs', class: 'p-2.5' },
-    { variant: ['card', 'table'], size: 'sm', class: 'p-3' },
-    { variant: ['card', 'table'], size: 'md', class: 'p-3.5' },
-    { variant: ['card', 'table'], size: 'lg', class: 'p-4' },
-    { variant: ['card', 'table'], size: 'xl', class: 'p-4.5' },
-    {
-      orientation: 'horizontal',
-      variant: 'table',
-      class: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg -ms-px first:ms-0',
-    },
-    {
-      orientation: 'vertical',
-      variant: 'table',
-      class: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
-    },
-    { color: 'primary', variant: 'card', class: 'data-[checked]:(border-primary)' },
-    { color: 'secondary', variant: 'card', class: 'data-[checked]:(border-secondary)' },
-    { color: 'error', variant: 'card', class: 'data-[checked]:(border-destructive)' },
-    { color: 'neutral', variant: 'card', class: 'data-[checked]:(border-foreground)' },
-    {
-      color: 'primary',
-      variant: 'table',
-      class: 'data-[checked]:(bg-primary/10 border-primary/50 z-1)',
-    },
-    {
-      color: 'secondary',
-      variant: 'table',
-      class: 'data-[checked]:(bg-secondary/10 border-secondary/50 z-1)',
-    },
-    {
-      color: 'error',
-      variant: 'table',
-      class: 'data-[checked]:(bg-destructive/10 border-destructive/50 z-1)',
-    },
-    {
-      color: 'neutral',
-      variant: 'table',
-      class: 'data-[checked]:(bg-muted border-foreground/50 z-1)',
-    },
-  ],
+  compoundVariants: [],
 })
+
+export const radioGroupCardPaddingVariants = cva('p-3.5', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'p-2.5',
+      sm: 'p-3',
+      md: 'p-3.5',
+      lg: 'p-4',
+      xl: 'p-4.5',
+    },
+  },
+})
+
+export const radioGroupTablePaddingVariants = cva('p-3.5', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'p-2.5',
+      sm: 'p-3',
+      md: 'p-3.5',
+      lg: 'p-4',
+      xl: 'p-4.5',
+    },
+  },
+})
+
+export const radioGroupTableOrientationVariants = cva(
+  'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
+  {
+    defaultVariants: {
+      orientation: 'vertical',
+    },
+    variants: {
+      orientation: {
+        horizontal: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg -ms-px first:ms-0',
+        vertical: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
+      },
+    },
+  },
+)
+
+export const radioGroupCardCheckedColorVariants = cva('data-[checked]:(border-primary)', {
+  defaultVariants: {
+    color: 'primary',
+  },
+  variants: {
+    color: {
+      primary: 'data-[checked]:(border-primary)',
+      secondary: 'data-[checked]:(border-secondary)',
+      neutral: 'data-[checked]:(border-foreground)',
+      error: 'data-[checked]:(border-destructive)',
+    },
+  },
+})
+
+export const radioGroupTableCheckedColorVariants = cva(
+  'data-[checked]:(bg-primary/10 border-primary/50 z-1)',
+  {
+    defaultVariants: {
+      color: 'primary',
+    },
+    variants: {
+      color: {
+        primary: 'data-[checked]:(bg-primary/10 border-primary/50 z-1)',
+        secondary: 'data-[checked]:(bg-secondary/10 border-secondary/50 z-1)',
+        neutral: 'data-[checked]:(bg-muted border-foreground/50 z-1)',
+        error: 'data-[checked]:(bg-destructive/10 border-destructive/50 z-1)',
+      },
+    },
+  },
+)
 
 export const radioGroupContainerVariants = cva('flex items-center', {
   defaultVariants: {
@@ -221,7 +240,17 @@ export const radioGroupDescriptionVariants = cva('text-muted-foreground', {
   },
 })
 
+type RadioGroupItemVariant = 'list' | 'card' | 'table'
+type RadioGroupItemIndicator = 'start' | 'end' | 'hidden'
+type RadioGroupItemVariantProps = Omit<
+  VariantProps<typeof radioGroupItemVariants>,
+  'variant' | 'indicator'
+>
+
 export type RadioGroupVariantProps = VariantProps<typeof radioGroupFieldsetVariants> &
   VariantProps<typeof radioGroupLegendVariants> &
-  VariantProps<typeof radioGroupItemVariants> &
-  VariantProps<typeof radioGroupIndicatorVariants>
+  RadioGroupItemVariantProps &
+  VariantProps<typeof radioGroupIndicatorVariants> & {
+    variant?: RadioGroupItemVariant
+    indicator?: RadioGroupItemIndicator
+  }

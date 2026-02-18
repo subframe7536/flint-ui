@@ -8,16 +8,18 @@ import type { IconName } from '../icon'
 import { Icon } from '../icon'
 import type { ModelModifiers } from '../shared/input-modifiers'
 import { applyInputModifiers } from '../shared/input-modifiers'
-import { callHandler, cn, useId } from '../shared/utils'
+import { callHandler, useId } from '../shared/utils'
 
 import type { InputVariantProps } from './input.class'
 import {
   inputBaseVariants,
+  inputEndPaddingNoSlotVariants,
+  inputEndPaddingWithSlotVariants,
   inputLeadingIconVariants,
   inputLeadingVariants,
   inputRootVariants,
-  inputSizePadding,
-  inputSizeSlotPadding,
+  inputStartPaddingNoSlotVariants,
+  inputStartPaddingWithSlotVariants,
   inputTrailingIconVariants,
   inputTrailingVariants,
 } from './input.class'
@@ -165,7 +167,6 @@ export function Input(props: InputProps): JSX.Element {
   const resolvedVariant = createMemo(() => normalizeInputVariant(local.variant))
   const resolvedHighlight = createMemo(() => field.highlight() ?? local.highlight)
   const disabled = createMemo(() => field.disabled())
-  const fieldGroupOrientation = createMemo(() => fieldGroup?.orientation)
   const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
   const isLazy = createMemo(() => Boolean(local.modelModifiers?.lazy))
 
@@ -276,7 +277,6 @@ export function Input(props: InputProps): JSX.Element {
           variant: resolvedVariant(),
           highlight: resolvedHighlight(),
           disabled: disabled(),
-          fieldGroup: fieldGroupOrientation(),
         },
         local.classes?.root,
       )}
@@ -285,10 +285,10 @@ export function Input(props: InputProps): JSX.Element {
       <Show when={hasLeading()}>
         <span
           data-slot="leading"
-          class={cn(
-            inputLeadingVariants({
+          class={inputLeadingVariants(
+            {
               size: resolvedSize(),
-            }),
+            },
             local.classes?.leading,
           )}
         >
@@ -301,11 +301,11 @@ export function Input(props: InputProps): JSX.Element {
                     name={iconName()}
                     data-slot="leadingIcon"
                     classes={{
-                      root: cn(
-                        inputLeadingIconVariants({
+                      root: inputLeadingIconVariants(
+                        {
                           size: resolvedSize(),
                           loading: local.loading,
-                        }),
+                        },
                         local.classes?.leadingIcon,
                       ),
                     }}
@@ -326,16 +326,24 @@ export function Input(props: InputProps): JSX.Element {
         name={field.name()}
         disabled={disabled()}
         data-slot="base"
-        class={cn(
-          inputBaseVariants({
+        class={inputBaseVariants(
+          {
             type: local.type === 'file' ? 'file' : undefined,
-          }),
+          },
           hasLeading()
-            ? inputSizeSlotPadding[resolvedSize()].start
-            : inputSizePadding[resolvedSize()].start,
+            ? inputStartPaddingWithSlotVariants({
+                size: resolvedSize(),
+              })
+            : inputStartPaddingNoSlotVariants({
+                size: resolvedSize(),
+              }),
           hasTrailing()
-            ? inputSizeSlotPadding[resolvedSize()].end
-            : inputSizePadding[resolvedSize()].end,
+            ? inputEndPaddingWithSlotVariants({
+                size: resolvedSize(),
+              })
+            : inputEndPaddingNoSlotVariants({
+                size: resolvedSize(),
+              }),
           local.classes?.input,
         )}
         onInput={onInput}
@@ -351,10 +359,10 @@ export function Input(props: InputProps): JSX.Element {
       <Show when={hasTrailing()}>
         <span
           data-slot="trailing"
-          class={cn(
-            inputTrailingVariants({
+          class={inputTrailingVariants(
+            {
               size: resolvedSize(),
-            }),
+            },
             local.classes?.trailing,
           )}
         >
@@ -367,11 +375,11 @@ export function Input(props: InputProps): JSX.Element {
                     name={iconName()}
                     data-slot="trailingIcon"
                     classes={{
-                      root: cn(
-                        inputTrailingIconVariants({
+                      root: inputTrailingIconVariants(
+                        {
                           size: resolvedSize(),
                           loading: local.loading,
-                        }),
+                        },
                         local.classes?.trailingIcon,
                       ),
                     }}

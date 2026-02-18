@@ -36,16 +36,12 @@ export const textareaRootVariants = cva(
       disabled: {
         true: 'cursor-not-allowed opacity-75',
       },
-      fieldGroup: {
-        horizontal: '',
-        vertical: '',
-      },
     },
     compoundVariants: [
-      { color: 'primary', highlight: 'true', class: 'ring-primary' },
-      { color: 'secondary', highlight: 'true', class: 'ring-secondary' },
-      { color: 'neutral', highlight: 'true', class: 'ring-foreground' },
-      { color: 'error', highlight: 'true', class: 'ring-destructive' },
+      { color: 'primary', highlight: true, class: 'ring-primary' },
+      { color: 'secondary', highlight: true, class: 'ring-secondary' },
+      { color: 'neutral', highlight: true, class: 'ring-foreground' },
+      { color: 'error', highlight: true, class: 'ring-destructive' },
     ],
   },
 )
@@ -73,13 +69,21 @@ export const textareaBaseVariants = cva(
   },
 )
 
-export const textareaSizePadding = {
-  xs: { start: 'ps-2', end: 'pe-2' },
-  sm: { start: 'ps-2.5', end: 'pe-2.5' },
-  md: { start: 'ps-2.5', end: 'pe-2.5' },
-  lg: { start: 'ps-3', end: 'pe-3' },
-  xl: { start: 'ps-3', end: 'pe-3' },
-} as const
+export const textareaPaddingVariants = cva('ps-2.5 pe-2.5', {
+  defaultVariants: {
+    size: 'md',
+  },
+  variants: {
+    size: {
+      xs: 'ps-2 pe-2',
+      sm: 'ps-2.5 pe-2.5',
+      md: 'ps-2.5 pe-2.5',
+      lg: 'ps-3 pe-3',
+      xl: 'ps-3 pe-3',
+    },
+  },
+})
 
 export type TextareaVariantProps = VariantProps<typeof textareaRootVariants> &
-  VariantProps<typeof textareaBaseVariants>
+  VariantProps<typeof textareaBaseVariants> &
+  VariantProps<typeof textareaPaddingVariants>

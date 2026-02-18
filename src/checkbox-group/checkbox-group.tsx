@@ -9,8 +9,9 @@ import { cn, useId } from '../shared/utils'
 import type { CheckboxGroupVariantProps } from './checkbox-group.class'
 import {
   checkboxGroupFieldsetVariants,
-  checkboxGroupItemVariants,
   checkboxGroupLegendVariants,
+  checkboxGroupTableOrientationVariants,
+  checkboxGroupTablePaddingVariants,
 } from './checkbox-group.class'
 
 export type CheckboxGroupValue = string
@@ -265,11 +266,11 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
         id={groupId()}
         data-slot="fieldset"
         aria-labelledby={local.legend ? legendId() : undefined}
-        class={cn(
-          checkboxGroupFieldsetVariants({
+        class={checkboxGroupFieldsetVariants(
+          {
             orientation: local.orientation,
             size: resolvedSize(),
-          }),
+          },
           local.classes?.fieldset,
         )}
         {...(ariaAttrs() as Record<string, string | boolean | undefined>)}
@@ -278,11 +279,11 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
           <legend
             id={legendId()}
             data-slot="legend"
-            class={cn(
-              checkboxGroupLegendVariants({
+            class={checkboxGroupLegendVariants(
+              {
                 size: resolvedSize(),
                 required: local.required,
-              }),
+              },
               local.classes?.legend,
             )}
           >
@@ -294,16 +295,26 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
           {(item) => (
             <div
               data-slot="item"
-              class={cn(
-                checkboxGroupItemVariants({
-                  variant: local.variant,
-                  orientation: local.orientation,
-                  size: resolvedSize(),
-                  disabled: item.disabled || disabled(),
-                }),
-                local.classes?.item,
-                item.classes?.root,
-              )}
+              class={
+                local.variant === 'table'
+                  ? checkboxGroupTablePaddingVariants(
+                      {
+                        size: resolvedSize(),
+                      },
+                      'border border-border',
+                      checkboxGroupTableOrientationVariants({
+                        orientation: local.orientation,
+                      }),
+                      item.disabled || disabled() ? 'cursor-not-allowed' : undefined,
+                      local.classes?.item,
+                      item.classes?.root,
+                    )
+                  : cn(
+                      item.disabled || disabled() ? 'cursor-not-allowed' : undefined,
+                      local.classes?.item,
+                      item.classes?.root,
+                    )
+              }
             >
               <Checkbox
                 id={item.id}

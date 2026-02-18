@@ -1,10 +1,10 @@
 import type { PresetWind4Theme } from 'unocss'
-import { presetWind4, transformerVariantGroup, presetIcons, defineConfig } from 'unocss'
+import { defineConfig, presetIcons, presetWind4, transformerVariantGroup } from 'unocss'
 import { presetAnimations } from 'unocss-preset-animations'
 import { presetFunctionCompletion, presetObjectCompletion } from 'unocss-preset-completion'
 
-import { presetTheme } from './src/unocss-preset-theme'
-import { createInjectRockPrefixTransformer } from './src/unocss-transformer-inject-rock-prefix'
+import { presetTheme } from '../src/unocss-preset-theme'
+import { createInjectRockPrefixTransformer } from '../src/unocss-transformer-inject-rock-prefix'
 
 export default defineConfig<PresetWind4Theme>({
   presets: [
@@ -17,10 +17,23 @@ export default defineConfig<PresetWind4Theme>({
     presetObjectCompletion(),
     presetFunctionCompletion(),
   ],
-  transformers: [transformerVariantGroup(), createInjectRockPrefixTransformer()],
+  transformers: [
+    // pipelines:
+    // 1) lib build: inject only
+    // 2) playground fast-simulate: inject + rock post
+    // 3) real user app: rock post only
+    transformerVariantGroup(),
+    createInjectRockPrefixTransformer(),
+  ],
   content: {
     pipeline: {
-      include: ['**/*.tsx', '**/*.class.ts', 'node_modules/**/*.*'],
+      include: [
+        './**/*.tsx',
+        './**/*.class.ts',
+        '../src/**/*.tsx',
+        '../src/**/*.class.ts',
+        'node_modules/**/*.*',
+      ],
     },
   },
   theme: {

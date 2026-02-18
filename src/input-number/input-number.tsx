@@ -12,9 +12,10 @@ import { callHandler, cn, useId } from '../shared/utils'
 import type { InputNumberVariantProps } from './input-number.class'
 import {
   inputNumberBaseVariants,
+  inputNumberDecrementPaddingVariants,
   inputNumberDecrementVariants,
+  inputNumberIncrementPaddingVariants,
   inputNumberIncrementVariants,
-  inputNumberRootVariants,
 } from './input-number.class'
 
 type InputNumberColor = NonNullable<InputNumberVariantProps['color']>
@@ -223,7 +224,7 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       disabled={disabled()}
       onRawValueChange={onRawValueChange}
       data-slot="root"
-      class={cn(inputNumberRootVariants(), local.classes?.root)}
+      class={cn('relative inline-flex w-full items-center', local.classes?.root)}
       {...rest}
     >
       <KobalteNumberField.Input
@@ -231,16 +232,17 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
         ref={(e) => (inputEl = e)}
         placeholder={local.placeholder}
         data-slot="base"
-        class={cn(
-          inputNumberBaseVariants({
+        class={inputNumberBaseVariants(
+          {
             color: resolvedColor(),
             size: resolvedSize(),
             variant: local.variant,
             highlight: resolvedHighlight(),
             orientation: local.orientation,
-            increment: resolvedIncrement(),
-            decrement: resolvedDecrement(),
-          }),
+          },
+          resolvedIncrement() && inputNumberIncrementPaddingVariants({ size: resolvedSize() }),
+          resolvedDecrement() && inputNumberDecrementPaddingVariants({ size: resolvedSize() }),
+          local.orientation === 'horizontal' && !resolvedDecrement() && 'text-start',
           local.classes?.base,
         )}
         onBlur={onBlur}
@@ -253,11 +255,11 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       <Show when={resolvedIncrement()}>
         <div
           data-slot="increment"
-          class={cn(
-            inputNumberIncrementVariants({
+          class={inputNumberIncrementVariants(
+            {
               orientation: local.orientation,
               disabled: disabled() || local.incrementDisabled,
-            }),
+            },
             local.classes?.increment,
           )}
         >
@@ -276,11 +278,11 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       <Show when={resolvedDecrement()}>
         <div
           data-slot="decrement"
-          class={cn(
-            inputNumberDecrementVariants({
+          class={inputNumberDecrementVariants(
+            {
               orientation: local.orientation,
               disabled: disabled() || local.decrementDisabled,
-            }),
+            },
             local.classes?.decrement,
           )}
         >

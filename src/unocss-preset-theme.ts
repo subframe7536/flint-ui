@@ -26,6 +26,7 @@ export interface PresetThemeOptions {
   radiusRem?: number
   colors?: Partial<AppConfig['colors']>
   icons?: Partial<AppConfig['icons']>
+  idFilter?: (id: string) => boolean
 }
 
 export const DEFAULT_COLORS: AppConfig['colors'] = {
@@ -143,6 +144,10 @@ function toKebabCase(value: string): string {
   return value.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function isColorScale(value: unknown): value is ColorScale {
   return SHADES.every((shade) => {
     return typeof (value as Record<number, unknown> | undefined)?.[shade] === 'string'
@@ -178,10 +183,6 @@ function createSemanticColor(
 
 function createIconShortcuts(icons: AppConfig['icons']): Shortcut[] {
   return Object.entries(icons).map(([name, icon]) => [`icon-${toKebabCase(name)}`, icon])
-}
-
-function getToneKeys(): ToneKey[] {
-  return ['primary', 'secondary', 'success', 'info', 'warning', 'error']
 }
 
 function createThemeColors(colors: AppConfig['colors'], isDark: boolean): Theme['colors'] {
@@ -234,63 +235,13 @@ function createThemeColors(colors: AppConfig['colors'], isDark: boolean): Theme[
   }
 }
 
-function createNuxtUiShadeVars(colors: AppConfig['colors']): string {
-  return Object.entries(colors)
-    .flatMap(([key, colorName]) => {
-      const scale = getColorScale(colorName)
-      return SHADES.map((shade) => `--ui-color-${key}-${shade}: ${scale[shade]};`)
-    })
-    .join('\n  ')
-}
-
-function createNuxtUiToneVars(shade: 400 | 500): string {
-  return getToneKeys()
-    .map((key) => `--ui-${key}: var(--ui-color-${key}-${shade});`)
-    .join('\n  ')
-}
-
-function createNuxtUiSemanticVars(isDark: boolean): string {
-  if (isDark) {
-    return `--ui-text-dimmed: var(--ui-color-neutral-500);
-  --ui-text-muted: var(--ui-color-neutral-400);
-  --ui-text-toned: var(--ui-color-neutral-300);
-  --ui-text: var(--ui-color-neutral-200);
-  --ui-text-highlighted: white;
-  --ui-text-inverted: var(--ui-color-neutral-900);
-  --ui-bg: var(--ui-color-neutral-900);
-  --ui-bg-muted: var(--ui-color-neutral-800);
-  --ui-bg-elevated: var(--ui-color-neutral-800);
-  --ui-bg-accented: var(--ui-color-neutral-700);
-  --ui-bg-inverted: white;
-  --ui-border: var(--ui-color-neutral-800);
-  --ui-border-muted: var(--ui-color-neutral-700);
-  --ui-border-accented: var(--ui-color-neutral-700);
-  --ui-border-inverted: white;`
-  }
-
-  return `--ui-text-dimmed: var(--ui-color-neutral-400);
-  --ui-text-muted: var(--ui-color-neutral-500);
-  --ui-text-toned: var(--ui-color-neutral-600);
-  --ui-text: var(--ui-color-neutral-700);
-  --ui-text-highlighted: var(--ui-color-neutral-900);
-  --ui-text-inverted: white;
-  --ui-bg: white;
-  --ui-bg-muted: var(--ui-color-neutral-50);
-  --ui-bg-elevated: var(--ui-color-neutral-100);
-  --ui-bg-accented: var(--ui-color-neutral-200);
-  --ui-bg-inverted: var(--ui-color-neutral-900);
-  --ui-border: var(--ui-color-neutral-200);
-  --ui-border-muted: var(--ui-color-neutral-200);
-  --ui-border-accented: var(--ui-color-neutral-300);
-  --ui-border-inverted: var(--ui-color-neutral-900);`
-}
-
 function normalizeOptions(options?: number | PresetThemeOptions): Required<PresetThemeOptions> {
   if (typeof options === 'number') {
     return {
       radiusRem: options,
       colors: {},
       icons: {},
+      idFilter: DEFAULT_ID_FILTER,
     }
   }
 
@@ -298,8 +249,16 @@ function normalizeOptions(options?: number | PresetThemeOptions): Required<Prese
     radiusRem: options?.radiusRem ?? 0.5,
     colors: options?.colors ?? {},
     icons: options?.icons ?? {},
+    idFilter: options?.idFilter ?? DEFAULT_ID_FILTER,
   }
 }
+
+export const ROCK_COMPONENT_LAYER = 'rock-component'
+export const ROCK_PREFIX = '_RK-'
+const ROCK_PREFIX_RE = new RegExp(escapeRegExp(ROCK_PREFIX), 'g')
+const ROCK_PREFIX_CLEAN_RE = new RegExp(`\\\\?${escapeRegExp(ROCK_PREFIX)}`, 'g')
+const SCRIPT_ID_RE = /\.(?:js|jsx|ts|tsx|mjs|cjs|mts|cts)(?:$|[?#])/i
+const DEFAULT_ID_FILTER = (id: string): boolean => SCRIPT_ID_RE.test(id)
 
 export function presetTheme(options?: number | PresetThemeOptions): Preset {
   const normalized = normalizeOptions(options)
@@ -322,15 +281,52 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset {
   }
 
   const darkThemeVars = generateCSSVariables(darkTheme as Record<string, unknown>).join(';\n')
-  const nuxtUiShadeVars = createNuxtUiShadeVars(appConfig.colors)
-  const nuxtUiToneLight = createNuxtUiToneVars(500)
-  const nuxtUiToneDark = createNuxtUiToneVars(400)
-  const nuxtUiSemanticLight = createNuxtUiSemanticVars(false)
-  const nuxtUiSemanticDark = createNuxtUiSemanticVars(true)
 
   return {
-    name: 'theme',
+    name: 'preset-rock',
     theme: lightTheme,
+    layers: {
+      [ROCK_PREFIX]: -1,
+      default: 1,
+    },
+    transformers: [
+      {
+        name: 'transformer-rock',
+        enforce: 'post',
+        idFilter: normalized.idFilter,
+        transform(code) {
+          const source = code.toString()
+          const nextSource = source.replace(ROCK_PREFIX_RE, '')
+          if (nextSource !== source) {
+            code.overwrite(0, code.original.length, nextSource)
+          }
+        },
+      },
+    ],
+    variants: [
+      (matcher) => {
+        if (!matcher.startsWith(ROCK_PREFIX)) {
+          return matcher
+        }
+
+        return {
+          matcher: matcher.slice(ROCK_PREFIX.length),
+          layer: ROCK_COMPONENT_LAYER,
+        }
+      },
+    ],
+    postprocess: [
+      (util) => {
+        if (util.layer !== ROCK_COMPONENT_LAYER) {
+          return
+        }
+
+        util.selector = util.selector.replace(ROCK_PREFIX_CLEAN_RE, '')
+        if (util.parent) {
+          util.parent = util.parent.replace(ROCK_PREFIX_CLEAN_RE, '')
+        }
+      },
+    ],
     shortcuts: [
       ['effect-fv', 'outline-none ring-2 ring-ring ring-offset-(1 background)'],
       ['effect-dis', 'pointer-events-none opacity-64 cursor-not-allowed'],
@@ -348,17 +344,8 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset {
   --ui-radius: var(--radius);
   --ui-container: 80rem;
 }
-:root, :host {
-  ${nuxtUiShadeVars}
-}
-:root, :host, .light {
-  ${nuxtUiToneLight}
-  ${nuxtUiSemanticLight}
-}
 .dark {
-${darkThemeVars};
-  ${nuxtUiToneDark}
-  ${nuxtUiSemanticDark}
+  ${darkThemeVars};
 }`,
       },
     ],

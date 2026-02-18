@@ -14,6 +14,7 @@ export default defineConfig([
     // use the solid plugin to handle jsx
     plugins: [
       unocss({
+        generateCSS: false,
         filter: { id: ['src/**/*.tsx', 'src/**/*.class.ts'] },
       }),
       solid(),
