@@ -2,7 +2,7 @@ import type { JSX, ValidComponent } from 'solid-js'
 import { Show, createMemo, mergeProps, onMount, splitProps } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 
-import { useFieldGroupContext } from '../form-field/field-group-context'
+import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
@@ -105,7 +105,6 @@ export function Input(props: InputProps): JSX.Element {
       type: 'text' as NonNullable<JSX.InputHTMLAttributes<HTMLInputElement>['type']>,
       autocomplete: 'off' as const,
       autofocusDelay: 0,
-      size: 'md' as const,
       color: 'primary' as const,
       variant: 'outline' as const,
       loading: false,

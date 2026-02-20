@@ -2,6 +2,8 @@ import { A, Route, Router } from '@solidjs/router'
 import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
+import { FieldGroup } from '../field-group'
+
 import { Button } from './button'
 
 function createDeferred() {
@@ -67,6 +69,17 @@ describe('Button', () => {
     const button = screen.getByRole('button', { name: 'Delete' })
     expect(button.className).toContain('bg-destructive')
     expect(button.className).toContain('h-8')
+  })
+
+  test('inherits size from field-group when size is not provided', () => {
+    const screen = render(() => (
+      <FieldGroup size="xl">
+        <Button>Group Button</Button>
+      </FieldGroup>
+    ))
+
+    const button = screen.getByRole('button', { name: 'Group Button' })
+    expect(button.className).toContain('h-11')
   })
 
   test('applies xs icon slot classes for leading and trailing', () => {

@@ -2,7 +2,7 @@ import type { JSX, ValidComponent } from 'solid-js'
 import { createEffect, createMemo, mergeProps, on, onMount, splitProps } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 
-import { useFieldGroupContext } from '../form-field/field-group-context'
+import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
 import type { ModelModifiers } from '../shared/input-modifiers'
 import { applyInputModifiers } from '../shared/input-modifiers'
@@ -93,7 +93,6 @@ export function Textarea(props: TextareaProps): JSX.Element {
       maxrows: 0,
       autofocusDelay: 0,
       autoresizeDelay: 0,
-      size: 'md' as const,
       color: 'primary' as const,
       variant: 'outline' as const,
       autoresize: false,

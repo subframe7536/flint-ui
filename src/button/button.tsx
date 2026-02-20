@@ -3,6 +3,7 @@ import type { ElementOf, PolymorphicProps } from '@kobalte/core/polymorphic'
 import type { JSX, ValidComponent } from 'solid-js'
 import { Show, createMemo, createSignal, splitProps } from 'solid-js'
 
+import { useFieldGroupContext } from '../field-group/field-group-context'
 import { callHandler, cn } from '../shared/utils'
 
 import type { ButtonVariantProps } from './button.class'
@@ -86,6 +87,8 @@ export type ButtonProps<T extends ValidComponent = 'button'> = PolymorphicProps<
   ButtonBaseProps & Omit<KobalteButton.ButtonRootProps<ElementOf<T>>, 'class'>
 >
 
+type ButtonSize = NonNullable<ButtonVariantProps['size']>
+
 type PromiseLikeWithFinally = PromiseLike<unknown> & {
   then: PromiseLike<unknown>['then']
 }
@@ -96,6 +99,18 @@ function isPromiseLike(value: unknown): value is PromiseLikeWithFinally {
     value !== null &&
     typeof (value as PromiseLike<unknown>).then === 'function'
   )
+}
+
+function normalizeFieldGroupButtonSize(size?: string): ButtonSize | undefined {
+  if (size === 'xs' || size === 'sm' || size === 'lg' || size === 'xl') {
+    return size
+  }
+
+  if (size === 'md') {
+    return 'default'
+  }
+
+  return undefined
 }
 
 /**
@@ -118,7 +133,15 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
     'children',
   ])
 
+  const fieldGroup = useFieldGroupContext()
   const [loadingAutoState, setLoadingAutoState] = createSignal(false)
+  const resolvedSize = createMemo<ButtonVariantProps['size']>(() => {
+    if (local.size !== undefined) {
+      return local.size
+    }
+
+    return normalizeFieldGroupButtonSize(fieldGroup?.size)
+  })
 
   const isLoading = createMemo(() =>
     Boolean(local.loading || (local.loadingAuto && loadingAutoState())),
@@ -171,7 +194,7 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
       class={buttonVariants(
         {
           variant: local.variant,
-          size: local.size,
+          size: resolvedSize(),
         },
         isLoading() && 'cursor-wait opacity-80',
         local.classes?.root,
@@ -187,7 +210,7 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
           data-slot="leading"
           class={buttonIconSizeVariants(
             {
-              size: local.size,
+              size: resolvedSize(),
             },
             'flex items-center',
             local.classes?.leading,
@@ -211,7 +234,7 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
             data-slot="trailing"
             class={buttonIconSizeVariants(
               {
-                size: local.size,
+                size: resolvedSize(),
               },
               'flex items-center',
               local.classes?.trailing,

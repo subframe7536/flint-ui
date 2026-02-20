@@ -10,7 +10,7 @@
 - [x] card | nuxt:Card.vue | coss:card.tsx | rock:src/card/ | tests+exports
 - [ ] (SKIP) chip | nuxt:Chip.vue | coss:badge.tsx | rock:src/chip/ | tests+exports | note: completed, unblocks form P1 `select`
 - [x] collapsible | nuxt:Collapsible.vue | coss:collapsible.tsx | rock:src/collapsible/ | tests+exports
-- [ ] field-group | nuxt:FieldGroup.vue | coss:fieldset.tsx | rock:src/field-group/ | tests+exports
+- [x] field-group | nuxt:FieldGroup.vue | coss:fieldset.tsx | rock:src/field-group/ | tests+exports
 - [ ] kbd | nuxt:Kbd.vue | coss:kbd.tsx | rock:src/kbd/ | tests+exports
 - [ ] progress | nuxt:Progress.vue | coss:progress.tsx | rock:src/progress/ | tests+exports
 - [ ] separator | nuxt:Separator.vue | coss:separator.tsx | rock:src/separator/ | tests+exports
