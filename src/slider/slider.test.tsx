@@ -96,7 +96,7 @@ describe('Slider', () => {
     expect(inputs[0]?.readOnly).toBe(true)
     expect(root?.getAttribute('data-orientation')).toBe('vertical')
     expect(track?.className).toContain('bg-input')
-    expect(thumb?.className).toContain('data-[dragging]:(scale-120')
+    expect(thumb?.className).toContain('data-dragging:scale-120')
     expect(screen.queryByRole('tooltip')).toBeNull()
   })
 

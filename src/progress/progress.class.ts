@@ -114,10 +114,10 @@ export const progressIndicatorVariants = cva(
         vertical: 'origin-bottom',
       },
       animation: {
-        carousel: 'data-[indeterminate]:opacity-100',
-        'carousel-inverse': 'data-[indeterminate]:opacity-100',
-        swing: 'data-[indeterminate]:opacity-100',
-        elastic: 'data-[indeterminate]:opacity-100',
+        carousel: 'data-indeterminate:opacity-100',
+        'carousel-inverse': 'data-indeterminate:opacity-100',
+        swing: 'data-indeterminate:opacity-100',
+        elastic: 'data-indeterminate:opacity-100',
       },
     },
     compoundVariants: [
@@ -125,43 +125,43 @@ export const progressIndicatorVariants = cva(
         orientation: 'horizontal',
         animation: 'carousel',
         class:
-          'data-[indeterminate]:animate-[carousel_2s_ease-in-out_infinite] data-[indeterminate]:rtl:animate-[carousel-rtl_2s_ease-in-out_infinite]',
+          'data-indeterminate:animate-[carousel_2s_ease-in-out_infinite] data-indeterminate:rtl:animate-[carousel-rtl_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'vertical',
         animation: 'carousel',
-        class: 'data-[indeterminate]:animate-[carousel-vertical_2s_ease-in-out_infinite]',
+        class: 'data-indeterminate:animate-[carousel-vertical_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'horizontal',
         animation: 'carousel-inverse',
         class:
-          'data-[indeterminate]:animate-[carousel-inverse_2s_ease-in-out_infinite] data-[indeterminate]:rtl:animate-[carousel-inverse-rtl_2s_ease-in-out_infinite]',
+          'data-indeterminate:animate-[carousel-inverse_2s_ease-in-out_infinite] data-indeterminate:rtl:animate-[carousel-inverse-rtl_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'vertical',
         animation: 'carousel-inverse',
-        class: 'data-[indeterminate]:animate-[carousel-inverse-vertical_2s_ease-in-out_infinite]',
+        class: 'data-indeterminate:animate-[carousel-inverse-vertical_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'horizontal',
         animation: 'swing',
-        class: 'data-[indeterminate]:animate-[swing_2s_ease-in-out_infinite]',
+        class: 'data-indeterminate:animate-[swing_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'vertical',
         animation: 'swing',
-        class: 'data-[indeterminate]:animate-[swing-vertical_2s_ease-in-out_infinite]',
+        class: 'data-indeterminate:animate-[swing-vertical_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'horizontal',
         animation: 'elastic',
-        class: 'data-[indeterminate]:animate-[elastic_2s_ease-in-out_infinite]',
+        class: 'data-indeterminate:animate-[elastic_2s_ease-in-out_infinite]',
       },
       {
         orientation: 'vertical',
         animation: 'elastic',
-        class: 'data-[indeterminate]:animate-[elastic-vertical_2s_ease-in-out_infinite]',
+        class: 'data-indeterminate:animate-[elastic-vertical_2s_ease-in-out_infinite]',
       },
     ],
   },

@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js'
 import { createMemo, createSignal, splitProps } from 'solid-js'
 
-import { useId } from '../shared/utils'
+import { cn, useId } from '../shared/utils'
 
 import type {
   FormContextValue,
@@ -11,8 +11,6 @@ import type {
   FormValidationError,
 } from './form-context'
 import { FormProvider } from './form-context'
-import type { FormVariantProps } from './form.class'
-import { formVariants } from './form.class'
 
 type FormState = object
 
@@ -33,7 +31,7 @@ export interface FormClasses {
   root?: string
 }
 
-export interface FormBaseProps<TState extends FormState = FormState> extends FormVariantProps {
+export interface FormBaseProps<TState extends FormState = FormState> {
   id?: string
   state?: TState
   validate?: (state: TState | undefined) => FormValidationError[] | Promise<FormValidationError[]>
@@ -279,13 +277,8 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
     <FormProvider value={contextValue}>
       <form
         id={formId()}
-        class={formVariants(
-          {
-            loading: loading(),
-          },
-          local.classes?.root,
-        )}
-        data-loading={loading() ? 'true' : undefined}
+        class={cn('w-full data-loading:opacity-80', local.classes?.root)}
+        data-loading={loading() ? '' : undefined}
         onSubmit={onSubmit}
         {...rest}
       >

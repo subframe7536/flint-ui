@@ -112,36 +112,33 @@ export const radioGroupTableOrientationVariants = cva(
   },
 )
 
-export const radioGroupCardCheckedColorVariants = cva('data-[checked]:(border-primary)', {
+export const radioGroupCardCheckedColorVariants = cva('', {
   defaultVariants: {
     color: 'primary',
   },
   variants: {
     color: {
-      primary: 'data-[checked]:(border-primary)',
-      secondary: 'data-[checked]:(border-secondary)',
-      neutral: 'data-[checked]:(border-foreground)',
-      error: 'data-[checked]:(border-destructive)',
+      primary: 'data-checked:border-primary',
+      secondary: 'data-checked:border-secondary',
+      neutral: 'data-checked:border-foreground',
+      error: 'data-checked:border-destructive',
     },
   },
 })
 
-export const radioGroupTableCheckedColorVariants = cva(
-  'data-[checked]:(bg-primary/10 border-primary/50 z-1)',
-  {
-    defaultVariants: {
-      color: 'primary',
-    },
-    variants: {
-      color: {
-        primary: 'data-[checked]:(bg-primary/10 border-primary/50 z-1)',
-        secondary: 'data-[checked]:(bg-secondary/10 border-secondary/50 z-1)',
-        neutral: 'data-[checked]:(bg-muted border-foreground/50 z-1)',
-        error: 'data-[checked]:(bg-destructive/10 border-destructive/50 z-1)',
-      },
+export const radioGroupTableCheckedColorVariants = cva('z-1', {
+  defaultVariants: {
+    color: 'primary',
+  },
+  variants: {
+    color: {
+      primary: 'data-checked:(bg-primary/10 border-primary/50)',
+      secondary: 'data-checked:(bg-secondary/10 border-secondary/50)',
+      neutral: 'data-checked:(bg-muted border-foreground/50)',
+      error: 'data-checked:(bg-destructive/10 border-destructive/50)',
     },
   },
-)
+})
 
 export const radioGroupContainerVariants = cva('flex items-center', {
   defaultVariants: {

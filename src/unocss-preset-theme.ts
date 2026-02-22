@@ -314,6 +314,19 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset {
           layer: ROCK_COMPONENT_LAYER,
         }
       },
+      (matcher) => {
+        const match = matcher.match(/^(data|aria)-(\w+):/)
+        if (!match) {
+          return matcher
+        }
+
+        return {
+          // Remove the prefix (e.g., "data-invalid:") from the matcher string
+          matcher: matcher.slice(match[0].length),
+          // Transform the selector to include the attribute: .foo -> .foo[data-invalid]
+          selector: (s) => `${s}[${match[1]}-${match[2]}]`,
+        }
+      },
     ],
     postprocess: [
       (util) => {

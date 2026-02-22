@@ -25,7 +25,7 @@ export const switchContainerVariants = cva('flex items-center', {
 })
 
 export const switchBaseVariants = cva(
-  'inline-flex shrink-0 items-center rounded-full border-2 border-transparent p-px outline-none transition-colors data-[checked]:bg-primary bg-input focus-visible:effect-fv',
+  'inline-flex shrink-0 items-center rounded-full border-2 border-transparent p-px outline-none transition-colors focus-visible:effect-fv',
   {
     defaultVariants: {
       color: 'primary',
@@ -34,10 +34,10 @@ export const switchBaseVariants = cva(
     },
     variants: {
       color: {
-        primary: 'data-[checked]:bg-primary',
-        secondary: 'data-[checked]:bg-secondary',
-        neutral: 'data-[checked]:bg-neutral',
-        error: 'data-[checked]:bg-destructive',
+        primary: 'data-checked:bg-primary',
+        secondary: 'data-checked:bg-secondary',
+        neutral: 'data-checked:bg-neutral',
+        error: 'data-checked:bg-destructive',
       },
       size: {
         xs: 'w-7',
@@ -61,11 +61,11 @@ export const switchThumbVariants = cva(
     },
     variants: {
       size: {
-        xs: 'size-3 data-[checked]:translate-x-3',
-        sm: 'size-3.5 data-[checked]:translate-x-3.5',
-        md: 'size-4 data-[checked]:translate-x-4',
-        lg: 'size-4.5 data-[checked]:translate-x-4.5',
-        xl: 'size-5 data-[checked]:translate-x-5',
+        xs: 'size-3 data-checked:translate-x-3',
+        sm: 'size-3.5 data-checked:translate-x-3.5',
+        md: 'size-4 data-checked:translate-x-4',
+        lg: 'size-4.5 data-checked:translate-x-4.5',
+        xl: 'size-5 data-checked:translate-x-5',
       },
     },
   },

@@ -135,7 +135,7 @@ export const selectClearVariants = cva(
 )
 
 export const selectItemVariants = cva(
-  'flex flex-col items-start justify-center gap-2 rounded-sm py-1 ps-3 pe-2 outline-none data-[disabled]:(pointer-events-none opacity-50) data-[highlighted]:(bg-accent text-accent-foreground)',
+  'flex items-center justify-between gap-2 rounded-sm py-1 ps-3 pe-2 outline-none data-disabled:(pointer-events-none opacity-50) data-highlighted:(bg-accent text-accent-foreground)',
   {
     defaultVariants: {
       size: 'md',

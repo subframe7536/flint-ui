@@ -6,20 +6,30 @@ import { render } from 'solid-js/web'
 
 import { ButtonDemos } from './components/button-demos'
 import { Sidebar } from './components/common/sidebar'
+import { ContextMenuDemos } from './components/context-menu-demos'
+import { DropdownMenuDemos } from './components/dropdown-menu-demos'
 import { FileUploadDemos } from './components/file-upload-demos'
 import { FormDemos } from './components/form-demos'
 import { FormFieldDemos } from './components/form-field-demos'
 import { IconDemos } from './components/icon-demos'
 import { InputDemos } from './components/input-demos'
 import { InputNumberDemos } from './components/input-number-demos'
+import { ModalDemos } from './components/modal-demos'
+import { PopoverDemos } from './components/popover-demos'
 import { SelectDemos } from './components/select-demos'
+import { SheetDemos } from './components/sheet-demos'
 import { SliderDemos } from './components/slider-demos'
 import { TooltipDemos } from './components/tooltip-demos'
 
 const PAGES = [
   { key: 'button', label: 'Button', group: 'General' },
   { key: 'icon', label: 'Icon', group: 'General' },
-  { key: 'tooltip', label: 'Tooltip', group: 'Feedback' },
+  { key: 'tooltip', label: 'Tooltip', group: 'Overlay' },
+  { key: 'popover', label: 'Popover', group: 'Overlay' },
+  { key: 'dropdown-menu', label: 'Dropdown Menu', group: 'Overlay' },
+  { key: 'context-menu', label: 'Context Menu', group: 'Overlay' },
+  { key: 'modal', label: 'Modal', group: 'Overlay' },
+  { key: 'sheet', label: 'Sheet', group: 'Overlay' },
   { key: 'input', label: 'Input & Textarea', group: 'Data Entry' },
   { key: 'input-number', label: 'Input Number', group: 'Data Entry' },
   { key: 'slider', label: 'Slider', group: 'Data Entry' },
@@ -56,6 +66,21 @@ function App() {
           </Match>
           <Match when={page() === 'tooltip'}>
             <TooltipDemos />
+          </Match>
+          <Match when={page() === 'popover'}>
+            <PopoverDemos />
+          </Match>
+          <Match when={page() === 'dropdown-menu'}>
+            <DropdownMenuDemos />
+          </Match>
+          <Match when={page() === 'context-menu'}>
+            <ContextMenuDemos />
+          </Match>
+          <Match when={page() === 'modal'}>
+            <ModalDemos />
+          </Match>
+          <Match when={page() === 'sheet'}>
+            <SheetDemos />
           </Match>
           <Match when={page() === 'input'}>
             <InputDemos />

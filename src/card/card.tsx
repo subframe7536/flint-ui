@@ -1,13 +1,10 @@
 import type { JSX } from 'solid-js'
 import { Show, splitProps } from 'solid-js'
 
+import { cn } from '../shared/utils'
+
 import type { CardVariantProps } from './card.class'
-import {
-  cardBodyVariants,
-  cardFooterVariants,
-  cardHeaderVariants,
-  cardRootVariants,
-} from './card.class'
+import { cardRootVariants } from './card.class'
 
 type CardVariant = NonNullable<CardVariantProps['variant']>
 
@@ -58,19 +55,25 @@ export function Card(props: CardProps): JSX.Element {
       {...rest}
     >
       <Show when={local.header}>
-        <div data-slot="header" class={cardHeaderVariants({}, local.classes?.header)}>
+        <div
+          data-slot="header"
+          class={cn(
+            'grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6',
+            local.classes?.header,
+          )}
+        >
           {local.header}
         </div>
       </Show>
 
       <Show when={local.children}>
-        <div data-slot="body" class={cardBodyVariants({}, local.classes?.body)}>
+        <div data-slot="body" class={cn('flex-1 p-6', local.classes?.body)}>
           {local.children}
         </div>
       </Show>
 
       <Show when={local.footer}>
-        <div data-slot="footer" class={cardFooterVariants({}, local.classes?.footer)}>
+        <div data-slot="footer" class={cn('flex items-center p-6', local.classes?.footer)}>
           {local.footer}
         </div>
       </Show>

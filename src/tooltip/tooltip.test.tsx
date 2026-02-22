@@ -45,7 +45,11 @@ describe('Tooltip', () => {
       </Tooltip>
     ))
 
-    expect(document.body.querySelector('[data-slot="arrow"]')).not.toBeNull()
+    const arrow = document.body.querySelector('[data-slot="arrow"]')
+
+    expect(arrow).not.toBeNull()
+    expect(arrow?.className).toContain('size-2.5')
+    expect(arrow?.className).toContain('bg-foreground')
   })
 
   test('does not render content when no text or kbds are provided', () => {

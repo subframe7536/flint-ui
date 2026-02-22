@@ -54,7 +54,7 @@ export function Collapsible(props: CollapsibleProps): JSX.Element {
       <KobalteCollapsible.Content
         data-slot="content"
         class={cn(
-          'h-$kb-collapsible-content-height overflow-hidden transition-height duration-200 data-[closed]:h-0',
+          'h-$kb-collapsible-content-height overflow-hidden transition-height duration-200 data-closed:h-0',
           local.classes?.content,
         )}
       >

@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const tooltipContentVariants = cva(
-  'z-50 max-w-72 rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md outline-none data-[expanded]:(animate-in fade-in-0 zoom-in-95) data-[state=delayed-open]:(animate-in fade-in-0 zoom-in-95) data-[closed]:(animate-out fade-out-0 zoom-out-95)',
+  'z-50 w-fit max-w-xs origin-$kb-tooltip-content-transform-origin rounded-md bg-foreground px-3 py-1.5 text-xs text-background outline-none data-expanded:(animate-in fade-in-0 zoom-in-95) data-[state=delayed-open]:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95)',
   {
     variants: {
       side: {
