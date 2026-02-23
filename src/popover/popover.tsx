@@ -2,7 +2,7 @@ import * as KobalteHoverCard from '@kobalte/core/hover-card'
 import * as KobaltePopover from '@kobalte/core/popover'
 import type { PopoverContentProps as KobaltePopoverContentProps } from '@kobalte/core/popover'
 import type { JSX } from 'solid-js'
-import { Show, children, mergeProps, onCleanup, splitProps } from 'solid-js'
+import { Show, mergeProps, onCleanup, splitProps } from 'solid-js'
 
 import { cn } from '../shared/utils'
 
@@ -10,19 +10,9 @@ import { popoverContentVariants } from './popover.class'
 
 type PopoverMode = 'click' | 'hover'
 type PopoverSide = 'top' | 'right' | 'bottom' | 'left'
-type PopoverPlacement =
-  | 'top'
-  | 'top-start'
-  | 'top-end'
-  | 'right'
-  | 'right-start'
-  | 'right-end'
-  | 'bottom'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'left'
-  | 'left-start'
-  | 'left-end'
+type PopoverPlacement = NonNullable<
+  KobaltePopover.PopoverRootProps['placement'] | KobalteHoverCard.HoverCardRootProps['placement']
+>
 
 export interface PopoverClasses {
   trigger?: string
@@ -44,7 +34,7 @@ export interface PopoverBaseProps {
   dismissible?: boolean
   classes?: PopoverClasses
   onClosePrevent?: () => void
-  children?: JSX.Element
+  children: JSX.Element
 }
 
 type PopoverRootProps = Omit<KobaltePopover.PopoverRootProps, 'children' | 'class'> &
@@ -52,20 +42,17 @@ type PopoverRootProps = Omit<KobaltePopover.PopoverRootProps, 'children' | 'clas
 
 export type PopoverProps = PopoverBaseProps & Omit<PopoverRootProps, keyof PopoverBaseProps>
 
-function resolvePopoverSide(placement?: PopoverPlacement): PopoverSide {
-  if (placement?.startsWith('right')) {
-    return 'right'
-  }
-
-  if (placement?.startsWith('bottom')) {
+function resolvePopoverSide(placement: PopoverPlacement | undefined): PopoverSide {
+  if (!placement) {
     return 'bottom'
   }
 
-  if (placement?.startsWith('left')) {
-    return 'left'
+  const [side] = placement.split('-')
+  if (side === 'top' || side === 'right' || side === 'bottom' || side === 'left') {
+    return side
   }
 
-  return 'top'
+  return 'bottom'
 }
 
 export function Popover(props: PopoverProps): JSX.Element {
@@ -85,9 +72,6 @@ export function Popover(props: PopoverProps): JSX.Element {
     ['mode', 'placement', 'dismissible', 'onClosePrevent'],
     ['content', 'classes', 'children'],
   )
-
-  const triggerChildren = children(() => contentProps.children)
-  const hasTrigger = () => triggerChildren.toArray().length > 0
 
   const preventDismiss = () => {
     behaviorProps.onClosePrevent?.()
@@ -129,11 +113,7 @@ export function Popover(props: PopoverProps): JSX.Element {
   const onInteractOutside = (
     event: Parameters<NonNullable<KobaltePopoverContentProps['onInteractOutside']>>[0],
   ) => {
-    if (behaviorProps.dismissible) {
-      return
-    }
-
-    if (event.defaultPrevented) {
+    if (behaviorProps.dismissible || event.defaultPrevented) {
       return
     }
 
@@ -157,8 +137,6 @@ export function Popover(props: PopoverProps): JSX.Element {
     preventDismiss()
   }
 
-  const side = () => resolvePopoverSide(behaviorProps.placement)
-
   const content = () => {
     if (contentProps.content === undefined || contentProps.content === null) {
       return undefined
@@ -180,7 +158,10 @@ export function Popover(props: PopoverProps): JSX.Element {
   const clickContent = () => (
     <KobaltePopover.Content
       data-slot="content"
-      class={popoverContentVariants({ side: side() }, contentProps.classes?.content)}
+      class={popoverContentVariants(
+        { side: resolvePopoverSide(behaviorProps.placement) },
+        contentProps.classes?.content,
+      )}
       onPointerDownOutside={onPointerDownOutside}
       onInteractOutside={onInteractOutside}
       onEscapeKeyDown={onEscapeKeyDown}
@@ -192,7 +173,10 @@ export function Popover(props: PopoverProps): JSX.Element {
   const hoverContent = () => (
     <KobalteHoverCard.Content
       data-slot="content"
-      class={popoverContentVariants({ side: side() }, contentProps.classes?.content)}
+      class={popoverContentVariants(
+        { side: resolvePopoverSide(behaviorProps.placement) },
+        contentProps.classes?.content,
+      )}
     >
       {content()}
     </KobalteHoverCard.Content>
@@ -200,15 +184,9 @@ export function Popover(props: PopoverProps): JSX.Element {
 
   const hoverRoot = () => (
     <KobalteHoverCard.Root placement={behaviorProps.placement} overflowPadding={-4} {...rootProps}>
-      <Show when={hasTrigger()}>
-        <KobalteHoverCard.Trigger
-          as="span"
-          data-slot="trigger"
-          class={contentProps.classes?.trigger}
-        >
-          {triggerChildren()}
-        </KobalteHoverCard.Trigger>
-      </Show>
+      <KobalteHoverCard.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
+        {contentProps.children}
+      </KobalteHoverCard.Trigger>
 
       <KobalteHoverCard.Portal>{hoverContent()}</KobalteHoverCard.Portal>
     </KobalteHoverCard.Root>
@@ -216,11 +194,9 @@ export function Popover(props: PopoverProps): JSX.Element {
 
   const clickRoot = () => (
     <KobaltePopover.Root placement={behaviorProps.placement} overflowPadding={-4} {...rootProps}>
-      <Show when={hasTrigger()}>
-        <KobaltePopover.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
-          {triggerChildren()}
-        </KobaltePopover.Trigger>
-      </Show>
+      <KobaltePopover.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
+        {contentProps.children}
+      </KobaltePopover.Trigger>
 
       <KobaltePopover.Portal>{clickContent()}</KobaltePopover.Portal>
     </KobaltePopover.Root>

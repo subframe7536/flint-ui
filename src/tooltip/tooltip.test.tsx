@@ -2,6 +2,7 @@ import { render } from '@solidjs/testing-library'
 import { describe, expect, test } from 'vitest'
 
 import { Tooltip } from './tooltip'
+import type { TooltipProps } from './tooltip'
 
 describe('Tooltip', () => {
   test('renders text content when open is controlled', () => {
@@ -38,13 +39,32 @@ describe('Tooltip', () => {
     expect(content?.className).toContain('root-override')
   })
 
-  test('does not render content when no text or kbds are provided', () => {
-    const screen = render(() => (
+  test('renders tooltip container when no text or kbds are provided', () => {
+    render(() => (
       <Tooltip open>
         <button type="button">Trigger</button>
       </Tooltip>
     ))
 
+    const content = document.body.querySelector('[role=tooltip]')
+
+    expect(content).not.toBeNull()
+    expect(content?.textContent).toBe('')
+  })
+
+  test('does not render content when disabled', () => {
+    const screen = render(() => (
+      <Tooltip open text="Tooltip content" disabled>
+        <button type="button">Trigger</button>
+      </Tooltip>
+    ))
+
     expect(screen.queryByRole('tooltip')).toBeNull()
+  })
+
+  test('requires children in type contract', () => {
+    // @ts-expect-error children is required
+    const props: TooltipProps = { open: true, text: 'Tooltip content' }
+    expect(props).toBeDefined()
   })
 })

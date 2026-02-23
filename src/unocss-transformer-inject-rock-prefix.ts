@@ -202,6 +202,7 @@ function collectClassOperandReplacements(
   source: string,
   prefix: string,
   replacements: Map<string, Replacement>,
+  insideClassesArg = false,
 ): void {
   if (!expression) {
     return
@@ -215,8 +216,20 @@ function collectClassOperandReplacements(
   }
 
   if (ts.isConditionalExpression(current)) {
-    collectClassOperandReplacements(current.whenTrue, source, prefix, replacements)
-    collectClassOperandReplacements(current.whenFalse, source, prefix, replacements)
+    collectClassOperandReplacements(
+      current.whenTrue,
+      source,
+      prefix,
+      replacements,
+      insideClassesArg,
+    )
+    collectClassOperandReplacements(
+      current.whenFalse,
+      source,
+      prefix,
+      replacements,
+      insideClassesArg,
+    )
     return
   }
 
@@ -227,7 +240,7 @@ function collectClassOperandReplacements(
       operator === ts.SyntaxKind.BarBarToken ||
       operator === ts.SyntaxKind.QuestionQuestionToken
     ) {
-      collectClassOperandReplacements(current.right, source, prefix, replacements)
+      collectClassOperandReplacements(current.right, source, prefix, replacements, insideClassesArg)
     }
 
     return
@@ -236,7 +249,7 @@ function collectClassOperandReplacements(
   if (ts.isArrayLiteralExpression(current)) {
     for (const element of current.elements) {
       if (ts.isExpression(element)) {
-        collectClassOperandReplacements(element, source, prefix, replacements)
+        collectClassOperandReplacements(element, source, prefix, replacements, insideClassesArg)
       }
     }
 
@@ -249,8 +262,12 @@ function collectClassOperandReplacements(
 
   const callName = getCallName(current.expression)
   if (callName === 'cn') {
+    if (insideClassesArg) {
+      return
+    }
+
     for (const argument of current.arguments) {
-      collectClassOperandReplacements(argument, source, prefix, replacements)
+      collectClassOperandReplacements(argument, source, prefix, replacements, insideClassesArg)
     }
 
     return
@@ -258,7 +275,7 @@ function collectClassOperandReplacements(
 
   if (callName?.endsWith('Variants')) {
     for (const argument of current.arguments.slice(1)) {
-      collectClassOperandReplacements(argument, source, prefix, replacements)
+      collectClassOperandReplacements(argument, source, prefix, replacements, true)
     }
   }
 }

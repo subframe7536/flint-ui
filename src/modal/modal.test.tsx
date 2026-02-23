@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
 import { Modal } from './modal'
+import type { ModalProps } from './modal'
 
 describe('Modal', () => {
   test('renders default shell with title, description, actions, body, footer and close button', () => {
@@ -13,7 +14,9 @@ describe('Modal', () => {
         actions={<button type="button">Action</button>}
         body="Modal body"
         footer="Modal footer"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Modal>
     ))
 
     expect(document.body.textContent).toContain('Confirm')
@@ -35,7 +38,9 @@ describe('Modal', () => {
         title="Default title"
         description="Default description"
         header={<div data-testid="custom-header">Custom Header</div>}
-      />
+      >
+        <button type="button">Trigger</button>
+      </Modal>
     ))
 
     expect(document.body.querySelector('[data-testid="custom-header"]')?.textContent).toContain(
@@ -47,7 +52,9 @@ describe('Modal', () => {
 
   test('renders body content and keeps shell sections', () => {
     render(() => (
-      <Modal open title="Dialog title" body={<div data-testid="custom-body">Body Content</div>} />
+      <Modal open title="Dialog title" body={<div data-testid="custom-body">Body Content</div>}>
+        <button type="button">Trigger</button>
+      </Modal>
     ))
 
     expect(document.body.querySelector('[data-testid="custom-body"]')?.textContent).toContain(
@@ -85,20 +92,32 @@ describe('Modal', () => {
   })
 
   test('renders into portal by default', () => {
-    const screen = render(() => <Modal open title="Portal default" body="Body" />)
+    const screen = render(() => (
+      <Modal open title="Portal default" body="Body">
+        <button type="button">Trigger</button>
+      </Modal>
+    ))
 
     expect(screen.container.querySelector('[data-slot="content"]')).toBeNull()
     expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
   })
 
   test('supports overlay=false', () => {
-    render(() => <Modal open overlay={false} body="Body" />)
+    render(() => (
+      <Modal open overlay={false} body="Body">
+        <button type="button">Trigger</button>
+      </Modal>
+    ))
 
     expect(document.body.querySelector('[data-slot="overlay"]')).toBeNull()
   })
 
   test('supports scrollable overlay mode', () => {
-    render(() => <Modal open scrollable body="Scrollable body" />)
+    render(() => (
+      <Modal open scrollable body="Scrollable body">
+        <button type="button">Trigger</button>
+      </Modal>
+    ))
 
     const overlays = document.body.querySelectorAll('[data-slot="overlay"]')
     const contents = document.body.querySelectorAll('[data-slot="content"]')
@@ -119,7 +138,9 @@ describe('Modal', () => {
           content: 'content-class',
         }}
         body="Body"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Modal>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]')
@@ -130,13 +151,21 @@ describe('Modal', () => {
   })
 
   test('supports custom close content', () => {
-    render(() => <Modal open close={<span data-testid="custom-close">X</span>} body="Body" />)
+    render(() => (
+      <Modal open close={<span data-testid="custom-close">X</span>} body="Body">
+        <button type="button">Trigger</button>
+      </Modal>
+    ))
 
     expect(document.body.querySelector('[data-testid="custom-close"]')?.textContent).toBe('X')
   })
 
   test('hides close button when close=false', () => {
-    render(() => <Modal open close={false} body="Body" />)
+    render(() => (
+      <Modal open close={false} body="Body">
+        <button type="button">Trigger</button>
+      </Modal>
+    ))
 
     expect(document.body.querySelector('[data-slot="close"]')).toBeNull()
   })
@@ -145,7 +174,9 @@ describe('Modal', () => {
     const onClosePrevent = vi.fn()
 
     render(() => (
-      <Modal defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body" />
+      <Modal defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body">
+        <button type="button">Trigger</button>
+      </Modal>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]') as HTMLElement
@@ -192,7 +223,9 @@ describe('Modal', () => {
         onClosePrevent={onClosePrevent}
         onOpenChange={onOpenChange}
         body="Body"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Modal>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]') as HTMLElement
@@ -208,9 +241,9 @@ describe('Modal', () => {
     })
   })
 
-  test('does not render trigger when default slot is missing', () => {
-    render(() => <Modal open body="Body" />)
-
-    expect(document.body.querySelector('[data-slot="trigger"]')).toBeNull()
+  test('requires children in type contract', () => {
+    // @ts-expect-error children is required
+    const props: ModalProps = { open: true, body: 'Body' }
+    expect(props).toBeDefined()
   })
 })

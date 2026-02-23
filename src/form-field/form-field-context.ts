@@ -1,5 +1,5 @@
 import type { Accessor, JSX } from 'solid-js'
-import { createMemo, createSignal, onCleanup } from 'solid-js'
+import { createEffect, createMemo, createSignal, onCleanup } from 'solid-js'
 
 import { useFormContext } from '../form/form-context'
 import { createContextProvider } from '../shared/create-context-provider'
@@ -122,15 +122,22 @@ export function useFormField(
     }
   })
 
-  if (formField) {
-    if (!options().bind) {
+  createEffect(() => {
+    if (!formField) {
+      return
+    }
+
+    const resolvedOptions = options()
+    const resolvedFieldProps = fieldProps()
+
+    if (!resolvedOptions.bind) {
       inputId.setId(null)
-    } else if (fieldProps().id !== undefined) {
-      inputId.setId(fieldProps().id)
+    } else if (resolvedFieldProps.id !== undefined) {
+      inputId.setId(resolvedFieldProps.id)
     } else {
       inputId.setId(undefined)
     }
-  }
+  })
 
   function emitFormEvent(type: 'blur' | 'change' | 'focus' | 'input', eager?: boolean): void {
     if (!formContext) {

@@ -1,6 +1,6 @@
 import * as KobalteContextMenu from '@kobalte/core/context-menu'
 import type { JSX } from 'solid-js'
-import { Show, children, mergeProps, splitProps } from 'solid-js'
+import { mergeProps, splitProps } from 'solid-js'
 
 import type { IconName } from '../icon'
 import { resolveOverlayMenuSide } from '../shared/overlay-menu'
@@ -69,7 +69,7 @@ export interface ContextMenuBaseProps {
   contentTop?: OverlayMenuContentSlot
   contentBottom?: OverlayMenuContentSlot
   classes?: ContextMenuClasses
-  children?: JSX.Element
+  children: JSX.Element
 }
 
 export type ContextMenuProps = ContextMenuBaseProps &
@@ -101,9 +101,6 @@ export function ContextMenu(props: ContextMenuProps): JSX.Element {
     ['children'],
   )
 
-  const triggerChildren = children(() => triggerProps.children)
-  const hasTrigger = () => triggerChildren.toArray().length > 0
-
   const rootSide = () => resolveOverlayMenuSide(rootStateProps.placement ?? 'right-start')
 
   return (
@@ -116,15 +113,13 @@ export function ContextMenu(props: ContextMenuProps): JSX.Element {
       overflowPadding={4}
       {...rootProps}
     >
-      <Show when={hasTrigger()}>
-        <KobalteContextMenu.Trigger
-          data-slot="trigger"
-          class={menuProps.classes?.trigger}
-          disabled={menuProps.disabled}
-        >
-          {triggerChildren()}
-        </KobalteContextMenu.Trigger>
-      </Show>
+      <KobalteContextMenu.Trigger
+        data-slot="trigger"
+        class={menuProps.classes?.trigger}
+        disabled={menuProps.disabled}
+      >
+        {triggerProps.children}
+      </KobalteContextMenu.Trigger>
 
       <OverlayMenuBaseContent<ContextMenuColor, ContextMenuItem, ContextMenuSize>
         primitives={CONTEXT_MENU_PRIMITIVES}

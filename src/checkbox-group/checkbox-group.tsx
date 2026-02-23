@@ -9,6 +9,7 @@ import { cn, useId } from '../shared/utils'
 import type { CheckboxGroupVariantProps } from './checkbox-group.class'
 import {
   checkboxGroupFieldsetVariants,
+  checkboxGroupItemVariants,
   checkboxGroupLegendVariants,
   checkboxGroupTableOrientationVariants,
   checkboxGroupTablePaddingVariants,
@@ -198,16 +199,6 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
     })
   })
 
-  function setValue(nextValue: CheckboxGroupValue[]): void {
-    if (formProps.value === undefined) {
-      setUncontrolledValue(nextValue)
-    }
-
-    formProps.onChange?.(nextValue)
-    field.emitFormChange()
-    field.emitFormInput()
-  }
-
   function onItemCheckedChange(value: CheckboxGroupValue, checked: boolean): void {
     const nextValues = checked
       ? selectedValues().includes(value)
@@ -215,7 +206,13 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
         : [...selectedValues(), value]
       : selectedValues().filter((itemValue) => itemValue !== value)
 
-    setValue(nextValues)
+    if (formProps.value === undefined) {
+      setUncontrolledValue(nextValues)
+    }
+
+    formProps.onChange?.(nextValues)
+    field.emitFormChange()
+    field.emitFormInput()
   }
 
   return (
@@ -257,26 +254,22 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
           {(item) => (
             <div
               data-slot="item"
-              class={
-                styleBehaviorProps.variant === 'table'
-                  ? checkboxGroupTablePaddingVariants(
-                      {
-                        size: resolvedSize(),
-                      },
-                      'border border-border',
-                      checkboxGroupTableOrientationVariants({
-                        orientation: styleBehaviorProps.orientation,
-                      }),
-                      item.disabled || disabled() ? 'cursor-not-allowed' : undefined,
-                      styleBehaviorProps.classes?.item,
-                      item.classes?.root,
-                    )
-                  : cn(
-                      item.disabled || disabled() ? 'cursor-not-allowed' : undefined,
-                      styleBehaviorProps.classes?.item,
-                      item.classes?.root,
-                    )
-              }
+              class={cn(
+                checkboxGroupItemVariants({
+                  variant: styleBehaviorProps.variant,
+                  disabled: item.disabled || disabled(),
+                }),
+                styleBehaviorProps.variant === 'table' &&
+                  checkboxGroupTablePaddingVariants({
+                    size: resolvedSize(),
+                  }),
+                styleBehaviorProps.variant === 'table' &&
+                  checkboxGroupTableOrientationVariants({
+                    orientation: styleBehaviorProps.orientation,
+                  }),
+                styleBehaviorProps.classes?.item,
+                item.classes?.root,
+              )}
             >
               <Checkbox
                 id={item.id}

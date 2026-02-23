@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
 import { Popover } from './popover'
+import type { PopoverProps } from './popover'
 
 describe('Popover', () => {
   test('supports click mode and renders content', () => {
@@ -34,8 +35,12 @@ describe('Popover', () => {
     ['right-start', 'ml-$kb-popper-content-overflow-padding'],
     ['bottom-start', 'mt-$kb-popper-content-overflow-padding'],
     ['left-start', 'mr-$kb-popper-content-overflow-padding'],
-  ])('applies side class for placement %s', (placement, expectedClass) => {
-    render(() => <Popover open placement={placement as never} content="Placement content" />)
+  ] as const)('applies side class for placement %s', (placement, expectedClass) => {
+    render(() => (
+      <Popover open placement={placement} content="Placement content">
+        <button type="button">Trigger</button>
+      </Popover>
+    ))
 
     const content = document.body.querySelector('[data-slot="content"]')
 
@@ -50,7 +55,9 @@ describe('Popover', () => {
           content: 'content-slot-class',
         }}
         content="Styled"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Popover>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]')
@@ -69,19 +76,27 @@ describe('Popover', () => {
     expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
   })
 
-  test('does not render trigger when default slot is missing', () => {
-    render(() => <Popover open content="No trigger" />)
-
-    expect(document.body.querySelector('[data-slot="trigger"]')).toBeNull()
+  test('requires children in type contract', () => {
+    // @ts-expect-error children is required
+    const props: PopoverProps = { open: true, content: 'No trigger' }
+    expect(props).toBeDefined()
   })
 
   test('does not render body wrapper when content is undefined or null', () => {
-    const undefinedPanelScreen = render(() => <Popover open />)
+    const undefinedPanelScreen = render(() => (
+      <Popover open>
+        <button type="button">Trigger</button>
+      </Popover>
+    ))
     expect(
       undefinedPanelScreen.container.ownerDocument.body.querySelector('[data-slot="body"]'),
     ).toBeNull()
 
-    render(() => <Popover open content={null as never} />)
+    render(() => (
+      <Popover open content={null as never}>
+        <button type="button">Trigger</button>
+      </Popover>
+    ))
     expect(document.body.querySelector('[data-slot="body"]')).toBeNull()
   })
 

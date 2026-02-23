@@ -1,6 +1,5 @@
-import type { JSX, ValidComponent } from 'solid-js'
+import type { JSX } from 'solid-js'
 import { createEffect, createMemo, mergeProps, on, onMount, splitProps } from 'solid-js'
-import { Dynamic } from 'solid-js/web'
 
 import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
@@ -31,7 +30,6 @@ export interface TextareaClasses {
 }
 
 export interface TextareaBaseProps extends TextareaStyleVariantProps {
-  as?: ValidComponent
   id?: string
   name?: string
   value?: TextareaValue
@@ -59,7 +57,6 @@ export type TextareaProps = TextareaBaseProps
 export function Textarea(props: TextareaProps): JSX.Element {
   const merged = mergeProps(
     {
-      as: 'div' as ValidComponent,
       rows: 3,
       maxrows: 0,
       autofocusDelay: 0,
@@ -88,7 +85,6 @@ export function Textarea(props: TextareaProps): JSX.Element {
       'onFocus',
     ],
     [
-      'as',
       'placeholder',
       'rows',
       'maxrows',
@@ -197,6 +193,14 @@ export function Textarea(props: TextareaProps): JSX.Element {
     callHandler(event, formProps.onFocus as any)
   }
 
+  const onRootPointerDown: JSX.EventHandlerUnion<HTMLDivElement, PointerEvent> = (event) => {
+    if (event.button !== 0 || event.defaultPrevented || event.target === textareaEl) {
+      return
+    }
+
+    textareaEl?.focus()
+  }
+
   createEffect(
     on(
       () => formProps.value,
@@ -222,8 +226,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
   })
 
   return (
-    <Dynamic
-      component={layoutProps.as}
+    <div
       data-slot="root"
       class={textareaRootVariants(
         {
@@ -235,7 +238,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
         },
         styleProps.classes?.root,
       )}
-      onclick={() => textareaEl?.focus()}
+      onPointerDown={onRootPointerDown}
     >
       <textarea
         id={textareaId()}
@@ -266,6 +269,6 @@ export function Textarea(props: TextareaProps): JSX.Element {
       />
 
       {layoutProps.children}
-    </Dynamic>
+    </div>
   )
 }

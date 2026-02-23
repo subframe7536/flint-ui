@@ -1,7 +1,7 @@
 import * as KobalteDialog from '@kobalte/core/dialog'
 import type { DialogContentProps as KobalteDialogContentProps } from '@kobalte/core/dialog'
 import type { JSX } from 'solid-js'
-import { Show, children, mergeProps, onCleanup, splitProps } from 'solid-js'
+import { Show, mergeProps, onCleanup, splitProps } from 'solid-js'
 
 import { Icon } from '../icon'
 import { cn } from '../shared/utils'
@@ -41,7 +41,7 @@ export interface ModalBaseProps {
   footer?: JSX.Element
   actions?: JSX.Element
   classes?: ModalClasses
-  children?: JSX.Element
+  children: JSX.Element
 }
 
 export type ModalProps = ModalBaseProps &
@@ -63,9 +63,6 @@ export function Modal(props: ModalProps): JSX.Element {
     ['overlay', 'scrollable', 'transition', 'fullscreen', 'close', 'dismissible', 'onClosePrevent'],
     ['title', 'description', 'header', 'body', 'footer', 'actions', 'classes', 'children'],
   )
-
-  const triggerChildren = children(() => contentProps.children)
-  const hasTrigger = () => triggerChildren.toArray().length > 0
 
   const preventDismiss = () => {
     behaviorProps.onClosePrevent?.()
@@ -107,11 +104,7 @@ export function Modal(props: ModalProps): JSX.Element {
   const onInteractOutside = (
     event: Parameters<NonNullable<KobalteDialogContentProps['onInteractOutside']>>[0],
   ) => {
-    if (behaviorProps.dismissible) {
-      return
-    }
-
-    if (event.defaultPrevented) {
+    if (behaviorProps.dismissible || event.defaultPrevented) {
       return
     }
 
@@ -197,10 +190,7 @@ export function Modal(props: ModalProps): JSX.Element {
                   <Show when={contentProps.description}>
                     <KobalteDialog.Description
                       data-slot="description"
-                      class={cn(
-                        'text-muted-foreground text-sm *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground',
-                        contentProps.classes?.description,
-                      )}
+                      class={cn('text-muted-foreground text-sm', contentProps.classes?.description)}
                     >
                       {contentProps.description}
                     </KobalteDialog.Description>
@@ -223,7 +213,7 @@ export function Modal(props: ModalProps): JSX.Element {
                   <KobalteDialog.CloseButton
                     data-slot="close"
                     class={cn(
-                      'inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors hover:(bg-accent text-accent-foreground) focus-visible:(border-ring ring-3 ring-ring/50)',
+                      'inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:(bg-accent text-accent-foreground) focus-visible:(border-ring ring-3 ring-ring/50)',
                       contentProps.classes?.close,
                     )}
                     aria-label="Close"
@@ -303,11 +293,9 @@ export function Modal(props: ModalProps): JSX.Element {
 
   return (
     <KobalteDialog.Root {...rootStateProps} modal {...rootProps}>
-      <Show when={hasTrigger()}>
-        <KobalteDialog.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
-          {triggerChildren()}
-        </KobalteDialog.Trigger>
-      </Show>
+      <KobalteDialog.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
+        {contentProps.children}
+      </KobalteDialog.Trigger>
 
       <KobalteDialog.Portal>{layer()}</KobalteDialog.Portal>
     </KobalteDialog.Root>

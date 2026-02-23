@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
 import { Sheet } from './sheet'
+import type { SheetProps } from './sheet'
 
 describe('Sheet', () => {
   test.each([
@@ -10,7 +11,11 @@ describe('Sheet', () => {
     ['top', 'top-0'],
     ['bottom', 'bottom-0'],
   ] as const)('applies side variant %s to content', (side, expectedClass) => {
-    render(() => <Sheet open side={side} body="Sheet body" />)
+    render(() => (
+      <Sheet open side={side} body="Sheet body">
+        <button type="button">Trigger</button>
+      </Sheet>
+    ))
 
     const content = document.body.querySelector('[data-slot="content"]')
 
@@ -30,7 +35,9 @@ describe('Sheet', () => {
           content: 'content-class',
         }}
         body="Body"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Sheet>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]')
@@ -51,7 +58,9 @@ describe('Sheet', () => {
         actions={<button type="button">Action</button>}
         body="Sheet body"
         footer="Sheet footer"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Sheet>
     ))
 
     expect(document.body.textContent).toContain('Panel')
@@ -63,20 +72,30 @@ describe('Sheet', () => {
   })
 
   test('supports custom close content', () => {
-    render(() => <Sheet open close={<span data-testid="custom-close">X</span>} body="Body" />)
+    render(() => (
+      <Sheet open close={<span data-testid="custom-close">X</span>} body="Body">
+        <button type="button">Trigger</button>
+      </Sheet>
+    ))
 
     expect(document.body.querySelector('[data-testid="custom-close"]')?.textContent).toBe('X')
   })
 
   test('hides close button when close=false', () => {
-    render(() => <Sheet open close={false} body="Body" />)
+    render(() => (
+      <Sheet open close={false} body="Body">
+        <button type="button">Trigger</button>
+      </Sheet>
+    ))
 
     expect(document.body.querySelector('[data-slot="close"]')).toBeNull()
   })
 
   test('renders body content and keeps shell sections', () => {
     render(() => (
-      <Sheet open title="Sheet title" body={<div data-testid="custom-body">Body Content</div>} />
+      <Sheet open title="Sheet title" body={<div data-testid="custom-body">Body Content</div>}>
+        <button type="button">Trigger</button>
+      </Sheet>
     ))
 
     expect(document.body.querySelector('[data-testid="custom-body"]')?.textContent).toContain(
@@ -114,14 +133,22 @@ describe('Sheet', () => {
   })
 
   test('renders into portal by default', () => {
-    const screen = render(() => <Sheet open title="Portal default" body="Body" />)
+    const screen = render(() => (
+      <Sheet open title="Portal default" body="Body">
+        <button type="button">Trigger</button>
+      </Sheet>
+    ))
 
     expect(screen.container.querySelector('[data-slot="content"]')).toBeNull()
     expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
   })
 
   test('supports overlay=false', () => {
-    render(() => <Sheet open overlay={false} body="Body" />)
+    render(() => (
+      <Sheet open overlay={false} body="Body">
+        <button type="button">Trigger</button>
+      </Sheet>
+    ))
 
     expect(document.body.querySelector('[data-slot="overlay"]')).toBeNull()
   })
@@ -130,7 +157,9 @@ describe('Sheet', () => {
     const onClosePrevent = vi.fn()
 
     render(() => (
-      <Sheet defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body" />
+      <Sheet defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body">
+        <button type="button">Trigger</button>
+      </Sheet>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]') as HTMLElement
@@ -177,7 +206,9 @@ describe('Sheet', () => {
         onClosePrevent={onClosePrevent}
         onOpenChange={onOpenChange}
         body="Body"
-      />
+      >
+        <button type="button">Trigger</button>
+      </Sheet>
     ))
 
     const content = document.body.querySelector('[data-slot="content"]') as HTMLElement
@@ -193,9 +224,9 @@ describe('Sheet', () => {
     })
   })
 
-  test('does not render trigger when default slot is missing', () => {
-    render(() => <Sheet open body="Body" />)
-
-    expect(document.body.querySelector('[data-slot="trigger"]')).toBeNull()
+  test('requires children in type contract', () => {
+    // @ts-expect-error children is required
+    const props: SheetProps = { open: true, body: 'Body' }
+    expect(props).toBeDefined()
   })
 })

@@ -1,5 +1,5 @@
 import type { JSX } from 'solid-js'
-import { Show, mergeProps, splitProps } from 'solid-js'
+import { Show } from 'solid-js'
 
 import { cn } from '../shared/utils'
 
@@ -23,46 +23,37 @@ export interface CardBaseProps extends CardVariantProps {
 export type CardProps = CardBaseProps
 
 export function Card(props: CardProps): JSX.Element {
-  const merged = mergeProps(
-    {
-      variant: 'outline' as const,
-    },
-    props,
-  ) as CardProps
-
-  const [styleProps, contentProps] = splitProps(merged, ['variant', 'classes'])
-
   return (
     <div
       data-slot="root"
       class={cardRootVariants(
         {
-          variant: styleProps.variant,
+          variant: props.variant,
         },
-        styleProps.classes?.root,
+        props.classes?.root,
       )}
     >
-      <Show when={contentProps.header}>
+      <Show when={props.header}>
         <div
           data-slot="header"
           class={cn(
             'grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6',
-            styleProps.classes?.header,
+            props.classes?.header,
           )}
         >
-          {contentProps.header}
+          {props.header}
         </div>
       </Show>
 
-      <Show when={contentProps.children}>
-        <div data-slot="body" class={cn('flex-1 p-6', styleProps.classes?.body)}>
-          {contentProps.children}
+      <Show when={props.children}>
+        <div data-slot="body" class={cn('flex-1 p-6', props.classes?.body)}>
+          {props.children}
         </div>
       </Show>
 
-      <Show when={contentProps.footer}>
-        <div data-slot="footer" class={cn('flex items-center p-6', styleProps.classes?.footer)}>
-          {contentProps.footer}
+      <Show when={props.footer}>
+        <div data-slot="footer" class={cn('flex items-center p-6', props.classes?.footer)}>
+          {props.footer}
         </div>
       </Show>
     </div>

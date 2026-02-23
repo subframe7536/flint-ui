@@ -20,7 +20,6 @@ export const progressStatusVariants = cva(
       orientation: 'horizontal',
       size: 'md',
       color: 'primary',
-      inverted: false,
     },
     variants: {
       orientation: {
@@ -40,22 +39,7 @@ export const progressStatusVariants = cva(
         neutral: 'text-muted-foreground',
         error: 'text-destructive',
       },
-      inverted: {
-        true: 'self-end',
-      },
     },
-    compoundVariants: [
-      {
-        orientation: 'horizontal',
-        inverted: true,
-        class: 'flex-row-reverse',
-      },
-      {
-        orientation: 'vertical',
-        inverted: true,
-        class: 'flex-col-reverse',
-      },
-    ],
   },
 )
 
@@ -201,7 +185,6 @@ export const progressStepVariants = cva(
       state: 'other',
       size: 'md',
       color: 'primary',
-      inverted: false,
     },
     variants: {
       state: {
@@ -222,9 +205,6 @@ export const progressStepVariants = cva(
         secondary: 'text-secondary',
         neutral: 'text-foreground',
         error: 'text-destructive',
-      },
-      inverted: {
-        true: 'text-start',
       },
     },
   },

@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
 import { DropdownMenu } from './dropdown-menu'
+import type { DropdownMenuProps } from './dropdown-menu'
 
 describe('DropdownMenu', () => {
   test('opens by keyboard and supports keyboard selection', async () => {
@@ -188,11 +189,10 @@ describe('DropdownMenu', () => {
     expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
   })
 
-  test('does not render trigger when default slot is missing', () => {
-    render(() => <DropdownMenu defaultOpen items={[{ label: 'Open item' }]} />)
-
-    expect(document.body.querySelector('[data-slot="trigger"]')).toBeNull()
-    expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
+  test('requires children in type contract', () => {
+    // @ts-expect-error children is required
+    const props: DropdownMenuProps = { defaultOpen: true, items: [{ label: 'Open item' }] }
+    expect(props).toBeDefined()
   })
 
   test('does not open when menu trigger is disabled', async () => {

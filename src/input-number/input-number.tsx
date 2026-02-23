@@ -21,6 +21,9 @@ import {
 type InputNumberColor = NonNullable<InputNumberVariantProps['color']>
 type InputNumberSize = NonNullable<InputNumberVariantProps['size']>
 type InputNumberButtonSize = NonNullable<ButtonProps<'button'>['size']>
+type InputNumberControlTrigger =
+  | typeof KobalteNumberField.IncrementTrigger
+  | typeof KobalteNumberField.DecrementTrigger
 
 type InputNumberControlButtonProps = Partial<
   Omit<ButtonProps<'button'>, 'children' | 'label' | 'onClick' | 'type'>
@@ -169,6 +172,32 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
     return typeof controlProps.decrement === 'object' ? controlProps.decrement : undefined
   })
 
+  function renderControl(config: {
+    slot: 'increment' | 'decrement'
+    trigger: InputNumberControlTrigger
+    className: string
+    disabled: boolean | undefined
+    ariaLabel: 'Increment' | 'Decrement'
+    icon: IconName
+    buttonProps: InputNumberControlButtonProps | undefined
+  }): JSX.Element {
+    const Trigger = config.trigger
+
+    return (
+      <div data-slot={config.slot} class={config.className}>
+        <Trigger
+          as={Button}
+          disabled={config.disabled}
+          variant="ghost"
+          size={buttonSize()}
+          aria-label={config.ariaLabel}
+          leading={<Icon name={config.icon} />}
+          {...config.buttonProps}
+        />
+      </div>
+    )
+  }
+
   function onRawValueChange(value: number): void {
     formProps.onRawValueChange?.(value)
     field.emitFormChange()
@@ -231,49 +260,39 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       <KobalteNumberField.HiddenInput data-slot="hidden-input" />
 
       <Show when={resolvedIncrement()}>
-        <div
-          data-slot="increment"
-          class={inputNumberIncrementVariants(
+        {renderControl({
+          slot: 'increment',
+          trigger: KobalteNumberField.IncrementTrigger,
+          className: inputNumberIncrementVariants(
             {
               orientation: controlProps.orientation,
               disabled: disabled() || controlProps.incrementDisabled,
             },
             styleProps.classes?.increment,
-          )}
-        >
-          <KobalteNumberField.IncrementTrigger
-            as={Button}
-            disabled={disabled() || controlProps.incrementDisabled}
-            variant="ghost"
-            size={buttonSize()}
-            aria-label="Increment"
-            leading={<Icon name={incrementIcon()} />}
-            {...incrementProps()}
-          />
-        </div>
+          ),
+          disabled: disabled() || controlProps.incrementDisabled,
+          ariaLabel: 'Increment',
+          icon: incrementIcon(),
+          buttonProps: incrementProps(),
+        })}
       </Show>
 
       <Show when={resolvedDecrement()}>
-        <div
-          data-slot="decrement"
-          class={inputNumberDecrementVariants(
+        {renderControl({
+          slot: 'decrement',
+          trigger: KobalteNumberField.DecrementTrigger,
+          className: inputNumberDecrementVariants(
             {
               orientation: controlProps.orientation,
               disabled: disabled() || controlProps.decrementDisabled,
             },
             styleProps.classes?.decrement,
-          )}
-        >
-          <KobalteNumberField.DecrementTrigger
-            as={Button}
-            disabled={disabled() || controlProps.decrementDisabled}
-            variant="ghost"
-            size={buttonSize()}
-            aria-label="Decrement"
-            leading={<Icon name={decrementIcon()} />}
-            {...decrementProps()}
-          />
-        </div>
+          ),
+          disabled: disabled() || controlProps.decrementDisabled,
+          ariaLabel: 'Decrement',
+          icon: decrementIcon(),
+          buttonProps: decrementProps(),
+        })}
       </Show>
     </KobalteNumberField.Root>
   )

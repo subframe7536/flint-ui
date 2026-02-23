@@ -2,6 +2,7 @@ import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
 import { ContextMenu } from './context-menu'
+import type { ContextMenuProps } from './context-menu'
 
 describe('ContextMenu', () => {
   test('opens on context menu event and supports keyboard selection', async () => {
@@ -224,10 +225,10 @@ describe('ContextMenu', () => {
     })
   })
 
-  test('does not render trigger when default slot is missing', () => {
-    render(() => <ContextMenu items={[{ label: 'Open item' }]} />)
-
-    expect(document.body.querySelector('[data-slot="trigger"]')).toBeNull()
+  test('requires children in type contract', () => {
+    // @ts-expect-error children is required
+    const props: ContextMenuProps = { items: [{ label: 'Open item' }] }
+    expect(props).toBeDefined()
   })
 
   test('does not open when context menu trigger is disabled', async () => {

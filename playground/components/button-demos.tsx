@@ -17,7 +17,7 @@ const VARIANTS: ButtonVariantName[] = [
   'destructive',
 ]
 
-const SIZES: ButtonSizeName[] = ['xs', 'sm', 'default', 'lg', 'xl']
+const SIZES: ButtonSizeName[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const ICON_SIZES: ButtonSizeName[] = ['icon-xs', 'icon-sm', 'icon', 'icon-lg', 'icon-xl']
 
 const wait = (ms: number) =>

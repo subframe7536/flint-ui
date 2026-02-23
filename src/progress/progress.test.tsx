@@ -2,6 +2,7 @@ import { render } from '@solidjs/testing-library'
 import { describe, expect, test } from 'vitest'
 
 import { Progress } from './progress'
+import type { ProgressProps } from './progress'
 
 describe('Progress', () => {
   test('renders determinate progress with default aria values', () => {
@@ -77,9 +78,9 @@ describe('Progress', () => {
     expect(indicator?.hasAttribute('data-indeterminate')).toBe(true)
   })
 
-  test('applies orientation, inverted, and animation classes', () => {
+  test('applies orientation and animation classes', () => {
     const screen = render(() => (
-      <Progress value={25} status orientation="vertical" inverted animation="swing" />
+      <Progress value={25} status orientation="vertical" animation="swing" />
     ))
 
     const root = screen.container.querySelector('[data-slot="root"]')
@@ -89,7 +90,7 @@ describe('Progress', () => {
     expect(root?.className).toContain('flex-row-reverse')
     expect(status.style.height).toBe('25%')
     expect(indicator.className).toContain('animate-[swing-vertical_2s_ease-in-out_infinite]')
-    expect(indicator.style.transform).toBe('translateY(75%)')
+    expect(indicator.style.transform).toBe('translateY(-75%)')
   })
 
   test('merges classes overrides into all slots', () => {
@@ -122,5 +123,11 @@ describe('Progress', () => {
     expect(indicator?.className).toContain('indicator-override')
     expect(steps?.className).toContain('steps-override')
     expect(step?.className).toContain('step-override')
+  })
+
+  test('rejects inverted in type contract', () => {
+    // @ts-expect-error inverted has been removed from Progress props
+    const props: ProgressProps = { inverted: true }
+    expect(props).toBeDefined()
   })
 })

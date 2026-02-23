@@ -2,6 +2,7 @@ import { render } from '@solidjs/testing-library'
 import { describe, expect, test } from 'vitest'
 
 import { Kbd } from './kbd'
+import type { KbdProps } from './kbd'
 
 describe('Kbd', () => {
   test('renders kbd root with content', () => {
@@ -26,12 +27,30 @@ describe('Kbd', () => {
     expect(xl.container.querySelector('[data-slot="root"]')?.className).toContain('h-6')
   })
 
-  test('falls back to md size when runtime size is invalid', () => {
-    // @ts-expect-error test invalid size
-    const screen = render(() => <Kbd size="invalid">K</Kbd>)
-    const root = screen.container.querySelector('[data-slot="root"]')
+  test('supports default/outline/invert variants with outline as default', () => {
+    const outlineByDefault = render(() => <Kbd>K</Kbd>)
+    const asDefault = render(() => <Kbd variant="default">K</Kbd>)
+    const asOutline = render(() => <Kbd variant="outline">K</Kbd>)
+    const asInvert = render(() => <Kbd variant="invert">K</Kbd>)
 
-    expect(root?.className).toContain('h-4')
+    expect(outlineByDefault.container.querySelector('[data-slot="root"]')?.className).toContain(
+      'border-border',
+    )
+    expect(asDefault.container.querySelector('[data-slot="root"]')?.className).toContain(
+      'bg-muted/70',
+    )
+    expect(asOutline.container.querySelector('[data-slot="root"]')?.className).toContain(
+      'border-border',
+    )
+    expect(asInvert.container.querySelector('[data-slot="root"]')?.className).toContain(
+      'bg-foreground',
+    )
+  })
+
+  test('rejects invalid size in type contract', () => {
+    // @ts-expect-error size must be a declared Kbd size
+    const props: KbdProps = { size: 'invalid' }
+    expect(props).toBeDefined()
   })
 
   test('applies classes.root override', () => {

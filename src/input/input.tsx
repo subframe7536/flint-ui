@@ -1,6 +1,5 @@
-import type { JSX, ValidComponent } from 'solid-js'
+import type { JSX } from 'solid-js'
 import { Show, createMemo, mergeProps, onMount, splitProps } from 'solid-js'
-import { Dynamic } from 'solid-js/web'
 
 import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
@@ -41,7 +40,6 @@ export interface InputClasses {
 }
 
 export interface InputBaseProps extends InputStyleVariantProps {
-  as?: ValidComponent
   id?: string
   name?: string
   type?: JSX.InputHTMLAttributes<HTMLInputElement>['type']
@@ -79,7 +77,6 @@ function isRenderableContent(value: unknown): value is JSX.Element {
 export function Input(props: InputProps): JSX.Element {
   const merged = mergeProps(
     {
-      as: 'div' as ValidComponent,
       type: 'text' as NonNullable<JSX.InputHTMLAttributes<HTMLInputElement>['type']>,
       autocomplete: 'off' as const,
       autofocusDelay: 0,
@@ -107,7 +104,7 @@ export function Input(props: InputProps): JSX.Element {
       'onBlur',
       'onFocus',
     ],
-    ['as', 'type', 'placeholder', 'autocomplete', 'autofocus', 'autofocusDelay', 'children'],
+    ['type', 'placeholder', 'autocomplete', 'autofocus', 'autofocusDelay', 'children'],
   )
 
   const field = useFormField(
@@ -231,6 +228,14 @@ export function Input(props: InputProps): JSX.Element {
     callHandler(event, formProps.onFocus as any)
   }
 
+  const onRootPointerDown: JSX.EventHandlerUnion<HTMLDivElement, PointerEvent> = (event) => {
+    if (event.button !== 0 || event.defaultPrevented || event.target === inputEl) {
+      return
+    }
+
+    inputEl?.focus()
+  }
+
   onMount(() => {
     if (!baseProps.autofocus) {
       return
@@ -242,8 +247,7 @@ export function Input(props: InputProps): JSX.Element {
   })
 
   return (
-    <Dynamic
-      component={baseProps.as}
+    <div
       data-slot="root"
       class={inputRootVariants(
         {
@@ -255,7 +259,7 @@ export function Input(props: InputProps): JSX.Element {
         },
         adornmentStyleProps.classes?.root,
       )}
-      onclick={() => inputEl?.focus()}
+      onPointerDown={onRootPointerDown}
     >
       <Show when={hasLeading()}>
         <span
@@ -371,6 +375,6 @@ export function Input(props: InputProps): JSX.Element {
           </Show>
         </span>
       </Show>
-    </Dynamic>
+    </div>
   )
 }

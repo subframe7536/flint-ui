@@ -103,6 +103,31 @@ const view = (
     expect(output).not.toContain(`${TEST_PREFIX}sm`)
   })
 
+  test('skips cn operands inside *Variants classes arguments', async () => {
+    const output = await runTransform(
+      `
+const view = (
+  <div
+    class={fooVariants(
+      { size: local.variant === 'table' ? 'md' : 'sm' },
+      cn('x y', cond && 'z', local.classes?.root),
+      'k l',
+    )}
+  />
+)
+`,
+      'src/example.tsx',
+    )
+
+    expect(output).toContain(`cn('x y', cond && 'z', local.classes?.root)`)
+    expect(output).toContain(`'${TEST_PREFIX}k ${TEST_PREFIX}l'`)
+    expect(output).not.toContain(`'${TEST_PREFIX}x ${TEST_PREFIX}y'`)
+    expect(output).not.toContain(`cond && '${TEST_PREFIX}z'`)
+    expect(output).not.toContain(`${TEST_PREFIX}table`)
+    expect(output).not.toContain(`${TEST_PREFIX}md`)
+    expect(output).not.toContain(`${TEST_PREFIX}sm`)
+  })
+
   test('is idempotent when transformer runs multiple times', async () => {
     const source = `const view = <div class={'${TEST_PREFIX}a b'} />`
     const once = await runTransform(source, 'src/once.tsx')

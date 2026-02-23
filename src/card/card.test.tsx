@@ -3,6 +3,7 @@ import type { JSX } from 'solid-js'
 import { describe, expect, test } from 'vitest'
 
 import { Card } from './card'
+import type { CardProps } from './card'
 
 describe('Card', () => {
   test('renders root with default outline variant classes', () => {
@@ -84,11 +85,9 @@ describe('Card', () => {
     expect(footer?.className).toContain('footer-override')
   })
 
-  test('falls back to outline variant when runtime value is invalid', () => {
-    const screen = render(() => <Card {...({ variant: 'invalid' } as any)} />)
-    const root = screen.container.querySelector('[data-slot="root"]')
-
-    expect(root?.className).toContain('divide-y')
-    expect(root?.className).toContain('border-border')
+  test('rejects invalid variant in type contract', () => {
+    // @ts-expect-error variant must be a declared Card variant
+    const props: CardProps = { variant: 'invalid' }
+    expect(props).toBeDefined()
   })
 })

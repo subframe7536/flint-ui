@@ -39,6 +39,23 @@ export const checkboxGroupLegendVariants = cva('mb-1 block font-medium text-fore
   },
 })
 
+export const checkboxGroupItemVariants = cva('', {
+  defaultVariants: {
+    variant: 'list',
+    disabled: false,
+  },
+  variants: {
+    variant: {
+      list: '',
+      card: '',
+      table: 'border',
+    },
+    disabled: {
+      true: 'cursor-not-allowed',
+    },
+  },
+})
+
 export const checkboxGroupTablePaddingVariants = cva('p-3.5', {
   defaultVariants: {
     size: 'md',

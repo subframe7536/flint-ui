@@ -4,6 +4,12 @@ Opinioned component library for solid.js, with style/base component sourcing fro
 
 ## Breaking Changes
 
+### 2026-02-23
+
+- `Input` and `Textarea` no longer support the polymorphic `as` prop and always render a `<div>` root wrapper.
+- `Progress` no longer supports the `inverted` prop.
+- `Kbd` now supports `variant` values `default`, `outline`, and `invert`; default variant is `outline`.
+
 ### 2026-02-22
 
 - Overlay `arrow` support has been hard-removed from public APIs and runtime rendering paths (`Popover`, `Tooltip`, `DropdownMenu`, `ContextMenu`, and shared overlay menu contracts).

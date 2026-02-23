@@ -62,10 +62,9 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     props,
   )
 
-  const [formProps, rootStateProps, visualProps, rootProps] = splitProps(
+  const [formProps, visualProps, rootProps] = splitProps(
     merged as CheckboxProps,
     ['id', 'name', 'formFieldBind', 'disabled', 'onChange'],
-    ['value', 'checked', 'defaultChecked', 'indeterminate', 'required', 'readOnly'],
     [
       'label',
       'description',
@@ -97,10 +96,9 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
   const rootId = createMemo(() => `${inputId()}-root`)
   const resolvedColor = createMemo(() => (field.color() ?? visualProps.color) as CheckboxColor)
   const resolvedSize = createMemo(() => (field.size() ?? visualProps.size) as CheckboxSize)
-  const disabled = createMemo(() => field.disabled())
-  const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
+
   const invalid = createMemo(() => {
-    const value = ariaAttrs()['aria-invalid']
+    const value = field.ariaAttrs()?.['aria-invalid']
 
     return value === true || value === 'true'
   })
@@ -113,17 +111,16 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
   return (
     <KobalteCheckbox.Root
-      {...rootStateProps}
       id={rootId()}
       name={field.name()}
-      disabled={disabled()}
+      disabled={field.disabled()}
       onChange={onChange}
       data-slot="root"
       class={checkboxRootVariants(
         {
           variant: visualProps.variant === 'card' ? 'card' : undefined,
           indicator: visualProps.indicator === 'hidden' ? undefined : visualProps.indicator,
-          disabled: disabled(),
+          disabled: field.disabled(),
         },
         visualProps.variant === 'card' &&
           checkboxCardPaddingVariants({
@@ -144,11 +141,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
               visualProps.classes?.container,
             )}
           >
-            <KobalteCheckbox.Input
-              id={inputId()}
-              data-slot="input"
-              {...(ariaAttrs() as Record<string, string | boolean | undefined>)}
-            />
+            <KobalteCheckbox.Input id={inputId()} data-slot="input" {...field.ariaAttrs()} />
 
             <KobalteCheckbox.Control
               data-slot="base"
@@ -156,7 +149,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                 {
                   color: resolvedColor(),
                   size: resolvedSize(),
-                  disabled: disabled(),
+                  disabled: field.disabled(),
                   invalid: invalid(),
                 },
                 visualProps.indicator === 'hidden' && 'sr-only',
@@ -221,8 +214,8 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                   data-slot="label"
                   class={checkboxLabelVariants(
                     {
-                      required: rootStateProps.required,
-                      disabled: disabled(),
+                      required: rootProps.required,
+                      disabled: field.disabled(),
                     },
                     visualProps.classes?.label,
                   )}
@@ -236,7 +229,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                   data-slot="description"
                   class={checkboxDescriptionVariants(
                     {
-                      disabled: disabled(),
+                      disabled: field.disabled(),
                     },
                     visualProps.classes?.description,
                   )}

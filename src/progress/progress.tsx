@@ -40,7 +40,6 @@ export interface ProgressBaseProps extends Pick<
   value?: number | null
   max?: number | string[]
   status?: boolean
-  inverted?: boolean
   getValueLabel?: KobalteProgress.ProgressRootProps['getValueLabel']
   renderStatus?: (context: ProgressStatusRenderContext) => JSX.Element
   renderStep?: (context: ProgressStepRenderContext) => JSX.Element
@@ -78,7 +77,6 @@ export function Progress(props: ProgressProps): JSX.Element {
       value: null,
       max: 100,
       status: false,
-      inverted: false,
       orientation: 'horizontal' as const,
       animation: 'carousel' as const,
       color: 'primary' as const,
@@ -90,7 +88,7 @@ export function Progress(props: ProgressProps): JSX.Element {
   const [valueProps, behaviorProps, styleProps, rootProps] = splitProps(
     merged as ProgressProps,
     ['value', 'max'],
-    ['status', 'inverted', 'orientation', 'animation', 'renderStatus', 'renderStep'],
+    ['status', 'orientation', 'animation', 'renderStatus', 'renderStep'],
     ['color', 'size', 'classes'],
   )
 
@@ -149,12 +147,12 @@ export function Progress(props: ProgressProps): JSX.Element {
       const distance = 100 - currentPercent
       if (behaviorProps.orientation === 'vertical') {
         return {
-          transform: `translateY(${behaviorProps.inverted ? '' : '-'}${distance}%)`,
+          transform: `translateY(-${distance}%)`,
         }
       }
 
       return {
-        transform: `translateX(${behaviorProps.inverted ? '' : '-'}${distance}%)`,
+        transform: `translateX(-${distance}%)`,
       }
     })
 
@@ -189,7 +187,6 @@ export function Progress(props: ProgressProps): JSX.Element {
                 orientation: behaviorProps.orientation,
                 size: styleProps.size,
                 color: styleProps.color,
-                inverted: behaviorProps.inverted,
               },
               styleProps.classes?.status,
             )}
@@ -246,7 +243,6 @@ export function Progress(props: ProgressProps): JSX.Element {
                       state: stepState(index()),
                       size: styleProps.size,
                       color: styleProps.color,
-                      inverted: behaviorProps.inverted,
                     },
                     styleProps.classes?.step,
                   )}

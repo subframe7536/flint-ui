@@ -1,6 +1,6 @@
 import * as KobalteDropdownMenu from '@kobalte/core/dropdown-menu'
 import type { JSX } from 'solid-js'
-import { Show, children, mergeProps, splitProps } from 'solid-js'
+import { mergeProps, splitProps } from 'solid-js'
 
 import type { IconName } from '../icon'
 import { resolveOverlayMenuSide } from '../shared/overlay-menu'
@@ -75,7 +75,7 @@ export interface DropdownMenuBaseProps {
   contentTop?: OverlayMenuContentSlot
   contentBottom?: OverlayMenuContentSlot
   classes?: DropdownMenuClasses
-  children?: JSX.Element
+  children: JSX.Element
 }
 
 export type DropdownMenuProps = DropdownMenuBaseProps &
@@ -111,9 +111,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     ['children'],
   )
 
-  const triggerChildren = children(() => triggerProps.children)
-  const hasTrigger = () => triggerChildren.toArray().length > 0
-
   const rootSide = () => resolveOverlayMenuSide(rootStateProps.placement)
 
   return (
@@ -124,16 +121,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       overflowPadding={0}
       {...rootProps}
     >
-      <Show when={hasTrigger()}>
-        <KobalteDropdownMenu.Trigger
-          as="span"
-          data-slot="trigger"
-          class={menuProps.classes?.trigger}
-          disabled={rootStateProps.disabled}
-        >
-          {triggerChildren()}
-        </KobalteDropdownMenu.Trigger>
-      </Show>
+      <KobalteDropdownMenu.Trigger
+        as="span"
+        data-slot="trigger"
+        class={menuProps.classes?.trigger}
+        disabled={rootStateProps.disabled}
+      >
+        {triggerProps.children}
+      </KobalteDropdownMenu.Trigger>
 
       <OverlayMenuBaseContent<DropdownMenuColor, DropdownMenuItem, DropdownMenuSize>
         primitives={DROPDOWN_MENU_PRIMITIVES}

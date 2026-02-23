@@ -1,4 +1,3 @@
-import '@unocss/reset/tailwind-v4.css'
 import 'uno.css'
 
 import { Match, Switch, createSignal, onMount } from 'solid-js'

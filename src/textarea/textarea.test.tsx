@@ -5,6 +5,7 @@ import { Form } from '../form'
 import { FormField } from '../form-field'
 
 import { Textarea } from './textarea'
+import type { TextareaProps } from './textarea'
 
 function createForm(
   validateOn?: Array<'blur' | 'change' | 'input'>,
@@ -283,5 +284,11 @@ describe('Textarea', () => {
     const root = screen.container.querySelector('[data-slot="root"]')
 
     expect(root?.className).toContain('root-override')
+  })
+
+  test('rejects as in type contract', () => {
+    // @ts-expect-error as has been removed from Textarea props
+    const props: TextareaProps = { as: 'section' }
+    expect(props).toBeDefined()
   })
 })

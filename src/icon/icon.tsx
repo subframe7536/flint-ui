@@ -1,5 +1,5 @@
 import type { JSX } from 'solid-js'
-import { Show, createMemo, splitProps } from 'solid-js'
+import { createMemo, splitProps } from 'solid-js'
 
 import { cn, combineStyle } from '../shared/utils'
 
@@ -48,6 +48,26 @@ function parseIconName(value: string): { name: string; prefix?: string } {
   }
 }
 
+function resolveStringIconClass(
+  name: string,
+  customize?: IconBaseProps['customize'],
+): string | undefined {
+  const parsed = parseIconName(name)
+  return customize?.(parsed.name, parsed.name, parsed.prefix, undefined) ?? name
+}
+
+function resolveNonStringIconContent(name: IconName): JSX.Element | undefined {
+  if (typeof name === 'string') {
+    return undefined
+  }
+
+  if (typeof name === 'function') {
+    return name()
+  }
+
+  return name
+}
+
 export function Icon(props: IconProps): JSX.Element {
   const [sourceProps, a11ySlotProps, styleProps] = splitProps(
     props as IconProps,
@@ -71,41 +91,25 @@ export function Icon(props: IconProps): JSX.Element {
     }
   })
 
-  const resolveIconClass = (): string | undefined => {
-    if (typeof sourceProps.name !== 'string') {
-      return undefined
-    }
-
-    const parsed = parseIconName(sourceProps.name)
-    const customized = sourceProps.customize?.(parsed.name, parsed.name, parsed.prefix, undefined)
-
-    return customized ?? sourceProps.name
-  }
-
-  const renderedContent = createMemo<JSX.Element>(() => {
-    if (typeof sourceProps.name === 'function') {
-      return sourceProps.name()
-    }
-
-    if (typeof sourceProps.name === 'string') {
-      return ''
-    }
-
-    return sourceProps.name
-  })
+  const iconClass = createMemo<string | undefined>(() =>
+    typeof sourceProps.name === 'string'
+      ? resolveStringIconClass(sourceProps.name, sourceProps.customize)
+      : undefined,
+  )
+  const renderedContent = createMemo(() => resolveNonStringIconContent(sourceProps.name))
 
   return (
     <span
       data-slot={a11ySlotProps['data-slot'] ?? 'icon'}
       class={cn(
         'inline-flex shrink-0 items-center justify-center align-middle',
-        resolveIconClass(),
+        iconClass(),
         styleProps.classes?.root,
       )}
       style={combineStyle(a11ySlotProps.style, sizeStyle())}
       aria-hidden={a11ySlotProps['aria-label'] ? undefined : true}
     >
-      <Show when={typeof sourceProps.name !== 'string'}>{renderedContent()}</Show>
+      {renderedContent()}
     </span>
   )
 }

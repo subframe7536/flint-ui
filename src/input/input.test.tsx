@@ -5,6 +5,7 @@ import { Form } from '../form'
 import { FormField } from '../form-field'
 
 import { Input } from './input'
+import type { InputProps } from './input'
 
 function createForm(
   validateOn?: Array<'blur' | 'change' | 'input'>,
@@ -343,5 +344,11 @@ describe('Input', () => {
     const root = screen.container.querySelector('[data-slot="root"]')
 
     expect(root?.className).toContain('root-override')
+  })
+
+  test('rejects as in type contract', () => {
+    // @ts-expect-error as has been removed from Input props
+    const props: InputProps = { as: 'section' }
+    expect(props).toBeDefined()
   })
 })

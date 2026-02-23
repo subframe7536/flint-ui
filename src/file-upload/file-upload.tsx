@@ -157,6 +157,76 @@ function createRejection(file: File, error: FileError): FileRejection {
   }
 }
 
+function filterAcceptedFiles(
+  files: File[],
+  accept: string | undefined,
+): {
+  accepted: File[]
+  rejected: FileRejection[]
+} {
+  const accepted: File[] = []
+  const rejected: FileRejection[] = []
+
+  for (const file of files) {
+    if (!isAcceptedFileType(file, accept)) {
+      rejected.push(createRejection(file, 'FILE_INVALID_TYPE'))
+      continue
+    }
+
+    accepted.push(file)
+  }
+
+  return { accepted, rejected }
+}
+
+function constrainMultipleFiles(
+  accepted: File[],
+  currentCount: number,
+  maxFiles: number,
+): {
+  accepted: File[]
+  rejected: FileRejection[]
+} {
+  const rejected: FileRejection[] = []
+  const remainingSlots = Number.isFinite(maxFiles)
+    ? Math.max(0, maxFiles - currentCount)
+    : Number.POSITIVE_INFINITY
+
+  if (remainingSlots === 0) {
+    for (const file of accepted) {
+      rejected.push(createRejection(file, 'TOO_MANY_FILES'))
+    }
+
+    return { accepted: [], rejected }
+  }
+
+  if (!Number.isFinite(remainingSlots) || accepted.length <= remainingSlots) {
+    return { accepted, rejected }
+  }
+
+  const boundedAccepted = accepted.slice(0, remainingSlots)
+  const overflow = accepted.slice(remainingSlots)
+
+  for (const file of overflow) {
+    rejected.push(createRejection(file, 'TOO_MANY_FILES'))
+  }
+
+  return { accepted: boundedAccepted, rejected }
+}
+
+function constrainSingleFile(accepted: File[]): {
+  accepted: File[]
+  rejected: FileRejection[]
+} {
+  if (accepted.length <= 1) {
+    return { accepted, rejected: [] }
+  }
+
+  const rejected = accepted.slice(1).map((file) => createRejection(file, 'TOO_MANY_FILES'))
+
+  return { accepted: [accepted[0]!], rejected }
+}
+
 export function FileUpload(props: FileUploadProps): JSX.Element {
   const merged = mergeProps(
     {
@@ -209,7 +279,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
   const [previewUrls, setPreviewUrls] = createSignal<Map<File, string>>(new Map())
 
   const inputId = () => field.id() ?? generatedId()
-  const resolvedColor = () => (field.color() ?? styleProps.color) as FileUploadColor
+  const resolvedColor = createMemo(() => (field.color() ?? styleProps.color) as FileUploadColor)
   const resolvedSize = createMemo(() => (field.size() ?? styleProps.size) as FileUploadSize)
   const invalid = createMemo(() => {
     const value = field.ariaAttrs()?.['aria-invalid']
@@ -252,52 +322,24 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
       return
     }
 
-    const accepted: File[] = []
-    const rejected: FileRejection[] = []
-
-    for (const file of files) {
-      if (!isAcceptedFileType(file, formProps.accept)) {
-        rejected.push(createRejection(file, 'FILE_INVALID_TYPE'))
-        continue
-      }
-
-      accepted.push(file)
-    }
+    const { accepted, rejected } = filterAcceptedFiles(files, formProps.accept)
 
     if (formProps.multiple) {
       const currentFiles = selectedFiles()
-      const maxFiles = resolvedMaxFiles()
-      const remainingSlots = Number.isFinite(maxFiles)
-        ? Math.max(0, maxFiles - currentFiles.length)
-        : Number.POSITIVE_INFINITY
+      const bounded = constrainMultipleFiles(accepted, currentFiles.length, resolvedMaxFiles())
+      rejected.push(...bounded.rejected)
 
-      if (remainingSlots === 0) {
-        for (const file of accepted) {
-          rejected.push(createRejection(file, 'TOO_MANY_FILES'))
-        }
-        accepted.length = 0
-      } else if (Number.isFinite(remainingSlots) && accepted.length > remainingSlots) {
-        const overflow = accepted.splice(remainingSlots)
-        for (const file of overflow) {
-          rejected.push(createRejection(file, 'TOO_MANY_FILES'))
-        }
-      }
-
-      if (accepted.length > 0) {
-        const nextFiles = [...currentFiles, ...accepted]
+      if (bounded.accepted.length > 0) {
+        const nextFiles = [...currentFiles, ...bounded.accepted]
         setSelectedFiles(nextFiles)
         emitValueChange(nextFiles)
       }
     } else {
-      if (accepted.length > 1) {
-        const overflow = accepted.splice(1)
-        for (const file of overflow) {
-          rejected.push(createRejection(file, 'TOO_MANY_FILES'))
-        }
-      }
+      const bounded = constrainSingleFile(accepted)
+      rejected.push(...bounded.rejected)
 
-      if (accepted.length > 0) {
-        const nextFiles = [accepted[0]!]
+      if (bounded.accepted.length > 0) {
+        const nextFiles = [bounded.accepted[0]!]
         setSelectedFiles(nextFiles)
         emitValueChange(nextFiles)
       }

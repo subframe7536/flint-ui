@@ -29,9 +29,8 @@ export function useId(
   deterministicId?: () => string | null | undefined,
   prefix?: string,
 ): Accessor<string> {
-  // Get the actual value if it's a function
-  return createMemo(() => {
-    const id = typeof deterministicId === 'function' ? deterministicId() : deterministicId
+  const resolvedId = createMemo(() => {
+    const id = deterministicId?.()
 
     // Return deterministic ID if provided
     if (id) {
@@ -41,6 +40,8 @@ export function useId(
     // Fallback to auto-incrementing counter
     return `${prefix}-${createUniqueId()}`
   })
+
+  return resolvedId
 }
 
 export { combineStyle } from '@solid-primitives/props'

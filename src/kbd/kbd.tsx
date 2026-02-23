@@ -17,7 +17,7 @@ export interface KbdBaseProps extends KbdVariantProps {
 export type KbdProps = KbdBaseProps
 
 export function Kbd(props: KbdProps): JSX.Element {
-  const [styleProps, contentProps] = splitProps(props as KbdProps, ['size', 'classes'])
+  const [styleProps, contentProps] = splitProps(props as KbdProps, ['size', 'variant', 'classes'])
 
   return (
     <kbd
@@ -25,6 +25,7 @@ export function Kbd(props: KbdProps): JSX.Element {
       class={kbdVariants(
         {
           size: styleProps.size,
+          variant: styleProps.variant,
         },
         styleProps.classes?.root,
       )}

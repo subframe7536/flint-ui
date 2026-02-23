@@ -1,7 +1,7 @@
 import * as KobalteDialog from '@kobalte/core/dialog'
 import type { DialogContentProps as KobalteDialogContentProps } from '@kobalte/core/dialog'
 import type { JSX } from 'solid-js'
-import { Show, children, mergeProps, onCleanup, splitProps } from 'solid-js'
+import { Show, mergeProps, onCleanup, splitProps } from 'solid-js'
 
 import { Icon } from '../icon'
 import { cn } from '../shared/utils'
@@ -43,7 +43,7 @@ export interface SheetBaseProps {
   footer?: JSX.Element
   actions?: JSX.Element
   classes?: SheetClasses
-  children?: JSX.Element
+  children: JSX.Element
 }
 
 export type SheetProps = SheetBaseProps &
@@ -66,9 +66,6 @@ export function Sheet(props: SheetProps): JSX.Element {
     ['overlay', 'transition', 'side', 'inset', 'close', 'dismissible', 'onClosePrevent'],
     ['title', 'description', 'header', 'body', 'footer', 'actions', 'classes', 'children'],
   )
-
-  const triggerChildren = children(() => contentProps.children)
-  const hasTrigger = () => triggerChildren.toArray().length > 0
 
   const preventDismiss = () => {
     behaviorProps.onClosePrevent?.()
@@ -110,11 +107,7 @@ export function Sheet(props: SheetProps): JSX.Element {
   const onInteractOutside = (
     event: Parameters<NonNullable<KobalteDialogContentProps['onInteractOutside']>>[0],
   ) => {
-    if (behaviorProps.dismissible) {
-      return
-    }
-
-    if (event.defaultPrevented) {
+    if (behaviorProps.dismissible || event.defaultPrevented) {
       return
     }
 
@@ -278,11 +271,9 @@ export function Sheet(props: SheetProps): JSX.Element {
 
   return (
     <KobalteDialog.Root modal {...rootProps}>
-      <Show when={hasTrigger()}>
-        <KobalteDialog.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
-          {triggerChildren()}
-        </KobalteDialog.Trigger>
-      </Show>
+      <KobalteDialog.Trigger as="span" data-slot="trigger" class={contentProps.classes?.trigger}>
+        {contentProps.children}
+      </KobalteDialog.Trigger>
 
       <KobalteDialog.Portal>{layer()}</KobalteDialog.Portal>
     </KobalteDialog.Root>
