@@ -74,6 +74,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
                   <Kbd
                     data-slot="kbd"
                     variant="invert"
+                    size="sm"
                     classes={{
                       root: contentProps.classes?.kbd,
                     }}

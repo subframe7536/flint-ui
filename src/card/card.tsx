@@ -3,9 +3,6 @@ import { Show } from 'solid-js'
 
 import { cn } from '../shared/utils'
 
-import type { CardVariantProps } from './card.class'
-import { cardRootVariants } from './card.class'
-
 export interface CardClasses {
   root?: string
   header?: string
@@ -13,7 +10,7 @@ export interface CardClasses {
   footer?: string
 }
 
-export interface CardBaseProps extends CardVariantProps {
+export interface CardBaseProps {
   header?: JSX.Element
   footer?: JSX.Element
   classes?: CardClasses
@@ -25,19 +22,18 @@ export type CardProps = CardBaseProps
 export function Card(props: CardProps): JSX.Element {
   return (
     <div
-      data-slot="root"
-      class={cardRootVariants(
-        {
-          variant: props.variant,
-        },
+      data-slot="card"
+      class={cn(
+        'ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-xl py-4 text-sm ring-1 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl flex flex-col',
+        props.footer && 'pb-0',
         props.classes?.root,
       )}
     >
       <Show when={props.header}>
         <div
-          data-slot="header"
+          data-slot="card-header"
           class={cn(
-            'grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6',
+            'gap-1 rounded-t-xl px-4 is-[.border-b]:pb-4 grid auto-rows-min items-start',
             props.classes?.header,
           )}
         >
@@ -46,13 +42,19 @@ export function Card(props: CardProps): JSX.Element {
       </Show>
 
       <Show when={props.children}>
-        <div data-slot="body" class={cn('flex-1 p-6', props.classes?.body)}>
+        <div data-slot="card-content" class={cn('flex-1 px-4', props.classes?.body)}>
           {props.children}
         </div>
       </Show>
 
       <Show when={props.footer}>
-        <div data-slot="footer" class={cn('flex items-center p-6', props.classes?.footer)}>
+        <div
+          data-slot="card-footer"
+          class={cn(
+            'flex items-center bg-muted/50 rounded-b-xl b-t-(1 border) p-4',
+            props.classes?.footer,
+          )}
+        >
           {props.footer}
         </div>
       </Show>

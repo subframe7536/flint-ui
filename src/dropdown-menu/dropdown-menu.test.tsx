@@ -50,6 +50,24 @@ describe('DropdownMenu', () => {
     expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
   })
 
+  test('uses downward animation classes for default bottom placement', async () => {
+    render(() => (
+      <DropdownMenu defaultOpen items={[{ label: 'Default animation item' }]}>
+        <button type="button">Actions</button>
+      </DropdownMenu>
+    ))
+
+    await waitFor(() => {
+      expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
+    })
+
+    const rootContent = document.body.querySelector('[data-slot="content"]') as HTMLElement
+
+    expect(rootContent.className).toContain('mt-$kb-popper-content-overflow-padding')
+    expect(rootContent.className).toContain('slide-in-from-top-2')
+    expect(rootContent.className).not.toContain('slide-in-from-bottom-2')
+  })
+
   test('renders item matrix, nested submenu, and content slots', async () => {
     const contentTop = vi.fn((props: { sub: boolean }) => (
       <div data-testid={props.sub ? 'content-top-sub' : 'content-top-root'}>

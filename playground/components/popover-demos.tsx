@@ -4,7 +4,7 @@ import { Button, Popover } from '../../src'
 
 import { DemoPage, DemoSection } from './common/demo-page'
 
-const PLACEMENTS = ['top-start', 'right-start', 'bottom-start', 'left-start'] as const
+const PLACEMENTS = ['top', 'right', 'bottom', 'left'] as const
 
 export const PopoverDemos = () => {
   const [preventedCloseCount, setPreventedCloseCount] = createSignal(0)

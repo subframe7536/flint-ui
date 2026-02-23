@@ -10,15 +10,15 @@ export const kbdVariants = cva(
     },
     variants: {
       size: {
-        xs: 'h-2 px-0.5 text-10px',
-        sm: 'h-3 px-0.5 text-10px',
-        md: 'h-4 px-1 text-10px',
+        xs: 'h-3 px-0.5 text-2',
+        sm: 'h-4 px-0.5 text-2.5',
+        md: 'h-4.5 px-1 text-3',
         lg: 'h-5 px-1.5 text-xs',
-        xl: 'h-6 px-2 text-xs',
+        xl: 'h-5.5 px-2 text-sm',
       },
       variant: {
         default: 'bg-muted/70 text-foreground',
-        outline: 'border bg-muted text-muted-foreground',
+        outline: 'border text-muted-foreground',
         invert: 'bg-muted-foreground text-muted',
       },
     },

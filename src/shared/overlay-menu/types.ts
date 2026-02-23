@@ -1,8 +1,8 @@
 import type { JSX } from 'solid-js'
 
-import type { IconName } from '../icon'
+import type { IconName } from '../../icon'
 
-import type { OverlayMenuItems } from './overlay-menu'
+import type { OverlayMenuItems } from './utils'
 
 export type OverlayMenuItemType = 'item' | 'label' | 'separator' | 'checkbox'
 
@@ -46,20 +46,4 @@ export interface OverlayMenuSharedItemRenderContext<TItem> {
   isCheckbox: boolean
   hasChildren: boolean
   defaultItem: JSX.Element
-}
-
-export type OverlayMenuPrimitive = (props: Record<string, unknown>) => JSX.Element
-
-export interface OverlayMenuPrimitives {
-  Portal: OverlayMenuPrimitive
-  Content: OverlayMenuPrimitive
-  Group: OverlayMenuPrimitive
-  GroupLabel: OverlayMenuPrimitive
-  Separator: OverlayMenuPrimitive
-  Item: OverlayMenuPrimitive
-  CheckboxItem: OverlayMenuPrimitive
-  ItemIndicator: OverlayMenuPrimitive
-  Sub: OverlayMenuPrimitive
-  SubTrigger: OverlayMenuPrimitive
-  SubContent: OverlayMenuPrimitive
 }

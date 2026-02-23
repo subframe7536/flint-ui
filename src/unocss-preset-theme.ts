@@ -30,7 +30,7 @@ export interface PresetThemeOptions {
 }
 
 export const DEFAULT_COLORS: AppConfig['colors'] = {
-  primary: 'green',
+  primary: 'gray',
   secondary: 'blue',
   success: 'green',
   info: 'blue',
@@ -186,7 +186,7 @@ function createIconShortcuts(icons: AppConfig['icons']): Shortcut[] {
 }
 
 function createThemeColors(colors: AppConfig['colors'], isDark: boolean): Theme['colors'] {
-  const defaultShade: Shade = isDark ? 400 : 500
+  const defaultShade: Shade = isDark ? 300 : 600
   const toneForeground = isDark ? DARK_TONE_FOREGROUND : LIGHT_TONE_FOREGROUND
   const primary = createSemanticColor(colors.primary, toneForeground.primary, defaultShade)
   const secondary = createSemanticColor(colors.secondary, toneForeground.secondary, defaultShade)

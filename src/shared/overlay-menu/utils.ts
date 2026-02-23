@@ -2,6 +2,20 @@ import type { JSX } from 'solid-js'
 
 export type OverlayMenuSide = 'top' | 'right' | 'bottom' | 'left'
 
+export type OverlayMenuPlacement =
+  | 'top'
+  | 'top-start'
+  | 'top-end'
+  | 'right'
+  | 'right-start'
+  | 'right-end'
+  | 'bottom'
+  | 'bottom-start'
+  | 'bottom-end'
+  | 'left'
+  | 'left-start'
+  | 'left-end'
+
 export type OverlayMenuItems<TItem> = TItem[] | TItem[][]
 
 export type OverlayMenuContentSlot = JSX.Element | ((context: { sub: boolean }) => JSX.Element)

@@ -11,7 +11,8 @@ describe('Card', () => {
     const root = screen.container.querySelector('[data-slot="root"]')
 
     expect(root?.className).toContain('divide-y')
-    expect(root?.className).toContain('border-border')
+    expect(root?.className).toContain('divide-border')
+    expect(root?.className).toContain('ring-1')
   })
 
   test('renders body slot only when children exist', () => {
@@ -44,18 +45,6 @@ describe('Card', () => {
 
     expect(header?.textContent).toBe('Header content')
     expect(footer?.textContent).toBe('Footer content')
-  })
-
-  test('applies each variant class: solid/outline/soft/subtle', () => {
-    const outline = render(() => <Card variant="outline" />)
-    const soft = render(() => <Card variant="soft" />)
-    const subtle = render(() => <Card variant="subtle" />)
-    const solid = render(() => <Card variant="solid" />)
-
-    expect(outline.container.querySelector('[data-slot="root"]')?.className).toContain('divide-y')
-    expect(soft.container.querySelector('[data-slot="root"]')?.className).toContain('bg-muted/56')
-    expect(subtle.container.querySelector('[data-slot="root"]')?.className).toContain('ring-1')
-    expect(solid.container.querySelector('[data-slot="root"]')?.className).toContain('bg-inverted')
   })
 
   test('applies classes.root/classes.header/classes.body/classes.footer overrides', () => {

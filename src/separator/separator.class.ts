@@ -13,7 +13,7 @@ export const separatorRootVariants = cva('flex items-center text-center', {
   },
 })
 
-export const separatorBorderVariants = cva('shrink-0 border-border', {
+export const separatorBorderVariants = cva('flex-1 shrink-0 border-border', {
   defaultVariants: {
     color: 'neutral',
     orientation: 'horizontal',

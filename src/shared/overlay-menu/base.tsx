@@ -1,74 +1,70 @@
-import type { JSX } from 'solid-js'
-import { For, Show } from 'solid-js'
+import {
+  ItemIndicator,
+  Portal,
+  Group,
+  Sub,
+  Separator,
+  SubTrigger,
+  SubContent,
+  CheckboxItem,
+  Item,
+  GroupLabel,
+} from '@kobalte/core/dropdown-menu'
+import type { ClassValueArray } from 'cls-variant'
+import type { Component, JSX } from 'solid-js'
+import { For, Match, Show, Switch } from 'solid-js'
 
-import { Icon } from '../icon'
-import type { IconName } from '../icon'
-import { Kbd } from '../kbd'
+import { Icon } from '../../icon'
+import type { IconName } from '../../icon'
+import { Kbd } from '../../kbd'
+import { cn } from '../utils'
 
+import { overlayMenuContentVariants, overlayMenuItemVariants } from './base.class'
+import type { OverlayMenuItemVariantProps } from './base.class'
+import type {
+  OverlayMenuSharedClasses,
+  OverlayMenuSharedItem,
+  OverlayMenuSharedItemRenderContext,
+} from './types'
 import {
   getOverlayMenuTextValue,
   normalizeOverlayMenuGroups,
   renderOverlayMenuContentSlot,
-} from './overlay-menu'
-import type { OverlayMenuContentSlot, OverlayMenuItems, OverlayMenuSide } from './overlay-menu'
-import type {
-  OverlayMenuPrimitives,
-  OverlayMenuSharedClasses,
-  OverlayMenuSharedItem,
-  OverlayMenuSharedItemRenderContext,
-} from './overlay-menu-base.types'
-import { cn } from './utils'
+} from './utils'
+import type { OverlayMenuContentSlot, OverlayMenuItems, OverlayMenuSide } from './utils'
+
+type OverlayMenuColor = NonNullable<OverlayMenuItemVariantProps['color']>
+type OverlayMenuSize = NonNullable<OverlayMenuItemVariantProps['size']>
 
 export interface OverlayMenuBaseContentProps<
-  TColor extends string,
-  TItem extends OverlayMenuSharedItem<TColor, TItem>,
-  TSize extends string,
+  TItem extends OverlayMenuSharedItem<OverlayMenuColor, TItem>,
 > {
-  primitives: OverlayMenuPrimitives
+  content: Component<any>
   items?: OverlayMenuItems<TItem>
-  size?: TSize
+  size?: OverlayMenuSize
   classes?: OverlayMenuSharedClasses
   checkedIcon?: IconName
   submenuIcon?: IconName
   itemRender?: (context: OverlayMenuSharedItemRenderContext<TItem>) => JSX.Element
   contentTop?: OverlayMenuContentSlot
   contentBottom?: OverlayMenuContentSlot
-  itemClassName: (item: TItem) => string | undefined
-  checkboxItemClassName: (item: TItem) => string | undefined
-  subTriggerClassName: (item: TItem) => string | undefined
-  rootContentClassName: (side: OverlayMenuSide) => string | undefined
-  subContentClassName: (side: OverlayMenuSide) => string | undefined
   rootSide: OverlayMenuSide
-  separatorClassName: string
-  renderRootExtras?: () => JSX.Element
 }
 
 export function OverlayMenuBaseContent<
-  TColor extends string,
-  TItem extends OverlayMenuSharedItem<TColor, TItem>,
-  TSize extends string,
->(props: OverlayMenuBaseContentProps<TColor, TItem, TSize>): JSX.Element {
+  TItem extends OverlayMenuSharedItem<OverlayMenuColor, TItem>,
+>(props: OverlayMenuBaseContentProps<TItem>): JSX.Element {
+  function getItemClass(item: TItem, ...cls: ClassValueArray): string {
+    return overlayMenuItemVariants(
+      {
+        size: props.size,
+        color: item.color,
+      },
+      ...cls,
+    )
+  }
+
   function renderItemNode(item: TItem, depth: number): JSX.Element {
-    if (item.type === 'separator') {
-      return (
-        <props.primitives.Separator
-          data-slot="separator"
-          class={cn(props.separatorClassName, props.classes?.separator)}
-        />
-      )
-    }
-
-    if (item.type === 'label') {
-      return (
-        <props.primitives.GroupLabel
-          data-slot="label"
-          class={cn('px-1.5 py-1 font-medium text-muted-foreground text-xs', props.classes?.label)}
-        >
-          {item.label}
-        </props.primitives.GroupLabel>
-      )
-    }
-
     const hasChildren = normalizeOverlayMenuGroups(item.children).length > 0
 
     const itemContent = (isCheckbox: boolean): JSX.Element => {
@@ -135,12 +131,18 @@ export function OverlayMenuBaseContent<
                   props.classes?.itemKbds,
                 )}
               >
-                <For each={item.kbds}>{(kbd) => <Kbd data-slot="item-kbd">{kbd}</Kbd>}</For>
+                <For each={item.kbds}>
+                  {(kbd) => (
+                    <Kbd size="sm" data-slot="item-kbd">
+                      {kbd}
+                    </Kbd>
+                  )}
+                </For>
               </span>
             </Show>
 
             <Show when={isCheckbox}>
-              <props.primitives.ItemIndicator
+              <ItemIndicator
                 data-slot="item-indicator"
                 class={cn(
                   'inline-flex items-center justify-center text-sm',
@@ -148,80 +150,103 @@ export function OverlayMenuBaseContent<
                 )}
               >
                 <Icon name={props.checkedIcon} />
-              </props.primitives.ItemIndicator>
+              </ItemIndicator>
             </Show>
           </span>
         </>
       )
 
-      if (!props.itemRender) {
-        return defaultItem
-      }
-
-      return props.itemRender({
-        item,
-        depth,
-        hasChildren,
-        isCheckbox,
-        defaultItem,
-      })
+      return (
+        props.itemRender?.({
+          item,
+          depth,
+          hasChildren,
+          isCheckbox,
+          defaultItem,
+        }) ?? defaultItem
+      )
     }
 
     if (hasChildren) {
-      const subSide: OverlayMenuSide = 'right'
+      const subSide: OverlayMenuSide = props.rootSide === 'left' ? 'left' : 'right'
 
       return (
-        <props.primitives.Sub open={item.open} defaultOpen={item.defaultOpen} overflowPadding={2}>
-          <props.primitives.SubTrigger
+        <Sub open={item.open} defaultOpen={item.defaultOpen} overflowPadding={2}>
+          <SubTrigger
             data-slot="item"
             disabled={item.disabled}
             textValue={getOverlayMenuTextValue(item)}
-            class={props.subTriggerClassName(item)}
+            class={getItemClass(
+              item,
+              'data-expanded:(bg-accent text-accent-foreground)',
+              props.classes?.item,
+            )}
           >
             {itemContent(false)}
-          </props.primitives.SubTrigger>
+          </SubTrigger>
 
-          <props.primitives.SubContent
+          <SubContent
             data-slot="content"
-            class={props.subContentClassName(subSide)}
+            class={overlayMenuContentVariants({ side: subSide, sub: true }, props.classes?.content)}
           >
             {renderOverlayMenuContentSlot(props.contentTop, true)}
 
             {renderGroups(item.children, depth + 1)}
 
             {renderOverlayMenuContentSlot(props.contentBottom, true)}
-          </props.primitives.SubContent>
-        </props.primitives.Sub>
-      )
-    }
-
-    if (item.type === 'checkbox') {
-      return (
-        <props.primitives.CheckboxItem
-          data-slot="item"
-          textValue={getOverlayMenuTextValue(item)}
-          disabled={item.disabled}
-          checked={item.checked}
-          defaultChecked={item.defaultChecked}
-          onChange={item.onCheckedChange}
-          onSelect={item.onSelect}
-          class={props.checkboxItemClassName(item)}
-        >
-          {itemContent(true)}
-        </props.primitives.CheckboxItem>
+          </SubContent>
+        </Sub>
       )
     }
 
     return (
-      <props.primitives.Item
-        data-slot="item"
-        textValue={getOverlayMenuTextValue(item)}
-        disabled={item.disabled}
-        onSelect={item.onSelect}
-        class={props.itemClassName(item)}
+      <Switch
+        fallback={
+          <Item
+            data-slot="item"
+            textValue={getOverlayMenuTextValue(item)}
+            disabled={item.disabled}
+            onSelect={item.onSelect}
+            class={getItemClass(item, props.classes?.item)}
+          >
+            {itemContent(false)}
+          </Item>
+        }
       >
-        {itemContent(false)}
-      </props.primitives.Item>
+        <Match when={item.type === 'separator'}>
+          <Separator
+            data-slot="separator"
+            class={cn('-mx-1 my-1 h-px border-t-border', props.classes?.separator)}
+          />
+        </Match>
+
+        <Match when={item.type === 'label'}>
+          <GroupLabel
+            data-slot="label"
+            class={cn(
+              'px-1.5 py-1 font-medium text-muted-foreground text-xs',
+              props.classes?.label,
+            )}
+          >
+            {item.label}
+          </GroupLabel>
+        </Match>
+
+        <Match when={item.type === 'checkbox'}>
+          <CheckboxItem
+            data-slot="item"
+            textValue={getOverlayMenuTextValue(item)}
+            disabled={item.disabled}
+            checked={item.checked}
+            defaultChecked={item.defaultChecked}
+            onChange={item.onCheckedChange}
+            onSelect={item.onSelect}
+            class={getItemClass(item, props.classes?.item)}
+          >
+            {itemContent(true)}
+          </CheckboxItem>
+        </Match>
+      </Switch>
     )
   }
 
@@ -234,28 +259,29 @@ export function OverlayMenuBaseContent<
     return (
       <For each={source}>
         {(group) => (
-          <props.primitives.Group data-slot="group" class={props.classes?.group}>
+          <Group data-slot="group" class={props.classes?.group}>
             <For each={group}>{(item) => renderItemNode(item, depth)}</For>
-          </props.primitives.Group>
+          </Group>
         )}
       </For>
     )
   }
 
   return (
-    <props.primitives.Portal>
-      <props.primitives.Content
+    <Portal>
+      <props.content
         data-slot="content"
-        class={props.rootContentClassName(props.rootSide)}
+        class={overlayMenuContentVariants(
+          { side: props.rootSide, sub: false },
+          props.classes?.content,
+        )}
       >
         {renderOverlayMenuContentSlot(props.contentTop, false)}
 
         {renderGroups(props.items, 0)}
 
         {renderOverlayMenuContentSlot(props.contentBottom, false)}
-
-        {props.renderRootExtras?.()}
-      </props.primitives.Content>
-    </props.primitives.Portal>
+      </props.content>
+    </Portal>
   )
 }

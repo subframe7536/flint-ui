@@ -3,26 +3,46 @@ import 'uno.css'
 import { Match, Switch, createSignal, onMount } from 'solid-js'
 import { render } from 'solid-js/web'
 
+import { BreadcrumbDemos } from './components/breadcrumb-demos'
 import { ButtonDemos } from './components/button-demos'
+import { CardDemos } from './components/card-demos'
+import { CollapsibleDemos } from './components/collapsible-demos'
 import { Sidebar } from './components/common/sidebar'
 import { ContextMenuDemos } from './components/context-menu-demos'
 import { DropdownMenuDemos } from './components/dropdown-menu-demos'
+import { FieldGroupDemos } from './components/field-group-demos'
 import { FileUploadDemos } from './components/file-upload-demos'
 import { FormDemos } from './components/form-demos'
 import { FormFieldDemos } from './components/form-field-demos'
 import { IconDemos } from './components/icon-demos'
 import { InputDemos } from './components/input-demos'
 import { InputNumberDemos } from './components/input-number-demos'
+import { KbdDemos } from './components/kbd-demos'
 import { ModalDemos } from './components/modal-demos'
+import { NavigationMenuDemos } from './components/navigation-menu-demos'
+import { PaginationDemos } from './components/pagination-demos'
 import { PopoverDemos } from './components/popover-demos'
+import { ProgressDemos } from './components/progress-demos'
 import { SelectDemos } from './components/select-demos'
+import { SeparatorDemos } from './components/separator-demos'
 import { SheetDemos } from './components/sheet-demos'
 import { SliderDemos } from './components/slider-demos'
+import { TabsDemos } from './components/tabs-demos'
 import { TooltipDemos } from './components/tooltip-demos'
 
 const PAGES = [
   { key: 'button', label: 'Button', group: 'General' },
   { key: 'icon', label: 'Icon', group: 'General' },
+  { key: 'kbd', label: 'Kbd', group: 'General' },
+  { key: 'separator', label: 'Separator', group: 'General' },
+  { key: 'card', label: 'Card', group: 'Layout' },
+  { key: 'field-group', label: 'Field Group', group: 'Layout' },
+  { key: 'breadcrumb', label: 'Breadcrumb', group: 'Navigation' },
+  { key: 'navigation-menu', label: 'Navigation Menu', group: 'Navigation' },
+  { key: 'pagination', label: 'Pagination', group: 'Navigation' },
+  { key: 'tabs', label: 'Tabs', group: 'Navigation' },
+  { key: 'collapsible', label: 'Collapsible', group: 'Disclosure' },
+  { key: 'progress', label: 'Progress', group: 'Feedback' },
   { key: 'tooltip', label: 'Tooltip', group: 'Overlay' },
   { key: 'popover', label: 'Popover', group: 'Overlay' },
   { key: 'dropdown-menu', label: 'Dropdown Menu', group: 'Overlay' },
@@ -60,8 +80,23 @@ function App() {
           <Match when={page() === 'button'}>
             <ButtonDemos />
           </Match>
+          <Match when={page() === 'breadcrumb'}>
+            <BreadcrumbDemos />
+          </Match>
+          <Match when={page() === 'card'}>
+            <CardDemos />
+          </Match>
+          <Match when={page() === 'collapsible'}>
+            <CollapsibleDemos />
+          </Match>
+          <Match when={page() === 'field-group'}>
+            <FieldGroupDemos />
+          </Match>
           <Match when={page() === 'icon'}>
             <IconDemos />
+          </Match>
+          <Match when={page() === 'kbd'}>
+            <KbdDemos />
           </Match>
           <Match when={page() === 'tooltip'}>
             <TooltipDemos />
@@ -78,8 +113,20 @@ function App() {
           <Match when={page() === 'modal'}>
             <ModalDemos />
           </Match>
+          <Match when={page() === 'navigation-menu'}>
+            <NavigationMenuDemos />
+          </Match>
+          <Match when={page() === 'pagination'}>
+            <PaginationDemos />
+          </Match>
           <Match when={page() === 'sheet'}>
             <SheetDemos />
+          </Match>
+          <Match when={page() === 'progress'}>
+            <ProgressDemos />
+          </Match>
+          <Match when={page() === 'separator'}>
+            <SeparatorDemos />
           </Match>
           <Match when={page() === 'input'}>
             <InputDemos />
@@ -101,6 +148,9 @@ function App() {
           </Match>
           <Match when={page() === 'form-field'}>
             <FormFieldDemos />
+          </Match>
+          <Match when={page() === 'tabs'}>
+            <TabsDemos />
           </Match>
         </Switch>
       </div>
