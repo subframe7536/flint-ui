@@ -7,6 +7,7 @@ import { BreadcrumbDemos } from './components/breadcrumb-demos'
 import { ButtonDemos } from './components/button-demos'
 import { CardDemos } from './components/card-demos'
 import { CollapsibleDemos } from './components/collapsible-demos'
+import { CommandPaletteDemos } from './components/command-palette-demos'
 import { Sidebar } from './components/common/sidebar'
 import { ContextMenuDemos } from './components/context-menu-demos'
 import { DropdownMenuDemos } from './components/dropdown-menu-demos'
@@ -41,6 +42,7 @@ const PAGES = [
   { key: 'tabs', label: 'Tabs', group: 'Navigation' },
   { key: 'collapsible', label: 'Collapsible', group: 'Disclosure' },
   { key: 'progress', label: 'Progress', group: 'Feedback' },
+  { key: 'command-palette', label: 'Command Palette', group: 'Overlay' },
   { key: 'tooltip', label: 'Tooltip', group: 'Overlay' },
   { key: 'popover', label: 'Popover', group: 'Overlay' },
   { key: 'dropdown-menu', label: 'Dropdown Menu', group: 'Overlay' },
@@ -95,6 +97,9 @@ function App() {
           </Match>
           <Match when={page() === 'kbd'}>
             <KbdDemos />
+          </Match>
+          <Match when={page() === 'command-palette'}>
+            <CommandPaletteDemos />
           </Match>
           <Match when={page() === 'tooltip'}>
             <TooltipDemos />

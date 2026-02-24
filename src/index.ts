@@ -1,4 +1,5 @@
 export * from './button'
+export * from './command-palette'
 export * from './breadcrumb'
 export * from './card'
 export * from './checkbox'
