@@ -162,17 +162,15 @@ export function Switch(props: SwitchProps): JSX.Element {
                     {(resolvedIconName) => (
                       <Icon
                         name={resolvedIconName()}
-                        classes={{
-                          root: switchIconVariants(
-                            {
-                              color: resolvedColor(),
-                              checked: !displayProps.loading && checked(),
-                              unchecked: !displayProps.loading && !checked(),
-                              loading: displayProps.loading,
-                            },
-                            styleProps.classes?.icon,
-                          ),
-                        }}
+                        class={switchIconVariants(
+                          {
+                            color: resolvedColor(),
+                            checked: !displayProps.loading && checked(),
+                            unchecked: !displayProps.loading && !checked(),
+                            loading: displayProps.loading,
+                          },
+                          styleProps.classes?.icon,
+                        )}
                       />
                     )}
                   </Show>

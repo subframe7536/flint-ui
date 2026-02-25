@@ -423,14 +423,12 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
         <Icon
           name={displayProps.icon}
           data-slot="icon"
-          classes={{
-            root: fileUploadIconVariants(
-              {
-                size: resolvedSize(),
-              },
-              styleProps.classes?.icon,
-            ),
-          }}
+          class={fileUploadIconVariants(
+            {
+              size: resolvedSize(),
+            },
+            styleProps.classes?.icon,
+          )}
         />
 
         <Show when={displayProps.label}>
@@ -482,11 +480,9 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
           fallback={
             <Icon
               name={displayProps.fileIcon}
-              classes={{
-                root: fileUploadIconVariants({
-                  size: resolvedSize(),
-                }),
-              }}
+              class={fileUploadIconVariants({
+                size: resolvedSize(),
+              })}
             />
           }
         >

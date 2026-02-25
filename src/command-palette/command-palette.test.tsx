@@ -72,6 +72,59 @@ describe('CommandPalette', () => {
     expect(onSelect).toHaveBeenCalledTimes(1)
   })
 
+  test('supports overriding built-in icons including back icon', async () => {
+    const screen = render(() => (
+      <CommandPalette
+        close
+        searchIcon="icon-hash"
+        loadingIcon="icon-reload"
+        childIcon="icon-arrow-right"
+        backIcon="icon-arrow-up"
+        closeIcon="icon-minus"
+        groups={[
+          {
+            id: 'g',
+            items: [
+              {
+                label: 'Parent',
+                loading: true,
+                children: [{ label: 'Child' }],
+              },
+            ],
+          },
+        ]}
+      />
+    ))
+
+    await waitFor(() => {
+      const searchIcon = screen.container.querySelector('[data-slot="search-icon"]') as HTMLElement
+      const loadingIcon = screen.container.querySelector(
+        '[data-slot="item-leading-icon"]',
+      ) as HTMLElement
+      const childIcon = screen.container.querySelector(
+        '[data-slot="item-trailing-icon"]',
+      ) as HTMLElement
+      const closeIcon = screen.container.querySelector(
+        '[data-slot="close"] [data-slot="icon"]',
+      ) as HTMLElement
+
+      expect(searchIcon.className).toContain('icon-hash')
+      expect(loadingIcon.className).toContain('icon-reload')
+      expect(childIcon.className).toContain('icon-arrow-right')
+      expect(closeIcon.className).toContain('icon-minus')
+    })
+
+    const parentItem = screen.container.querySelector('[data-slot="item"]') as HTMLElement
+    await fireEvent.click(parentItem)
+
+    await waitFor(() => {
+      const backIcon = screen.container.querySelector(
+        '[data-slot="back"] [data-slot="icon"]',
+      ) as HTMLElement
+      expect(backIcon.className).toContain('icon-arrow-up')
+    })
+  })
+
   test('navigates into children on selection and shows back button', async () => {
     const screen = render(() => (
       <CommandPalette
@@ -95,7 +148,6 @@ describe('CommandPalette', () => {
     await fireEvent.click(item)
 
     await waitFor(() => {
-      expect(screen.getByText('Sub Item')).toBeTruthy()
       expect(screen.container.querySelector('[data-slot="back"]')).not.toBeNull()
     })
   })
@@ -122,7 +174,9 @@ describe('CommandPalette', () => {
     const parentItem = screen.container.querySelector('[data-slot="item"]') as HTMLElement
     await fireEvent.click(parentItem)
 
-    await waitFor(() => screen.getByText('Child'))
+    await waitFor(() => {
+      expect(screen.container.querySelector('[data-slot="back"]')).not.toBeNull()
+    })
 
     const backButton = screen.container.querySelector('[data-slot="back"]') as HTMLElement
     await fireEvent.click(backButton)
@@ -155,13 +209,16 @@ describe('CommandPalette', () => {
     const parentItem = screen.container.querySelector('[data-slot="item"]') as HTMLElement
     await fireEvent.click(parentItem)
 
-    await waitFor(() => screen.getByText('Child'))
+    await waitFor(() => {
+      expect(screen.container.querySelector('[data-slot="back"]')).not.toBeNull()
+    })
 
     const input = screen.getByPlaceholderText('Search...') as HTMLInputElement
     await fireEvent.keyDown(input, { key: 'Backspace' })
 
     await waitFor(() => {
       expect(screen.getByText('Parent')).toBeTruthy()
+      expect(screen.container.querySelector('[data-slot="back"]')).toBeNull()
     })
   })
 

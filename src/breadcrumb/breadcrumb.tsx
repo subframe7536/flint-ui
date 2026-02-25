@@ -133,12 +133,10 @@ export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
                       <Icon
                         data-slot="separator-icon"
                         name={contentProps.separatorIcon as IconName}
-                        classes={{
-                          root: cn(
-                            'size-4 text-muted-foreground',
-                            contentProps.classes?.separatorIcon,
-                          ),
-                        }}
+                        class={cn(
+                          'size-4 text-muted-foreground',
+                          contentProps.classes?.separatorIcon,
+                        )}
                       />
                     </KobalteBreadcrumbs.Separator>
                   </li>

@@ -22,16 +22,16 @@ export type CardProps = CardBaseProps
 export function Card(props: CardProps): JSX.Element {
   return (
     <div
-      data-slot="card"
+      data-slot="root"
       class={cn(
-        'ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-xl py-4 text-sm ring-1 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl flex flex-col',
+        'ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden divide-y divide-border rounded-xl py-4 text-sm ring-1 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl flex flex-col',
         props.footer && 'pb-0',
         props.classes?.root,
       )}
     >
       <Show when={props.header}>
         <div
-          data-slot="card-header"
+          data-slot="header"
           class={cn(
             'gap-1 rounded-t-xl px-4 is-[.border-b]:pb-4 grid auto-rows-min items-start',
             props.classes?.header,
@@ -42,14 +42,14 @@ export function Card(props: CardProps): JSX.Element {
       </Show>
 
       <Show when={props.children}>
-        <div data-slot="card-content" class={cn('flex-1 px-4', props.classes?.body)}>
+        <div data-slot="body" class={cn('flex-1 px-4', props.classes?.body)}>
           {props.children}
         </div>
       </Show>
 
       <Show when={props.footer}>
         <div
-          data-slot="card-footer"
+          data-slot="footer"
           class={cn(
             'flex items-center bg-muted/50 rounded-b-xl b-t-(1 border) p-4',
             props.classes?.footer,

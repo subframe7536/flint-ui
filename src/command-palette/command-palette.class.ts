@@ -30,7 +30,7 @@ export const commandPaletteInputVariants = cva(
   },
 )
 
-export const commandPaletteGroupLabelVariants = cva('font-semibold text-muted-foreground px-2', {
+export const commandPaletteGroupLabelVariants = cva('font-semibold text-muted-foreground px-0.5', {
   defaultVariants: { size: 'md' },
   variants: {
     size: {
@@ -44,18 +44,31 @@ export const commandPaletteGroupLabelVariants = cva('font-semibold text-muted-fo
 })
 
 export const commandPaletteItemVariants = cva(
-  'group relative w-full flex items-start cursor-default select-none outline-none rounded-md data-disabled:(pointer-events-none opacity-75) data-highlighted:(bg-accent text-accent-foreground)',
+  'group relative w-full flex items-center cursor-default select-none outline-none rounded-md data-disabled:(pointer-events-none opacity-75) data-highlighted:(bg-accent text-accent-foreground)',
   {
-    defaultVariants: { size: 'md' },
+    defaultVariants: { size: 'md', hasIcon: false },
     variants: {
       size: {
-        xs: 'gap-1 p-1 text-xs',
-        sm: 'gap-1.5 p-1.5 text-xs',
-        md: 'gap-1.5 p-1.5 text-sm',
-        lg: 'gap-2 p-2 text-sm',
-        xl: 'gap-2 p-2 text-base',
+        xs: 'p-1 text-3',
+        sm: 'p-1 text-3.5',
+        md: 'p-1.5 text-3.5',
+        lg: 'p-2 text-4',
+        xl: 'p-2 text-base',
       },
+      hasIcon: { true: '', false: '' },
     },
+    compoundVariants: [
+      { size: 'xs', hasIcon: false, class: 'gap-1' },
+      { size: 'sm', hasIcon: false, class: 'gap-1.5' },
+      { size: 'md', hasIcon: false, class: 'gap-1.5' },
+      { size: 'lg', hasIcon: false, class: 'gap-2' },
+      { size: 'xl', hasIcon: false, class: 'gap-2' },
+      { size: 'xs', hasIcon: true, class: 'gap-2' },
+      { size: 'sm', hasIcon: true, class: 'gap-2.5' },
+      { size: 'md', hasIcon: true, class: 'gap-2.5' },
+      { size: 'lg', hasIcon: true, class: 'gap-3' },
+      { size: 'xl', hasIcon: true, class: 'gap-3' },
+    ],
   },
 )
 

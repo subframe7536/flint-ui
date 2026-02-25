@@ -54,7 +54,7 @@ describe('Icon', () => {
   })
 
   test('applies classes.root override', () => {
-    const screen = render(() => <Icon name="i-lucide-search" classes={{ root: 'root-override' }} />)
+    const screen = render(() => <Icon name="i-lucide-search" class="root-override" />)
     const icon = screen.container.querySelector('[data-slot="icon"]')
 
     expect(icon?.className).toContain('root-override')

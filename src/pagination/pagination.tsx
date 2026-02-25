@@ -190,7 +190,7 @@ export function Pagination(props: PaginationProps): JSX.Element {
                     )}
                     aria-hidden
                   >
-                    <Icon name={uiProps.ellipsisIcon} classes={{ root: 'size-4' }} />
+                    <Icon name={uiProps.ellipsisIcon} class="size-4" />
                     <span class="sr-only">More pages</span>
                   </span>
                 </li>

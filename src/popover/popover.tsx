@@ -1,13 +1,10 @@
-import * as KobalteHoverCard from '@kobalte/core/hover-card'
 import * as KobaltePopover from '@kobalte/core/popover'
-import type { PopoverContentProps as KobaltePopoverContentProps } from '@kobalte/core/popover'
 import type { JSX } from 'solid-js'
-import { Show, createMemo, mergeProps, onCleanup, splitProps } from 'solid-js'
+import { Show, createSignal, mergeProps, onCleanup, splitProps } from 'solid-js'
 
 import { cn } from '../shared/utils'
 
 import { popoverContentVariants } from './popover.class'
-import type { PopoverContentVariantProps } from './popover.class'
 
 type PopoverMode = 'click' | 'hover'
 
@@ -19,6 +16,8 @@ export interface PopoverClasses {
 
 export interface PopoverBaseProps {
   mode?: PopoverMode
+  openDelay?: number
+  closeDelay?: number
   content?: JSX.Element
   dismissible?: boolean
   classes?: PopoverClasses
@@ -26,8 +25,7 @@ export interface PopoverBaseProps {
   children: JSX.Element
 }
 
-type PopoverRootProps = Omit<KobaltePopover.PopoverRootProps, 'children' | 'class'> &
-  Omit<KobalteHoverCard.HoverCardRootProps, 'children' | 'class'>
+type PopoverRootProps = Omit<KobaltePopover.PopoverRootProps, 'children' | 'class'>
 
 export type PopoverProps = PopoverBaseProps &
   Omit<PopoverRootProps, keyof PopoverBaseProps | 'arrow'>
@@ -45,113 +43,119 @@ export function Popover(props: PopoverProps): JSX.Element {
   ) as PopoverProps
   const [behaviorProps, contentProps, rootProps] = splitProps(
     merged,
-    ['mode', 'placement', 'dismissible', 'onClosePrevent'],
+    ['mode', 'placement', 'openDelay', 'closeDelay', 'dismissible', 'onClosePrevent'],
     ['content', 'classes', 'children'],
   )
 
-  const side = createMemo<PopoverContentVariantProps['side']>(
-    () => behaviorProps.placement?.split('-')?.[0] as any,
-  )
+  const [hoverOpen, setHoverOpen] = createSignal<boolean>(rootProps.defaultOpen ?? false)
 
+  let openTimer: ReturnType<typeof setTimeout> | undefined
+  let closeTimer: ReturnType<typeof setTimeout> | undefined
   let hasPreventedPointerAttempt = false
   let resetTimeout: ReturnType<typeof setTimeout> | undefined
 
-  onCleanup(() => clearTimeout(resetTimeout))
-
-  const onPointerDownOutside = (
-    event: Parameters<NonNullable<KobaltePopoverContentProps['onPointerDownOutside']>>[0],
-  ) => {
-    if (behaviorProps.dismissible) {
-      return
-    }
-    event.preventDefault()
-    hasPreventedPointerAttempt = true
+  onCleanup(() => {
     clearTimeout(resetTimeout)
-    resetTimeout = setTimeout(() => {
-      hasPreventedPointerAttempt = false
-      resetTimeout = undefined
-    }, 0)
-    behaviorProps.onClosePrevent?.()
-  }
-
-  const onInteractOutside = (
-    event: Parameters<NonNullable<KobaltePopoverContentProps['onInteractOutside']>>[0],
-  ) => {
-    if (behaviorProps.dismissible || event.defaultPrevented) {
-      return
-    }
-    event.preventDefault()
-    if (!hasPreventedPointerAttempt) {
-      behaviorProps.onClosePrevent?.()
-    }
-  }
-
-  const onEscapeKeyDown = (
-    event: Parameters<NonNullable<KobaltePopoverContentProps['onEscapeKeyDown']>>[0],
-  ) => {
-    if (behaviorProps.dismissible) {
-      return
-    }
-    event.preventDefault()
-    behaviorProps.onClosePrevent?.()
-  }
-
-  const contentClass = () => popoverContentVariants({ side: side() }, contentProps.classes?.content)
-
-  const innerContent = () => (
-    <Show when={contentProps.content !== undefined && contentProps.content !== null}>
-      <div
-        data-slot="body"
-        class={cn(
-          'max-h-$kb-popper-content-available-height overflow-auto',
-          contentProps.classes?.body,
-        )}
-      >
-        {contentProps.content}
-      </div>
-    </Show>
-  )
+    clearTimeout(openTimer)
+    clearTimeout(closeTimer)
+  })
 
   return (
-    <Show
-      when={behaviorProps.mode === 'hover'}
-      fallback={
-        <KobaltePopover.Root placement={behaviorProps.placement} overflowPadding={4} {...rootProps}>
-          <KobaltePopover.Trigger
-            as="span"
-            data-slot="trigger"
-            class={contentProps.classes?.trigger}
-          >
-            {contentProps.children}
-          </KobaltePopover.Trigger>
-          <KobaltePopover.Portal>
-            <KobaltePopover.Content
-              data-slot="content"
-              class={contentClass()}
-              onPointerDownOutside={onPointerDownOutside}
-              onInteractOutside={onInteractOutside}
-              onEscapeKeyDown={onEscapeKeyDown}
-            >
-              {innerContent()}
-            </KobaltePopover.Content>
-          </KobaltePopover.Portal>
-        </KobaltePopover.Root>
+    <KobaltePopover.Root
+      placement={behaviorProps.placement}
+      overflowPadding={4}
+      {...rootProps}
+      open={
+        behaviorProps.mode === 'hover'
+          ? rootProps.open !== undefined
+            ? rootProps.open
+            : hoverOpen()
+          : rootProps.open
       }
     >
-      <KobalteHoverCard.Root placement={behaviorProps.placement} overflowPadding={4} {...rootProps}>
-        <KobalteHoverCard.Trigger
-          as="span"
-          data-slot="trigger"
-          class={contentProps.classes?.trigger}
+      <KobaltePopover.Trigger
+        as="span"
+        data-slot="trigger"
+        class={contentProps.classes?.trigger}
+        onMouseEnter={
+          behaviorProps.mode === 'hover'
+            ? () => {
+                clearTimeout(closeTimer)
+                closeTimer = undefined
+                openTimer = setTimeout(() => {
+                  setHoverOpen(true)
+                  rootProps.onOpenChange?.(true)
+                  openTimer = undefined
+                }, behaviorProps.openDelay)
+              }
+            : undefined
+        }
+        onMouseLeave={
+          behaviorProps.mode === 'hover'
+            ? () => {
+                clearTimeout(openTimer)
+                openTimer = undefined
+                closeTimer = setTimeout(() => {
+                  setHoverOpen(false)
+                  rootProps.onOpenChange?.(false)
+                  closeTimer = undefined
+                }, behaviorProps.closeDelay)
+              }
+            : undefined
+        }
+      >
+        {contentProps.children}
+      </KobaltePopover.Trigger>
+      <KobaltePopover.Portal>
+        <KobaltePopover.Content
+          data-slot="content"
+          class={popoverContentVariants(
+            { side: behaviorProps.placement?.split('-')?.[0] as any },
+            contentProps.classes?.content,
+          )}
+          onPointerDownOutside={(event) => {
+            if (behaviorProps.dismissible) {
+              return
+            }
+            event.preventDefault()
+            hasPreventedPointerAttempt = true
+            clearTimeout(resetTimeout)
+            resetTimeout = setTimeout(() => {
+              hasPreventedPointerAttempt = false
+              resetTimeout = undefined
+            }, 0)
+            behaviorProps.onClosePrevent?.()
+          }}
+          onInteractOutside={(event) => {
+            if (behaviorProps.dismissible || event.defaultPrevented) {
+              return
+            }
+            event.preventDefault()
+            if (!hasPreventedPointerAttempt) {
+              behaviorProps.onClosePrevent?.()
+            }
+          }}
+          onEscapeKeyDown={(event) => {
+            if (behaviorProps.dismissible) {
+              return
+            }
+            event.preventDefault()
+            behaviorProps.onClosePrevent?.()
+          }}
         >
-          {contentProps.children}
-        </KobalteHoverCard.Trigger>
-        <KobalteHoverCard.Portal>
-          <KobalteHoverCard.Content data-slot="content" class={contentClass()}>
-            {innerContent()}
-          </KobalteHoverCard.Content>
-        </KobalteHoverCard.Portal>
-      </KobalteHoverCard.Root>
-    </Show>
+          <Show when={contentProps.content !== undefined && contentProps.content !== null}>
+            <div
+              data-slot="body"
+              class={cn(
+                'max-h-$kb-popper-content-available-height overflow-auto',
+                contentProps.classes?.body,
+              )}
+            >
+              {contentProps.content}
+            </div>
+          </Show>
+        </KobaltePopover.Content>
+      </KobaltePopover.Portal>
+    </KobaltePopover.Root>
   )
 }

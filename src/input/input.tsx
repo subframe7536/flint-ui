@@ -279,15 +279,13 @@ export function Input(props: InputProps): JSX.Element {
                   <Icon
                     name={iconName()}
                     data-slot="leadingIcon"
-                    classes={{
-                      root: inputLeadingIconVariants(
-                        {
-                          size: resolvedSize(),
-                          loading: adornmentStyleProps.loading,
-                        },
-                        adornmentStyleProps.classes?.leadingIcon,
-                      ),
-                    }}
+                    class={inputLeadingIconVariants(
+                      {
+                        size: resolvedSize(),
+                        loading: adornmentStyleProps.loading,
+                      },
+                      adornmentStyleProps.classes?.leadingIcon,
+                    )}
                   />
                 )}
               </Show>
@@ -357,15 +355,13 @@ export function Input(props: InputProps): JSX.Element {
                   <Icon
                     name={iconName()}
                     data-slot="trailingIcon"
-                    classes={{
-                      root: inputTrailingIconVariants(
-                        {
-                          size: resolvedSize(),
-                          loading: adornmentStyleProps.loading,
-                        },
-                        adornmentStyleProps.classes?.trailingIcon,
-                      ),
-                    }}
+                    class={inputTrailingIconVariants(
+                      {
+                        size: resolvedSize(),
+                        loading: adornmentStyleProps.loading,
+                      },
+                      adornmentStyleProps.classes?.trailingIcon,
+                    )}
                   />
                 )}
               </Show>

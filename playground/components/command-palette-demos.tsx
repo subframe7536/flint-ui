@@ -1,6 +1,6 @@
-import { createSignal } from 'solid-js'
+import { createSignal, onCleanup, onMount } from 'solid-js'
 
-import { CommandPalette } from '../../src'
+import { Button, CommandPalette, Kbd, Modal } from '../../src'
 import type { CommandPaletteGroup } from '../../src'
 
 import { DemoPage, DemoSection } from './common/demo-page'
@@ -62,6 +62,18 @@ const SUB_NAV_GROUPS: CommandPaletteGroup[] = [
 
 export function CommandPaletteDemos() {
   const [closeCount, setCloseCount] = createSignal(0)
+  const [paletteOpen, setPaletteOpen] = createSignal(false)
+
+  onMount(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setPaletteOpen(true)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    onCleanup(() => window.removeEventListener('keydown', handler))
+  })
 
   return (
     <DemoPage
@@ -69,6 +81,26 @@ export function CommandPaletteDemos() {
       title="Command Palette"
       description="An inline, searchable command palette built on Kobalte Combobox."
     >
+      <DemoSection
+        title="Usage"
+        description="Click the button or press ⌘K to open the command palette."
+      >
+        <Modal
+          open={paletteOpen()}
+          onOpenChange={setPaletteOpen}
+          close={false}
+          body={
+            <CommandPalette groups={BASIC_GROUPS} close onClose={() => setPaletteOpen(false)} />
+          }
+          classes={{ body: 'p-0' }}
+        >
+          <Button variant="outline">
+            Search... <Kbd>⌘</Kbd>
+            <Kbd>K</Kbd>
+          </Button>
+        </Modal>
+      </DemoSection>
+
       <DemoSection title="Basic" description="Groups of items with icons, kbds, and descriptions.">
         <div class="border rounded-lg max-w-lg shadow-lg overflow-hidden">
           <CommandPalette groups={BASIC_GROUPS} />
@@ -94,6 +126,29 @@ export function CommandPaletteDemos() {
         <p class="text-sm text-muted-foreground mt-2">Close clicked: {closeCount()} time(s)</p>
       </DemoSection>
 
+      <DemoSection title="Loading" description="Search icon becomes a spinner while loading.">
+        <div class="border rounded-lg max-w-lg shadow-lg overflow-hidden">
+          <CommandPalette groups={BASIC_GROUPS} loading />
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Custom empty state"
+        description="Override the default 'No results.' message."
+      >
+        <div class="border rounded-lg max-w-lg shadow-lg overflow-hidden">
+          <CommandPalette
+            groups={[]}
+            empty={
+              <span class="flex flex-col gap-1 items-center">
+                <span>Nothing here yet.</span>
+                <span class="text-xs">Try a different search term.</span>
+              </span>
+            }
+          />
+        </div>
+      </DemoSection>
+
       <DemoSection title="Size: lg" description="Larger input and item sizing.">
         <div class="border rounded-lg max-w-lg shadow-lg overflow-hidden">
           <CommandPalette groups={BASIC_GROUPS} size="lg" />
@@ -103,12 +158,6 @@ export function CommandPaletteDemos() {
       <DemoSection title="Size: xs" description="Compact sizing.">
         <div class="border rounded-lg max-w-lg shadow-lg overflow-hidden">
           <CommandPalette groups={BASIC_GROUPS} size="xs" />
-        </div>
-      </DemoSection>
-
-      <DemoSection title="Empty state" description="No groups provided.">
-        <div class="border rounded-lg max-w-lg shadow-lg overflow-hidden">
-          <CommandPalette groups={[]} />
         </div>
       </DemoSection>
     </DemoPage>

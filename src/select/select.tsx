@@ -863,7 +863,7 @@ export function Select(props: SelectProps): JSX.Element {
             >
               {(icon) => (
                 <span class="flex gap-2 col-start-1 items-center">
-                  <Icon name={icon()} classes={{ root: 'text-base shrink-0' }} />
+                  <Icon name={icon()} />
                   {renderItemLabel(params.option, params.fallbackLabel)}
                 </span>
               )}
@@ -1043,12 +1043,10 @@ export function Select(props: SelectProps): JSX.Element {
             <Icon
               name={icon()}
               data-slot="leading-icon"
-              classes={{
-                root: selectLeadingIconVariants(
-                  { size: resolvedSize() },
-                  styleProps.classes?.leadingIcon,
-                ),
-              }}
+              class={selectLeadingIconVariants(
+                { size: resolvedSize() },
+                styleProps.classes?.leadingIcon,
+              )}
             />
           )}
         </Show>
@@ -1152,7 +1150,7 @@ export function Select(props: SelectProps): JSX.Element {
               fallback={
                 <Icon
                   name={renderDisplayProps.loadingIcon ?? 'icon-loading'}
-                  classes={{ root: 'animate-spin' }}
+                  class="animate-spin"
                 />
               }
             >

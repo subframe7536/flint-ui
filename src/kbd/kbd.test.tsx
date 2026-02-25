@@ -20,11 +20,11 @@ describe('Kbd', () => {
     const lg = render(() => <Kbd size="lg">L</Kbd>)
     const xl = render(() => <Kbd size="xl">XL</Kbd>)
 
-    expect(xs.container.querySelector('[data-slot="root"]')?.className).toContain('h-2')
-    expect(sm.container.querySelector('[data-slot="root"]')?.className).toContain('h-3')
-    expect(md.container.querySelector('[data-slot="root"]')?.className).toContain('h-4')
+    expect(xs.container.querySelector('[data-slot="root"]')?.className).toContain('h-3')
+    expect(sm.container.querySelector('[data-slot="root"]')?.className).toContain('h-4')
+    expect(md.container.querySelector('[data-slot="root"]')?.className).toContain('h-4.5')
     expect(lg.container.querySelector('[data-slot="root"]')?.className).toContain('h-5')
-    expect(xl.container.querySelector('[data-slot="root"]')?.className).toContain('h-6')
+    expect(xl.container.querySelector('[data-slot="root"]')?.className).toContain('h-5.5')
   })
 
   test('supports default/outline/invert variants with outline as default', () => {

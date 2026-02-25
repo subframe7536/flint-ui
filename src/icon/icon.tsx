@@ -5,10 +5,6 @@ import { cn, combineStyle } from '../shared/utils'
 
 export type IconName = string | JSX.Element | (() => JSX.Element)
 
-export interface IconClasses {
-  root?: string
-}
-
 export interface IconBaseProps {
   /**
    * Icon source. Strings should be Uno icon classes such as `i-lucide-search`
@@ -30,7 +26,7 @@ export interface IconBaseProps {
   /**
    * Slot-based class overrides.
    */
-  classes?: IconClasses
+  class?: string
   style?: JSX.CSSProperties | string
   'aria-label'?: string
   'data-slot'?: string
@@ -101,11 +97,7 @@ export function Icon(props: IconProps): JSX.Element {
   return (
     <span
       data-slot={a11ySlotProps['data-slot'] ?? 'icon'}
-      class={cn(
-        'inline-flex shrink-0 items-center justify-center align-middle',
-        iconClass(),
-        styleProps.classes?.root,
-      )}
+      class={cn('inline-flex shrink-0', iconClass(), styleProps.class)}
       style={combineStyle(a11ySlotProps.style, sizeStyle())}
       aria-hidden={a11ySlotProps['aria-label'] ? undefined : true}
     >

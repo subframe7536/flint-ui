@@ -170,27 +170,23 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                   fallback={
                     <Icon
                       name={visualProps.checkedIcon}
-                      classes={{
-                        root: checkboxIconVariants(
-                          {
-                            size: resolvedSize(),
-                          },
-                          visualProps.classes?.icon,
-                        ),
-                      }}
+                      class={checkboxIconVariants(
+                        {
+                          size: resolvedSize(),
+                        },
+                        visualProps.classes?.icon,
+                      )}
                     />
                   }
                 >
                   <Icon
                     name={visualProps.indeterminateIcon}
-                    classes={{
-                      root: checkboxIconVariants(
-                        {
-                          size: resolvedSize(),
-                        },
-                        visualProps.classes?.icon,
-                      ),
-                    }}
+                    class={checkboxIconVariants(
+                      {
+                        size: resolvedSize(),
+                      },
+                      visualProps.classes?.icon,
+                    )}
                   />
                 </Show>
               </KobalteCheckbox.Indicator>

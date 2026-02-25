@@ -117,9 +117,7 @@ export function OverlayMenuBaseContent<
             <Show when={hasChildren}>
               <Icon
                 name={props.submenuIcon}
-                classes={{
-                  root: cn('text-muted-foreground text-sm', props.classes?.itemSubIcon),
-                }}
+                class={cn('text-muted-foreground text-sm', props.classes?.itemSubIcon)}
               />
             </Show>
 

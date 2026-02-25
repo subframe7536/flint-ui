@@ -75,7 +75,7 @@ export const switchThumbVariants = cva(
   },
 )
 
-export const switchIconVariants = cva('absolute size-10/12 shrink-0 transition-opacity', {
+export const switchIconVariants = cva('absolute size-10/12 transition-opacity', {
   defaultVariants: {
     color: 'primary',
   },
@@ -90,10 +90,10 @@ export const switchIconVariants = cva('absolute size-10/12 shrink-0 transition-o
       true: 'opacity-100',
     },
     unchecked: {
-      true: 'opacity-100 text-muted-foreground',
+      true: 'opacity-90 text-muted-foreground',
     },
     loading: {
-      true: 'opacity-100 animate-spin',
+      true: 'opacity-80 animate-spin',
     },
   },
 })
