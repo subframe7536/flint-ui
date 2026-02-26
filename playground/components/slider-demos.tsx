@@ -5,7 +5,6 @@ import type { SliderValue } from '../../src/slider/slider'
 
 import { DemoPage, DemoSection } from './common/demo-page'
 
-const COLORS = ['primary', 'secondary', 'neutral', 'error'] as const
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 
 function formatSliderValue(value: SliderValue): string {
@@ -33,7 +32,7 @@ export const SliderDemos = () => {
     <DemoPage
       eyebrow="Rock UI Playground"
       title="Slider"
-      description="Single and range sliders with orientation, colors, sizes, and form integration."
+      description="Single and range sliders with orientation, sizes, and form integration."
     >
       <DemoSection
         title="Controlled Single"
@@ -94,19 +93,6 @@ export const SliderDemos = () => {
               <Slider orientation="vertical" defaultValue={45} />
             </div>
           </div>
-        </div>
-      </DemoSection>
-
-      <DemoSection title="Colors" description="Color variants with highlight enabled.">
-        <div class="gap-4 grid sm:grid-cols-2">
-          <For each={COLORS}>
-            {(color) => (
-              <div class="space-y-2">
-                <label class="text-xs text-zinc-500 block capitalize">{color}</label>
-                <Slider color={color} defaultValue={40} highlight />
-              </div>
-            )}
-          </For>
         </div>
       </DemoSection>
 

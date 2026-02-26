@@ -13,6 +13,12 @@ import {
 } from 'solid-js'
 
 import { useFormField } from '../form-field/form-field-context'
+import type {
+  FormDisableOption,
+  FormIdentityOptions,
+  FormRequiredOption,
+} from '../form-field/form-options'
+import { FORM_ID_NAME_DISABLED_KEYS } from '../form-field/form-options'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
 import { useId } from '../shared/utils'
@@ -34,9 +40,6 @@ import {
   fileUploadWrapperVariants,
 } from './file-upload.class'
 
-type FileUploadColor = NonNullable<FileUploadBaseProps['color']>
-type FileUploadSize = NonNullable<FileUploadBaseProps['size']>
-
 export type FileUploadValue = File | File[] | null
 
 export interface FileUploadClasses {
@@ -55,17 +58,15 @@ export interface FileUploadClasses {
   fileRemove?: string
 }
 
-export interface FileUploadBaseProps extends Pick<
-  FileUploadVariantProps,
-  'color' | 'size' | 'highlight'
-> {
+export interface FileUploadBaseProps
+  extends
+    Pick<FileUploadVariantProps, 'size' | 'highlight'>,
+    FormIdentityOptions,
+    FormRequiredOption,
+    FormDisableOption {
   as?: ValidComponent
-  id?: string
-  name?: string
   accept?: string
   multiple?: boolean
-  required?: boolean
-  disabled?: boolean
   dropzone?: boolean
   preview?: boolean
   label?: JSX.Element
@@ -235,7 +236,6 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
       multiple: false,
       dropzone: true,
       preview: true,
-      color: 'primary' as const,
       size: 'md' as const,
       icon: 'icon-upload' as IconName,
       fileIcon: 'icon-file' as IconName,
@@ -247,29 +247,32 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
     merged as FileUploadProps,
     [
       'as',
-      'id',
-      'name',
+      ...FORM_ID_NAME_DISABLED_KEYS,
       'accept',
       'multiple',
       'required',
-      'disabled',
       'maxFiles',
       'onValueChange',
       'onFileReject',
     ],
     ['dropzone', 'preview', 'label', 'description', 'icon', 'fileIcon'],
-    ['color', 'size', 'highlight', 'classes'],
+    ['size', 'highlight', 'classes'],
   )
 
-  const field = useFormField(() => ({
-    id: formProps.id,
-    name: formProps.name,
-    size: styleProps.size,
-    color: styleProps.color,
-    highlight: styleProps.highlight,
-    disabled: formProps.disabled,
-  }))
   const generatedId = useId(() => formProps.id, 'file-upload')
+  const field = useFormField(
+    () => ({
+      id: formProps.id,
+      name: formProps.name,
+      size: styleProps.size,
+      highlight: styleProps.highlight,
+      disabled: formProps.disabled,
+    }),
+    {
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
+  )
 
   let hiddenInputEl: HTMLInputElement | undefined
   let fileFieldContext: ReturnType<typeof KobalteFileField.useFileFieldContext> | undefined
@@ -278,14 +281,6 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
   const [dragging, setDragging] = createSignal(false)
   const [previewUrls, setPreviewUrls] = createSignal<Map<File, string>>(new Map())
 
-  const inputId = () => field.id() ?? generatedId()
-  const resolvedColor = createMemo(() => (field.color() ?? styleProps.color) as FileUploadColor)
-  const resolvedSize = createMemo(() => (field.size() ?? styleProps.size) as FileUploadSize)
-  const invalid = createMemo(() => {
-    const value = field.ariaAttrs()?.['aria-invalid']
-
-    return value === true || value === 'true'
-  })
   const resolvedMaxFiles = createMemo(() => {
     if (formProps.maxFiles !== undefined) {
       return formProps.maxFiles
@@ -415,7 +410,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
         data-slot="wrapper"
         class={fileUploadWrapperVariants(
           {
-            size: resolvedSize(),
+            size: field.size(),
           },
           styleProps.classes?.wrapper,
         )}
@@ -425,7 +420,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
           data-slot="icon"
           class={fileUploadIconVariants(
             {
-              size: resolvedSize(),
+              size: field.size(),
             },
             styleProps.classes?.icon,
           )}
@@ -436,7 +431,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
             data-slot="label"
             class={fileUploadLabelVariants(
               {
-                size: resolvedSize(),
+                size: field.size(),
               },
               styleProps.classes?.label,
             )}
@@ -450,7 +445,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
             data-slot="description"
             class={fileUploadDescriptionVariants(
               {
-                size: resolvedSize(),
+                size: field.size(),
               },
               styleProps.classes?.description,
             )}
@@ -470,7 +465,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
         data-slot="filePreview"
         class={fileUploadPreviewVariants(
           {
-            size: resolvedSize(),
+            size: field.size(),
           },
           styleProps.classes?.filePreview,
         )}
@@ -481,7 +476,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
             <Icon
               name={displayProps.fileIcon}
               class={fileUploadIconVariants({
-                size: resolvedSize(),
+                size: field.size(),
               })}
             />
           }
@@ -495,7 +490,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
   return (
     <KobalteFileField.Root
       as={formProps.as}
-      id={`${inputId()}-root`}
+      id={`${field.id()}-root`}
       name={field.name()}
       accept={formProps.accept}
       multiple={formProps.multiple}
@@ -506,7 +501,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
       data-slot="root"
       class={fileUploadRootVariants(
         {
-          size: resolvedSize(),
+          size: field.size(),
           disabled: field.disabled(),
         },
         styleProps.classes?.root,
@@ -522,13 +517,12 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
             data-slot="base"
             class={fileUploadBaseVariants(
               {
-                color: resolvedColor(),
-                size: resolvedSize(),
+                size: field.size(),
                 highlight: field.highlight(),
                 disabled: field.disabled(),
                 dragging: false,
                 dropzone: false,
-                invalid: invalid(),
+                invalid: field.invalid(),
               },
               styleProps.classes?.base,
             )}
@@ -543,13 +537,12 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
           data-slot="base"
           class={fileUploadBaseVariants(
             {
-              color: resolvedColor(),
-              size: resolvedSize(),
+              size: field.size(),
               highlight: field.highlight(),
               disabled: field.disabled(),
               dragging: dragging(),
               dropzone: true,
-              invalid: invalid(),
+              invalid: field.invalid(),
             },
             styleProps.classes?.base,
           )}
@@ -577,7 +570,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
       </Show>
 
       <KobalteFileField.HiddenInput
-        id={inputId()}
+        id={field.id()}
         ref={(element) => (hiddenInputEl = element)}
         name={field.name()}
         required={formProps.required}
@@ -586,7 +579,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
           const files = Array.from(event.currentTarget.files ?? [])
           processIncomingFiles(files)
         }}
-        {...(field.ariaAttrs() ?? {})}
+        {...field.ariaAttrs()}
       />
 
       <Show when={displayProps.preview && selectedFiles().length > 0}>
@@ -594,7 +587,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
           data-slot="files"
           class={fileUploadFilesVariants(
             {
-              size: resolvedSize(),
+              size: field.size(),
             },
             styleProps.classes?.files,
           )}
@@ -605,7 +598,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
                 data-slot="file"
                 class={fileUploadFileVariants(
                   {
-                    size: resolvedSize(),
+                    size: field.size(),
                   },
                   styleProps.classes?.file,
                 )}
@@ -616,7 +609,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
                   data-slot="fileMeta"
                   class={fileUploadMetaVariants(
                     {
-                      size: resolvedSize(),
+                      size: field.size(),
                     },
                     styleProps.classes?.fileMeta,
                   )}
@@ -625,7 +618,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
                     data-slot="fileName"
                     class={fileUploadNameVariants(
                       {
-                        size: resolvedSize(),
+                        size: field.size(),
                       },
                       styleProps.classes?.fileName,
                     )}
@@ -636,7 +629,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
                     data-slot="fileSize"
                     class={fileUploadSizeVariants(
                       {
-                        size: resolvedSize(),
+                        size: field.size(),
                       },
                       styleProps.classes?.fileSize,
                     )}
@@ -651,7 +644,7 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
                   data-slot="fileRemove"
                   class={fileUploadRemoveVariants(
                     {
-                      size: resolvedSize(),
+                      size: field.size(),
                       disabled: field.disabled(),
                     },
                     styleProps.classes?.fileRemove,

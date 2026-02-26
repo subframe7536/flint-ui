@@ -5,18 +5,11 @@ export const inputNumberBaseVariants = cva(
   'w-full rounded-md border border-input bg-transparent text-foreground outline-none transition-[color,box-shadow] dark:bg-input/30 placeholder:text-muted-foreground focus-visible:(border-ring ring-3 ring-ring/50) aria-invalid:(border-destructive ring-3 ring-destructive/20) dark:aria-invalid:(border-destructive/50 ring-destructive/40) disabled:(cursor-not-allowed opacity-75)',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       variant: 'outline',
       orientation: 'horizontal',
     },
     variants: {
-      color: {
-        primary: '',
-        secondary: '',
-        neutral: '',
-        error: '',
-      },
       size: {
         xs: 'h-7 px-2 text-xs',
         sm: 'h-8 px-2.5 text-xs',

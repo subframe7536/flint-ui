@@ -6,7 +6,6 @@ import { DemoPage, DemoSection } from './common/demo-page'
 
 const VARIANTS = ['outline', 'soft', 'subtle', 'ghost', 'none'] as const
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
-const COLORS = ['primary', 'secondary', 'neutral', 'error'] as const
 
 export const InputDemos = () => {
   const [textareaValue, setTextareaValue] = createSignal('Type here to see autoresize...')
@@ -15,7 +14,7 @@ export const InputDemos = () => {
     <DemoPage
       eyebrow="Rock UI Playground"
       title="Input & Textarea"
-      description="Text input with icon slots, plus textarea variants, sizes, colors, and autoresize."
+      description="Text input with icon slots, plus textarea variants, sizes, and autoresize."
     >
       <DemoSection title="Input Variants" description="Visual style variants.">
         <div class="gap-3 grid lg:grid-cols-3 sm:grid-cols-2">
@@ -28,14 +27,6 @@ export const InputDemos = () => {
       <DemoSection title="Input Sizes" description="From xs to xl.">
         <div class="gap-3 grid lg:grid-cols-3 sm:grid-cols-2">
           <For each={SIZES}>{(size) => <Input size={size} placeholder={`Size: ${size}`} />}</For>
-        </div>
-      </DemoSection>
-
-      <DemoSection title="Input Colors" description="Color variants with highlight ring.">
-        <div class="gap-3 grid sm:grid-cols-2">
-          <For each={COLORS}>
-            {(color) => <Input color={color} highlight placeholder={`Color: ${color}`} />}
-          </For>
         </div>
       </DemoSection>
 

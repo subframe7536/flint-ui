@@ -4,7 +4,10 @@ import { createMemo, mergeProps, onMount, Show, splitProps } from 'solid-js'
 
 import { Button } from '../button'
 import type { ButtonProps } from '../button/button'
+import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
+import type { FormDisableOption, FormIdentityOptions } from '../form-field/form-options'
+import { FORM_ID_NAME_DISABLED_KEYS, FORM_INPUT_INTERACTION_KEYS } from '../form-field/form-options'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
 import { callHandler, cn, useId } from '../shared/utils'
@@ -18,7 +21,6 @@ import {
   inputNumberIncrementVariants,
 } from './input-number.class'
 
-type InputNumberColor = NonNullable<InputNumberVariantProps['color']>
 type InputNumberSize = NonNullable<InputNumberVariantProps['size']>
 type InputNumberButtonSize = NonNullable<ButtonProps<'button'>['size']>
 type InputNumberControlTrigger =
@@ -36,12 +38,11 @@ export interface InputNumberClasses {
   decrement?: string
 }
 
-export interface InputNumberBaseProps extends Pick<
-  InputNumberVariantProps,
-  'size' | 'color' | 'variant' | 'highlight' | 'orientation'
-> {
-  id?: string
-  name?: string
+export interface InputNumberBaseProps
+  extends
+    Pick<InputNumberVariantProps, 'size' | 'variant' | 'highlight' | 'orientation'>,
+    FormIdentityOptions,
+    FormDisableOption {
   placeholder?: string
   increment?: boolean | InputNumberControlButtonProps
   incrementIcon?: IconName
@@ -82,8 +83,6 @@ function toButtonIconSize(size: InputNumberSize): InputNumberButtonSize {
 export function InputNumber(props: InputNumberProps): JSX.Element {
   const merged = mergeProps(
     {
-      size: 'md' as const,
-      color: 'primary' as const,
       variant: 'outline' as const,
       orientation: 'horizontal' as const,
       increment: true,
@@ -95,7 +94,7 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
 
   const [formProps, controlProps, styleProps, rootProps] = splitProps(
     merged as InputNumberProps,
-    ['id', 'name', 'disabled', 'onRawValueChange', 'onBlur', 'onFocus'],
+    [...FORM_ID_NAME_DISABLED_KEYS, 'onRawValueChange', ...FORM_INPUT_INTERACTION_KEYS],
     [
       'placeholder',
       'orientation',
@@ -108,29 +107,29 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       'autofocus',
       'autofocusDelay',
     ],
-    ['size', 'color', 'variant', 'highlight', 'classes'],
+    ['size', 'variant', 'highlight', 'classes'],
   )
 
-  const field = useFormField(() => ({
-    id: formProps.id,
-    name: formProps.name,
-    size: styleProps.size,
-    color: styleProps.color,
-    highlight: styleProps.highlight,
-    disabled: formProps.disabled,
-  }))
+  const fieldGroup = useFieldGroupContext()
   const generatedId = useId(() => formProps.id, 'input-number')
+  const field = useFormField(
+    () => ({
+      id: formProps.id,
+      name: formProps.name,
+      size: styleProps.size ?? fieldGroup?.size,
+      highlight: styleProps.highlight,
+      disabled: formProps.disabled,
+    }),
+    {
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
+  )
 
   let inputEl: HTMLInputElement | undefined
 
-  const inputId = createMemo(() => field.id() ?? generatedId())
-  const rootId = createMemo(() => `${inputId()}-root`)
-  const resolvedSize = createMemo(() => (field.size() ?? styleProps.size) as InputNumberSize)
-  const resolvedColor = createMemo(() => (field.color() ?? styleProps.color) as InputNumberColor)
-  const resolvedHighlight = createMemo(() => field.highlight() ?? styleProps.highlight)
-  const disabled = createMemo(() => field.disabled())
-  const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
-  const buttonSize = createMemo(() => toButtonIconSize(resolvedSize()))
+  const resolvedHighlight = field.highlight
+  const buttonSize = createMemo(() => toButtonIconSize(field.size()))
 
   const resolvedIncrement = createMemo(() => {
     if (controlProps.orientation === 'vertical') {
@@ -226,35 +225,34 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
 
   return (
     <KobalteNumberField.Root
-      id={rootId()}
+      id={`${field.id()}-root`}
       name={field.name()}
-      disabled={disabled()}
+      disabled={field.disabled()}
       onRawValueChange={onRawValueChange}
       data-slot="root"
       class={cn('relative inline-flex w-full items-center', styleProps.classes?.root)}
       {...rootProps}
     >
       <KobalteNumberField.Input
-        id={inputId()}
+        id={field.id()}
         ref={(e) => (inputEl = e)}
         placeholder={controlProps.placeholder}
         data-slot="base"
         class={inputNumberBaseVariants(
           {
-            color: resolvedColor(),
-            size: resolvedSize(),
+            size: field.size(),
             variant: styleProps.variant,
             highlight: resolvedHighlight(),
             orientation: controlProps.orientation,
           },
-          resolvedIncrement() && inputNumberIncrementPaddingVariants({ size: resolvedSize() }),
-          resolvedDecrement() && inputNumberDecrementPaddingVariants({ size: resolvedSize() }),
+          resolvedIncrement() && inputNumberIncrementPaddingVariants({ size: field.size() }),
+          resolvedDecrement() && inputNumberDecrementPaddingVariants({ size: field.size() }),
           controlProps.orientation === 'horizontal' && !resolvedDecrement() && 'text-start',
           styleProps.classes?.base,
         )}
         onBlur={onBlur}
         onFocus={onFocus}
-        {...(ariaAttrs() as Record<string, string | boolean | undefined>)}
+        {...field.ariaAttrs()}
       />
 
       <KobalteNumberField.HiddenInput data-slot="hidden-input" />
@@ -266,11 +264,11 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
           className: inputNumberIncrementVariants(
             {
               orientation: controlProps.orientation,
-              disabled: disabled() || controlProps.incrementDisabled,
+              disabled: field.disabled() || controlProps.incrementDisabled,
             },
             styleProps.classes?.increment,
           ),
-          disabled: disabled() || controlProps.incrementDisabled,
+          disabled: field.disabled() || controlProps.incrementDisabled,
           ariaLabel: 'Increment',
           icon: incrementIcon(),
           buttonProps: incrementProps(),
@@ -284,11 +282,11 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
           className: inputNumberDecrementVariants(
             {
               orientation: controlProps.orientation,
-              disabled: disabled() || controlProps.decrementDisabled,
+              disabled: field.disabled() || controlProps.decrementDisabled,
             },
             styleProps.classes?.decrement,
           ),
-          disabled: disabled() || controlProps.decrementDisabled,
+          disabled: field.disabled() || controlProps.decrementDisabled,
           ariaLabel: 'Decrement',
           icon: decrementIcon(),
           buttonProps: decrementProps(),

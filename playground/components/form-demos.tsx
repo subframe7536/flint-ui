@@ -136,7 +136,6 @@ export const FormDemos = () => {
               items={RADIO_ITEMS}
               orientation="horizontal"
               variant="table"
-              color="secondary"
               value={planValue()}
               onChange={setPlanValue}
             />

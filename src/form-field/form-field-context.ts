@@ -1,13 +1,14 @@
 import type { Accessor, JSX } from 'solid-js'
-import { createEffect, createMemo, createSignal, onCleanup } from 'solid-js'
+import { createMemo, onCleanup } from 'solid-js'
 
+import type { FormFieldRuntimeState } from '../form/form-context'
 import { useFormContext } from '../form/form-context'
 import { createContextProvider } from '../shared/create-context-provider'
 
 export interface FormFieldInjectedOptions {
   error?: boolean | string | JSX.Element
   name?: string
-  size?: string
+  size?: FormFieldSize
   eagerValidation?: boolean
   validateOnInputDelay?: number
   errorPattern?: RegExp
@@ -15,18 +16,14 @@ export interface FormFieldInjectedOptions {
   description?: JSX.Element
   help?: JSX.Element
   ariaId: string
-}
-
-export interface InputIdContextValue {
-  id?: string
-  setId: (next: string | null | undefined) => void
+  controlId?: string
+  registerControl?: (entry: { id: Accessor<string>; bind: Accessor<boolean> }) => () => void
 }
 
 export interface UseFormFieldProps {
   id?: string
   name?: string
-  size?: string
-  color?: string
+  size?: FormFieldSize
   highlight?: boolean
   disabled?: boolean
 }
@@ -34,55 +31,57 @@ export interface UseFormFieldProps {
 export interface UseFormFieldOptions {
   bind?: boolean
   deferInputValidation?: boolean
+  defaultId: Accessor<string>
+  defaultSize: FormFieldSize
+  defaultAriaAttrs?: Record<string, string | boolean | undefined>
 }
 
 export interface UseFormFieldReturn {
-  id: Accessor<string | undefined>
+  id: Accessor<string>
   name: Accessor<string | undefined>
-  size: Accessor<string | undefined>
-  color: Accessor<string | undefined>
+  size: Accessor<FormFieldSize>
   highlight: Accessor<boolean | undefined>
   disabled: Accessor<boolean>
+  invalid: Accessor<boolean>
+  ariaAttrs: Accessor<Record<string, string | boolean | undefined>>
+  touched: Accessor<boolean>
+  dirty: Accessor<boolean>
+  focused: Accessor<boolean>
+  validating: Accessor<boolean>
   emitFormBlur: () => void
   emitFormFocus: () => void
   emitFormChange: () => void
   emitFormInput: () => void
-  ariaAttrs: Accessor<Record<string, string | boolean | undefined> | undefined>
 }
+
+export type FormFieldSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 export const [FormFieldProvider, useFormFieldContext] =
   createContextProvider<FormFieldInjectedOptions | null>('FormField', null)
-export const [InputIdProvider, useInputIdContext] =
-  createContextProvider<InputIdContextValue | null>('InputId', null)
 
-function createInputIdContextFallback(): InputIdContextValue {
-  const [id, setId] = createSignal<string | null | undefined>(undefined)
-
-  return {
-    get id() {
-      return id() ?? undefined
-    },
-    setId,
-  }
+const EMPTY_RUNTIME_STATE: FormFieldRuntimeState = {
+  touched: false,
+  dirty: false,
+  focused: false,
+  validating: false,
 }
 
 function resolveOptions(
-  opts?: UseFormFieldOptions | Accessor<UseFormFieldOptions>,
+  opts: UseFormFieldOptions | Accessor<UseFormFieldOptions>,
 ): UseFormFieldOptions {
   if (typeof opts === 'function') {
-    return opts() ?? {}
+    return opts()
   }
 
-  return opts ?? {}
+  return opts
 }
 
 export function useFormField(
-  props?: Accessor<UseFormFieldProps>,
-  opts?: UseFormFieldOptions | Accessor<UseFormFieldOptions>,
+  props: Accessor<UseFormFieldProps> | undefined,
+  opts: UseFormFieldOptions | Accessor<UseFormFieldOptions>,
 ): UseFormFieldReturn {
   const formContext = useFormContext()
   const formField = useFormFieldContext()
-  const inputId = useInputIdContext() ?? createInputIdContextFallback()
 
   const options = createMemo(() => {
     const value = resolveOptions(opts)
@@ -90,21 +89,27 @@ export function useFormField(
     return {
       bind: value.bind ?? true,
       deferInputValidation: value.deferInputValidation ?? false,
+      defaultId: value.defaultId,
+      defaultSize: value.defaultSize,
+      defaultAriaAttrs: value.defaultAriaAttrs,
     }
   })
 
   const fieldProps = createMemo(() => props?.() ?? {})
+  const bind = createMemo(() => options().bind)
+  const localId = createMemo(() => fieldProps().id ?? options().defaultId())
 
-  const id = createMemo(() => fieldProps().id ?? inputId.id)
+  if (formField?.registerControl) {
+    const unregister = formField.registerControl({
+      id: localId,
+      bind,
+    })
+    onCleanup(unregister)
+  }
+
+  const id = createMemo(() => fieldProps().id ?? formField?.controlId ?? options().defaultId())
   const name = createMemo(() => fieldProps().name ?? formField?.name)
-  const size = createMemo(() => fieldProps().size ?? formField?.size)
-  const color = createMemo(() => {
-    if (formField?.error) {
-      return 'error'
-    }
-
-    return fieldProps().color
-  })
+  const size = createMemo(() => fieldProps().size ?? formField?.size ?? options().defaultSize)
   const highlight = createMemo(() => {
     if (formField?.error) {
       return true
@@ -113,29 +118,18 @@ export function useFormField(
     return fieldProps().highlight
   })
   const disabled = createMemo(() => Boolean(formContext?.disabled || fieldProps().disabled))
+  const invalid = createMemo(() => Boolean(formField?.error))
+  const runtimeState = createMemo(() => formContext?.getFieldState(name()) ?? EMPTY_RUNTIME_STATE)
+  const touched = createMemo(() => runtimeState().touched)
+  const dirty = createMemo(() => runtimeState().dirty)
+  const focused = createMemo(() => runtimeState().focused)
+  const validating = createMemo(() => runtimeState().validating)
 
   let inputTimer: ReturnType<typeof setTimeout> | undefined
   onCleanup(() => {
     if (inputTimer) {
       clearTimeout(inputTimer)
       inputTimer = undefined
-    }
-  })
-
-  createEffect(() => {
-    if (!formField) {
-      return
-    }
-
-    const resolvedOptions = options()
-    const resolvedFieldProps = fieldProps()
-
-    if (!resolvedOptions.bind) {
-      inputId.setId(null)
-    } else if (resolvedFieldProps.id !== undefined) {
-      inputId.setId(resolvedFieldProps.id)
-    } else {
-      inputId.setId(undefined)
     }
   })
 
@@ -176,9 +170,9 @@ export function useFormField(
     }, delay)
   }
 
-  const ariaAttrs = createMemo<Record<string, string | boolean | undefined> | undefined>(() => {
+  const ariaAttrs = createMemo<Record<string, string | boolean | undefined>>(() => {
     if (!formField) {
-      return undefined
+      return options().defaultAriaAttrs ?? {}
     }
 
     const describedBy: string[] = []
@@ -211,13 +205,17 @@ export function useFormField(
     id,
     name,
     size,
-    color,
     highlight,
     disabled,
+    invalid,
+    ariaAttrs,
+    touched,
+    dirty,
+    focused,
+    validating,
     emitFormBlur,
     emitFormFocus,
     emitFormChange,
     emitFormInput,
-    ariaAttrs,
   } satisfies UseFormFieldReturn
 }

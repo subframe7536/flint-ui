@@ -3,6 +3,14 @@ import type { JSX, ValidComponent } from 'solid-js'
 import { For, createEffect, createMemo, createSignal, mergeProps, splitProps } from 'solid-js'
 
 import { useFormField } from '../form-field/form-field-context'
+import type {
+  FormDisableOption,
+  FormIdentityOptions,
+  FormReadOnlyOption,
+  FormRequiredOption,
+  FormValueOptions,
+} from '../form-field/form-options'
+import { FORM_ID_NAME_VALUE_REQUIRED_DISABLED_KEYS } from '../form-field/form-options'
 import { useId } from '../shared/utils'
 
 import type { SliderVariantProps } from './slider.class'
@@ -14,9 +22,6 @@ import {
   sliderTrackVariants,
 } from './slider.class'
 
-type SliderColor = NonNullable<SliderBaseProps['color']>
-type SliderSize = NonNullable<SliderBaseProps['size']>
-
 export type SliderValue = number | number[]
 
 export interface SliderClasses {
@@ -27,20 +32,20 @@ export interface SliderClasses {
   input?: string
 }
 
-export interface SliderBaseProps extends Pick<SliderVariantProps, 'color' | 'size' | 'highlight'> {
-  id?: string
-  name?: string
-  value?: SliderValue
-  defaultValue?: SliderValue
+export interface SliderBaseProps
+  extends
+    Pick<SliderVariantProps, 'size' | 'highlight'>,
+    FormIdentityOptions,
+    FormValueOptions<SliderValue>,
+    FormRequiredOption,
+    FormDisableOption,
+    FormReadOnlyOption {
   min?: number
   max?: number
   step?: number
   minStepsBetweenThumbs?: number
   orientation?: 'horizontal' | 'vertical'
   inverted?: boolean
-  required?: boolean
-  disabled?: boolean
-  readOnly?: boolean
   onValueChange?: (value: SliderValue) => void
   onChange?: (value: SliderValue) => void
   classes?: SliderClasses
@@ -81,7 +86,6 @@ export function Slider(props: SliderProps): JSX.Element {
       step: 1,
       minStepsBetweenThumbs: 0,
       orientation: 'horizontal' as const,
-      color: 'primary' as const,
       size: 'md' as const,
     },
     props,
@@ -89,36 +93,26 @@ export function Slider(props: SliderProps): JSX.Element {
 
   const [formProps, rangeProps, styleProps, rootProps] = splitProps(
     merged as SliderProps,
-    [
-      'id',
-      'name',
-      'value',
-      'defaultValue',
-      'required',
-      'disabled',
-      'readOnly',
-      'onValueChange',
-      'onChange',
-    ],
+    [...FORM_ID_NAME_VALUE_REQUIRED_DISABLED_KEYS, 'readOnly', 'onValueChange', 'onChange'],
     ['min', 'max', 'step', 'minStepsBetweenThumbs', 'orientation', 'inverted'],
-    ['color', 'size', 'highlight', 'classes'],
+    ['size', 'highlight', 'classes'],
   )
 
-  const field = useFormField(() => ({
-    id: formProps.id,
-    name: formProps.name,
-    size: styleProps.size,
-    color: styleProps.color,
-    highlight: styleProps.highlight,
-    disabled: formProps.disabled,
-  }))
   const generatedId = useId(() => formProps.id, 'slider')
-
-  const inputId = () => field.id() ?? generatedId()
-  const resolvedColor = () => (field.color() ?? styleProps.color) as SliderColor
-  const resolvedSize = () => (field.size() ?? styleProps.size) as SliderSize
-  const resolvedHighlight = () => field.highlight() ?? styleProps.highlight
-  const disabled = () => field.disabled()
+  const field = useFormField(
+    () => ({
+      id: formProps.id,
+      name: formProps.name,
+      size: styleProps.size,
+      highlight: styleProps.highlight,
+      disabled: formProps.disabled,
+    }),
+    {
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
+  )
+  const resolvedHighlight = field.highlight
   const kobalteValue = createMemo(() => normalizeSliderValues(formProps.value, rangeProps.min!))
   const kobalteDefaultValue = createMemo(() =>
     normalizeSliderValues(formProps.defaultValue, rangeProps.min!),
@@ -139,10 +133,10 @@ export function Slider(props: SliderProps): JSX.Element {
 
   function inputIdForIndex(index: number): string {
     if (index === 0) {
-      return inputId()
+      return field.id()
     }
 
-    return `${inputId()}-${index + 1}`
+    return `${field.id()}-${index + 1}`
   }
 
   function toPublicValue(values: number[]): SliderValue {
@@ -209,7 +203,7 @@ export function Slider(props: SliderProps): JSX.Element {
 
   return (
     <KobalteSlider.Root
-      id={`${inputId()}-root`}
+      id={`${field.id()}-root`}
       name={field.name()}
       minValue={rangeProps.min}
       maxValue={rangeProps.max}
@@ -220,18 +214,17 @@ export function Slider(props: SliderProps): JSX.Element {
       value={kobalteValue()}
       defaultValue={kobalteDefaultValue()}
       required={formProps.required}
-      disabled={disabled()}
+      disabled={field.disabled()}
       readOnly={formProps.readOnly}
       onChange={onValueChange}
       onChangeEnd={onChange}
       data-slot="root"
       class={sliderRootVariants(
         {
-          color: resolvedColor(),
-          size: resolvedSize(),
+          size: field.size(),
           orientation: rangeProps.orientation,
           highlight: resolvedHighlight(),
-          disabled: disabled(),
+          disabled: field.disabled(),
         },
         styleProps.classes?.root,
       )}
@@ -241,11 +234,10 @@ export function Slider(props: SliderProps): JSX.Element {
         data-slot="track"
         class={sliderTrackVariants(
           {
-            color: resolvedColor(),
-            size: resolvedSize(),
+            size: field.size(),
             orientation: rangeProps.orientation,
             highlight: resolvedHighlight(),
-            disabled: disabled(),
+            disabled: field.disabled(),
           },
           styleProps.classes?.track,
         )}
@@ -254,11 +246,10 @@ export function Slider(props: SliderProps): JSX.Element {
           data-slot="range"
           class={sliderRangeVariants(
             {
-              color: resolvedColor(),
-              size: resolvedSize(),
+              size: field.size(),
               orientation: rangeProps.orientation,
               highlight: resolvedHighlight(),
-              disabled: disabled(),
+              disabled: field.disabled(),
             },
             styleProps.classes?.range,
           )}
@@ -273,11 +264,10 @@ export function Slider(props: SliderProps): JSX.Element {
             style={thumbStyle(thumbIndex)}
             class={sliderThumbVariants(
               {
-                color: resolvedColor(),
-                size: resolvedSize(),
+                size: field.size(),
                 orientation: rangeProps.orientation,
                 highlight: resolvedHighlight(),
-                disabled: disabled(),
+                disabled: field.disabled(),
               },
               styleProps.classes?.thumb,
             )}
@@ -289,15 +279,14 @@ export function Slider(props: SliderProps): JSX.Element {
               data-slot="input"
               class={sliderInputVariants(
                 {
-                  color: resolvedColor(),
-                  size: resolvedSize(),
+                  size: field.size(),
                   orientation: rangeProps.orientation,
                   highlight: resolvedHighlight(),
-                  disabled: disabled(),
+                  disabled: field.disabled(),
                 },
                 styleProps.classes?.input,
               )}
-              {...(field.ariaAttrs() ?? {})}
+              {...field.ariaAttrs()}
             />
           </KobalteSlider.Thumb>
         )}

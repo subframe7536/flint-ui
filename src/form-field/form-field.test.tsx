@@ -8,21 +8,31 @@ import { RadioGroup } from '../radio-group'
 import { FormField } from './form-field'
 import { useFormField } from './form-field-context'
 
-function FieldControl(props: { state?: { value: string }; id?: string }) {
+function FieldControl(props: {
+  state?: { value: string }
+  id?: string
+  bind?: boolean
+  testId?: string
+}) {
   const field = useFormField(
     () => ({
       id: props.id,
     }),
-    { deferInputValidation: true },
+    () => ({
+      bind: props.bind,
+      deferInputValidation: true,
+      defaultId: () => 'field-control-default-id',
+      defaultSize: 'md',
+    }),
   )
 
   return (
     <input
-      data-testid="control"
+      data-testid={props.testId ?? 'control'}
       id={field.id()}
       name={field.name()}
-      aria-invalid={field.ariaAttrs()?.['aria-invalid'] ? 'true' : undefined}
-      aria-describedby={field.ariaAttrs()?.['aria-describedby'] as string | undefined}
+      aria-invalid={field.ariaAttrs()['aria-invalid'] ? 'true' : undefined}
+      aria-describedby={field.ariaAttrs()['aria-describedby'] as string | undefined}
       onInput={(event) => {
         if (props.state) {
           props.state.value = event.currentTarget.value
@@ -32,6 +42,29 @@ function FieldControl(props: { state?: { value: string }; id?: string }) {
       onChange={() => field.emitFormChange()}
       onBlur={() => field.emitFormBlur()}
       onFocus={() => field.emitFormFocus()}
+    />
+  )
+}
+
+function FieldMetaProbe(props: { id?: string; size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' }) {
+  const field = useFormField(
+    () => ({
+      id: props.id,
+      size: props.size,
+    }),
+    {
+      defaultId: () => 'meta-default-id',
+      defaultSize: 'md',
+    },
+  )
+
+  return (
+    <output
+      data-testid="meta-probe"
+      data-id={field.id()}
+      data-size={field.size()}
+      data-invalid={String(field.invalid())}
+      data-aria-key-count={String(Object.keys(field.ariaAttrs()).length)}
     />
   )
 }
@@ -127,6 +160,46 @@ describe('FormField', () => {
     expect(screen.getByTestId('control')).not.toBeNull()
   })
 
+  test('returns defaults outside providers', () => {
+    const screen = render(() => <FieldMetaProbe />)
+    const probe = screen.getByTestId('meta-probe')
+
+    expect(probe.getAttribute('data-id')).toBe('meta-default-id')
+    expect(probe.getAttribute('data-size')).toBe('md')
+    expect(probe.getAttribute('data-invalid')).toBe('false')
+    expect(probe.getAttribute('data-aria-key-count')).toBe('0')
+  })
+
+  test('id prop takes priority over context and defaults', () => {
+    const screen = render(() => (
+      <FormField id="form-field-id">
+        <FieldMetaProbe id="explicit-id" />
+      </FormField>
+    ))
+
+    expect(screen.getByTestId('meta-probe').getAttribute('data-id')).toBe('explicit-id')
+  })
+
+  test('size prop takes priority over context and defaults', () => {
+    const screen = render(() => (
+      <FormField size="lg">
+        <FieldMetaProbe size="xl" />
+      </FormField>
+    ))
+
+    expect(screen.getByTestId('meta-probe').getAttribute('data-size')).toBe('xl')
+  })
+
+  test('invalid reflects form field error state', () => {
+    const screen = render(() => (
+      <FormField error="Error">
+        <FieldMetaProbe />
+      </FormField>
+    ))
+
+    expect(screen.getByTestId('meta-probe').getAttribute('data-invalid')).toBe('true')
+  })
+
   test('does not bind form-field label for grouped controls', () => {
     const state = { value: '' }
 
@@ -140,6 +213,41 @@ describe('FormField', () => {
 
     const label = screen.getByText('Radio group')
     expect(label.getAttribute('for')).toBeNull()
+  })
+
+  test('binds label to last bind=true control', () => {
+    const screen = render(() => (
+      <FormField label="Multi control">
+        <FieldControl id="first-control" bind testId="first-control" />
+        <FieldControl id="second-control" bind testId="second-control" />
+      </FormField>
+    ))
+
+    const label = screen.getByText('Multi control')
+    expect(label.getAttribute('for')).toBe('second-control')
+  })
+
+  test('does not bind label when all registered controls bind=false', () => {
+    const screen = render(() => (
+      <FormField label="Unbound controls">
+        <FieldControl id="first-control" bind={false} testId="first-control" />
+        <FieldControl id="second-control" bind={false} testId="second-control" />
+      </FormField>
+    ))
+
+    const label = screen.getByText('Unbound controls')
+    expect(label.getAttribute('for')).toBeNull()
+  })
+
+  test('falls back to form-field identity id when no controls are registered', () => {
+    const screen = render(() => (
+      <FormField id="fallback-form-field-id" label="Standalone label">
+        <div data-testid="placeholder" />
+      </FormField>
+    ))
+
+    const label = screen.getByText('Standalone label')
+    expect(label.getAttribute('for')).toBe('fallback-form-field-id')
   })
 
   test('applies classes.root override', () => {

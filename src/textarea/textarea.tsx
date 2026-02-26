@@ -3,6 +3,14 @@ import { createEffect, createMemo, mergeProps, on, onMount, splitProps } from 's
 
 import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
+import type {
+  FormDisableOption,
+  FormIdentityOptions,
+  FormReadOnlyOption,
+  FormRequiredOption,
+  FormValueOptions,
+} from '../form-field/form-options'
+import { FORM_ID_NAME_DISABLED_KEYS, FORM_INPUT_INTERACTION_KEYS } from '../form-field/form-options'
 import type { ModelModifiers } from '../shared/input-modifiers'
 import { applyInputModifiers } from '../shared/input-modifiers'
 import { callHandler, useId } from '../shared/utils'
@@ -16,10 +24,8 @@ import {
 
 type TextareaStyleVariantProps = Pick<
   TextareaVariantProps,
-  'color' | 'size' | 'variant' | 'highlight' | 'autoresize'
+  'size' | 'variant' | 'highlight' | 'autoresize'
 >
-type TextareaColor = NonNullable<TextareaBaseProps['color']>
-type TextareaSize = NonNullable<TextareaBaseProps['size']>
 type TextareaVariant = NonNullable<TextareaBaseProps['variant']>
 
 export type TextareaValue = string | number | null | undefined
@@ -29,17 +35,18 @@ export interface TextareaClasses {
   base?: string
 }
 
-export interface TextareaBaseProps extends TextareaStyleVariantProps {
-  id?: string
-  name?: string
-  value?: TextareaValue
+export interface TextareaBaseProps
+  extends
+    TextareaStyleVariantProps,
+    FormIdentityOptions,
+    FormValueOptions<TextareaValue>,
+    FormRequiredOption,
+    FormReadOnlyOption,
+    FormDisableOption {
   placeholder?: string
-  required?: boolean
-  readOnly?: boolean
   autofocus?: boolean
   autofocusDelay?: number
   autoresizeDelay?: number
-  disabled?: boolean
   rows?: number
   maxrows?: number
   modelModifiers?: ModelModifiers<TextareaValue>
@@ -61,7 +68,6 @@ export function Textarea(props: TextareaProps): JSX.Element {
       maxrows: 0,
       autofocusDelay: 0,
       autoresizeDelay: 0,
-      color: 'primary' as const,
       variant: 'outline' as const,
       autoresize: false,
     },
@@ -71,18 +77,15 @@ export function Textarea(props: TextareaProps): JSX.Element {
   const [formProps, layoutProps, styleProps] = splitProps(
     merged as TextareaProps,
     [
-      'id',
-      'name',
+      ...FORM_ID_NAME_DISABLED_KEYS,
       'value',
       'required',
-      'disabled',
       'readOnly',
       'modelModifiers',
       'onValueChange',
       'onInput',
       'onChange',
-      'onBlur',
-      'onFocus',
+      ...FORM_INPUT_INTERACTION_KEYS,
     ],
     [
       'placeholder',
@@ -96,31 +99,27 @@ export function Textarea(props: TextareaProps): JSX.Element {
     ],
   )
 
+  const fieldGroup = useFieldGroupContext()
+  const generatedId = useId(() => formProps.id, 'textarea')
   const field = useFormField(
     () => ({
       id: formProps.id,
       name: formProps.name,
-      size: styleProps.size,
-      color: styleProps.color,
+      size: styleProps.size ?? fieldGroup?.size,
       highlight: styleProps.highlight,
       disabled: formProps.disabled,
     }),
-    { deferInputValidation: true },
+    {
+      deferInputValidation: true,
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
   )
-  const fieldGroup = useFieldGroupContext()
-  const generatedId = useId(() => formProps.id, 'textarea')
 
   let textareaEl: HTMLTextAreaElement | undefined
 
-  const textareaId = createMemo(() => field.id() ?? generatedId())
-  const resolvedColor = createMemo(() => (field.color() ?? styleProps.color) as TextareaColor)
-  const resolvedSize = createMemo(
-    () => (styleProps.size ?? fieldGroup?.size ?? field.size() ?? 'md') as TextareaSize,
-  )
   const resolvedVariant = createMemo(() => styleProps.variant as TextareaVariant)
-  const resolvedHighlight = createMemo(() => field.highlight() ?? styleProps.highlight)
-  const disabled = createMemo(() => field.disabled())
-  const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
+  const resolvedHighlight = field.highlight
   const isLazy = createMemo(() => Boolean(formProps.modelModifiers?.lazy))
 
   function updateInputValue(value: string | null | undefined): void {
@@ -230,34 +229,33 @@ export function Textarea(props: TextareaProps): JSX.Element {
       data-slot="root"
       class={textareaRootVariants(
         {
-          color: resolvedColor(),
-          size: resolvedSize(),
+          size: field.size(),
           variant: resolvedVariant(),
           highlight: resolvedHighlight(),
-          disabled: disabled(),
+          disabled: field.disabled(),
         },
         styleProps.classes?.root,
       )}
       onPointerDown={onRootPointerDown}
     >
       <textarea
-        id={textareaId()}
+        id={field.id()}
         ref={(element) => (textareaEl = element)}
         name={field.name()}
         value={formProps.value as string | number | string[] | undefined}
         rows={layoutProps.rows ?? 3}
         placeholder={layoutProps.placeholder}
         required={formProps.required}
-        disabled={disabled()}
+        disabled={field.disabled()}
         readOnly={formProps.readOnly}
         data-slot="base"
         class={textareaBaseVariants(
           {
-            size: resolvedSize(),
+            size: field.size(),
             autoresize: layoutProps.autoresize,
           },
           textareaPaddingVariants({
-            size: resolvedSize(),
+            size: field.size(),
           }),
           styleProps.classes?.base,
         )}
@@ -265,7 +263,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
         onChange={onChange}
         onBlur={onBlur}
         onFocus={onFocus}
-        {...(ariaAttrs() as Record<string, string | boolean | undefined>)}
+        {...field.ariaAttrs()}
       />
 
       {layoutProps.children}

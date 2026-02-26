@@ -5,6 +5,7 @@ import { cn, useId } from '../shared/utils'
 
 import type {
   FormContextValue,
+  FormFieldRuntimeState,
   FormInputEvent,
   FormInputEventType,
   FormInputMeta,
@@ -47,6 +48,56 @@ export interface FormBaseProps<TState extends FormState = FormState> {
 
 export type FormProps<TState extends FormState = FormState> = FormBaseProps<TState>
 
+interface FormFieldRuntimeEntry {
+  touched: boolean
+  dirty: boolean
+  focused: boolean
+  validatingCount: number
+  blurred: boolean
+}
+
+const EMPTY_FIELD_RUNTIME_STATE: FormFieldRuntimeState = {
+  touched: false,
+  dirty: false,
+  focused: false,
+  validating: false,
+}
+
+const EMPTY_FIELD_RUNTIME_ENTRY: FormFieldRuntimeEntry = {
+  touched: false,
+  dirty: false,
+  focused: false,
+  validatingCount: 0,
+  blurred: false,
+}
+
+function createFieldRuntimeEntry(): FormFieldRuntimeEntry {
+  return { ...EMPTY_FIELD_RUNTIME_ENTRY }
+}
+
+function toFieldRuntimeState(entry: FormFieldRuntimeEntry | undefined): FormFieldRuntimeState {
+  if (!entry) {
+    return EMPTY_FIELD_RUNTIME_STATE
+  }
+
+  return {
+    touched: entry.touched,
+    dirty: entry.dirty,
+    focused: entry.focused,
+    validating: entry.validatingCount > 0,
+  }
+}
+
+function isSameRuntimeEntry(a: FormFieldRuntimeEntry, b: FormFieldRuntimeEntry): boolean {
+  return (
+    a.touched === b.touched &&
+    a.dirty === b.dirty &&
+    a.focused === b.focused &&
+    a.validatingCount === b.validatingCount &&
+    a.blurred === b.blurred
+  )
+}
+
 function matchesValidationTarget(
   error: FormValidationError,
   names: string[],
@@ -66,7 +117,7 @@ function matchesValidationTarget(
   })
 }
 
-const DEFAULT_VALUDATE_ON: FormInputEventType[] = ['input', 'blur', 'change']
+const DEFAULT_VALIDATE_ON: FormInputEventType[] = ['input', 'blur', 'change']
 export function Form<TState extends FormState = FormState>(props: FormProps<TState>): JSX.Element {
   const [stateValidationProps, eventProps, renderProps] = splitProps(
     props as FormProps<TState>,
@@ -78,23 +129,91 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
   const [loading, setLoading] = createSignal(false)
   const [errors, setErrors] = createSignal<FormValidationError[]>([])
   const [inputs, setInputs] = createSignal<Record<string, FormInputMeta>>({})
-
-  const touchedFields = new Set<string>()
-  const dirtyFields = new Set<string>()
-  const blurredFields = new Set<string>()
+  const [fieldStates, setFieldStates] = createSignal<Record<string, FormFieldRuntimeEntry>>({})
 
   const listeners = new Set<(event: FormInputEvent) => void>()
 
+  function patchFieldState(name: string, patch: Partial<FormFieldRuntimeEntry>): void {
+    if (!name) {
+      return
+    }
+
+    setFieldStates((previous) => {
+      const current = previous[name] ?? createFieldRuntimeEntry()
+      const next = {
+        ...current,
+        ...patch,
+      }
+
+      if (isSameRuntimeEntry(current, next)) {
+        return previous
+      }
+
+      return {
+        ...previous,
+        [name]: next,
+      }
+    })
+  }
+
+  function removeFieldState(name: string): void {
+    setFieldStates((previous) => {
+      if (!(name in previous)) {
+        return previous
+      }
+
+      const next = { ...previous }
+      delete next[name]
+      return next
+    })
+  }
+
+  function updateValidatingState(names: string[], delta: 1 | -1): void {
+    const uniqueNames = [...new Set(names.filter(Boolean))]
+
+    if (uniqueNames.length === 0) {
+      return
+    }
+
+    setFieldStates((previous) => {
+      let next: Record<string, FormFieldRuntimeEntry> | undefined
+
+      for (const name of uniqueNames) {
+        const current = previous[name] ?? createFieldRuntimeEntry()
+        const validatingCount = Math.max(0, current.validatingCount + delta)
+
+        if (validatingCount === current.validatingCount) {
+          continue
+        }
+
+        if (!next) {
+          next = { ...previous }
+        }
+
+        next[name] = {
+          ...current,
+          validatingCount,
+        }
+      }
+
+      return next ?? previous
+    })
+  }
+
+  function isFieldBlurred(name: string): boolean {
+    return Boolean(fieldStates()[name]?.blurred)
+  }
+
   async function handleInputEvent(event: FormInputEvent): Promise<void> {
     if (
-      (stateValidationProps.validateOn ?? DEFAULT_VALUDATE_ON).includes(event.type) &&
+      (stateValidationProps.validateOn ?? DEFAULT_VALIDATE_ON).includes(event.type) &&
       !loading()
     ) {
       if (event.type !== 'input') {
         if (event.name) {
           await runValidation(event.name)
         }
-      } else if (event.eager || (event.name && blurredFields.has(event.name))) {
+      } else if (event.eager || (event.name && isFieldBlurred(event.name))) {
         if (event.name) {
           await runValidation(event.name)
         }
@@ -106,16 +225,29 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
     }
 
     if (event.type === 'blur') {
-      blurredFields.add(event.name)
-      touchedFields.add(event.name)
+      patchFieldState(event.name, {
+        blurred: true,
+        touched: true,
+        focused: false,
+      })
     }
 
     if (event.type === 'focus' || event.type === 'change' || event.type === 'input') {
-      touchedFields.add(event.name)
+      patchFieldState(event.name, {
+        touched: true,
+      })
+    }
+
+    if (event.type === 'focus') {
+      patchFieldState(event.name, {
+        focused: true,
+      })
     }
 
     if (event.type === 'change' || event.type === 'input') {
-      dirtyFields.add(event.name)
+      patchFieldState(event.name, {
+        dirty: true,
+      })
     }
   }
 
@@ -145,6 +277,7 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
       delete next[name]
       return next
     })
+    removeFieldState(name)
   }
 
   function getInputMeta(name: string): FormInputMeta | undefined {
@@ -176,21 +309,28 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
   }
 
   async function runValidation(target?: string | string[]): Promise<FormValidationError[]> {
-    const allErrors = await getErrors()
+    const targets = target ? (Array.isArray(target) ? target : [target]) : Object.keys(inputs())
+    updateValidatingState(targets, 1)
 
-    if (!target) {
-      setErrors(allErrors)
-      return allErrors
+    try {
+      const allErrors = await getErrors()
+
+      if (!target) {
+        setErrors(allErrors)
+        return allErrors
+      }
+
+      const names = Array.isArray(target) ? target : [target]
+      const nextErrors = [
+        ...errors().filter((error) => !matchesValidationTarget(error, names, inputs())),
+        ...allErrors.filter((error) => matchesValidationTarget(error, names, inputs())),
+      ]
+
+      setErrors(nextErrors)
+      return nextErrors
+    } finally {
+      updateValidatingState(targets, -1)
     }
-
-    const names = Array.isArray(target) ? target : [target]
-    const nextErrors = [
-      ...errors().filter((error) => !matchesValidationTarget(error, names, inputs())),
-      ...allErrors.filter((error) => matchesValidationTarget(error, names, inputs())),
-    ]
-
-    setErrors(nextErrors)
-    return nextErrors
   }
 
   const stateAccessor = createMemo(
@@ -211,7 +351,7 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
       return stateAccessor()
     },
     get validateOn() {
-      return stateValidationProps.validateOn ?? DEFAULT_VALUDATE_ON
+      return stateValidationProps.validateOn ?? DEFAULT_VALIDATE_ON
     },
     get validateOnInputDelay() {
       return stateValidationProps.validateOnInputDelay ?? 300
@@ -219,6 +359,13 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
     registerInput,
     unregisterInput,
     getInputMeta,
+    getFieldState: (name) => {
+      if (!name) {
+        return EMPTY_FIELD_RUNTIME_STATE
+      }
+
+      return toFieldRuntimeState(fieldStates()[name])
+    },
     emitInputEvent,
     subscribeInputEvents,
     setErrors: (nextErrors) => {
@@ -260,7 +407,24 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
 
       submitEvent.data = stateValidationProps.state
       await eventProps.onSubmit?.(submitEvent)
-      dirtyFields.clear()
+      setFieldStates((previous) => {
+        let changed = false
+        const next = { ...previous }
+
+        for (const [name, state] of Object.entries(previous)) {
+          if (!state.dirty) {
+            continue
+          }
+
+          changed = true
+          next[name] = {
+            ...state,
+            dirty: false,
+          }
+        }
+
+        return changed ? next : previous
+      })
     } finally {
       setLoading(false)
     }

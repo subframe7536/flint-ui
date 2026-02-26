@@ -34,7 +34,7 @@ const GROUPED_OPTIONS: SelectOption[] = [
 ]
 
 const VARIANTS = ['outline', 'soft', 'subtle', 'ghost'] as const
-const SIZES = ['sm', 'md', 'lg'] as const
+const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 
 function makeOptions(count: number, offset = 0): SelectOption[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -184,8 +184,8 @@ export const SelectDemos = () => {
         </div>
       </DemoSection>
 
-      <DemoSection title="Sizes" description="Small, medium, and large.">
-        <div class="gap-3 grid sm:grid-cols-3">
+      <DemoSection title="Sizes" description="From xs to xl.">
+        <div class="gap-3 grid md:grid-cols-5 sm:grid-cols-3">
           <For each={SIZES}>
             {(size) => <Select options={FRUIT_OPTIONS} size={size} placeholder={`Size: ${size}`} />}
           </For>

@@ -25,21 +25,14 @@ export const switchContainerVariants = cva('flex items-center', {
 })
 
 export const switchBaseVariants = cva(
-  'inline-flex shrink-0 items-center rounded-full border border-transparent bg-input p-px outline-none transition-[color,box-shadow] dark:bg-input/80 focus-visible:(border-ring ring-3 ring-ring/50)',
+  'inline-flex shrink-0 items-center rounded-full border border-transparent bg-input p-px outline-none transition-[color,box-shadow] dark:bg-input/80 focus-visible:(border-ring ring-3 ring-ring/50) data-checked:bg-primary',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       disabled: false,
       invalid: false,
     },
     variants: {
-      color: {
-        primary: 'data-checked:bg-primary',
-        secondary: 'data-checked:bg-secondary',
-        neutral: 'data-checked:bg-neutral',
-        error: 'data-checked:bg-destructive',
-      },
       size: {
         xs: 'w-7',
         sm: 'w-8',
@@ -75,17 +68,8 @@ export const switchThumbVariants = cva(
   },
 )
 
-export const switchIconVariants = cva('absolute size-10/12 transition-opacity', {
-  defaultVariants: {
-    color: 'primary',
-  },
+export const switchIconVariants = cva('absolute size-10/12 transition-opacity text-primary', {
   variants: {
-    color: {
-      primary: 'text-primary',
-      secondary: 'text-secondary',
-      neutral: 'text-foreground',
-      error: 'text-destructive',
-    },
     checked: {
       true: 'opacity-100',
     },

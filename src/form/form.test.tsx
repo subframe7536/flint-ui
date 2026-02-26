@@ -16,6 +16,8 @@ interface TestState {
 function TestInput(props: { state: TestState; deferInputValidation?: boolean }) {
   const field = useFormField(undefined, () => ({
     deferInputValidation: props.deferInputValidation,
+    defaultId: () => 'test-input-default-id',
+    defaultSize: 'md',
   }))
 
   return (
@@ -23,8 +25,12 @@ function TestInput(props: { state: TestState; deferInputValidation?: boolean }) 
       data-testid="input"
       id={field.id()}
       name={field.name()}
-      aria-invalid={field.ariaAttrs()?.['aria-invalid'] ? 'true' : undefined}
-      aria-describedby={field.ariaAttrs()?.['aria-describedby'] as string | undefined}
+      data-touched={String(field.touched())}
+      data-dirty={String(field.dirty())}
+      data-focused={String(field.focused())}
+      data-validating={String(field.validating())}
+      aria-invalid={field.ariaAttrs()['aria-invalid'] ? 'true' : undefined}
+      aria-describedby={field.ariaAttrs()['aria-describedby'] as string | undefined}
       onInput={(event) => {
         props.state.value = event.currentTarget.value
         field.emitFormInput()
@@ -235,5 +241,54 @@ describe('Form', () => {
     expect((screen.container.querySelector('form') as HTMLFormElement).className).toContain(
       'root-override',
     )
+  })
+
+  test('exposes touched/dirty/focused/validating field runtime state', async () => {
+    const state: TestState = { value: '' }
+
+    const screen = render(() => (
+      <Form
+        state={state}
+        validateOn={['blur']}
+        validate={() =>
+          new Promise((resolve) => {
+            setTimeout(() => {
+              resolve([])
+            }, 30)
+          })
+        }
+      >
+        <FormField name="value" label="Value">
+          <TestInput state={state} />
+        </FormField>
+      </Form>
+    ))
+
+    const input = screen.getByTestId('input')
+
+    expect(input.getAttribute('data-touched')).toBe('false')
+    expect(input.getAttribute('data-dirty')).toBe('false')
+    expect(input.getAttribute('data-focused')).toBe('false')
+    expect(input.getAttribute('data-validating')).toBe('false')
+
+    await fireEvent.focus(input)
+    await waitFor(() => {
+      expect(input.getAttribute('data-touched')).toBe('true')
+      expect(input.getAttribute('data-focused')).toBe('true')
+    })
+
+    await fireEvent.input(input, { target: { value: 'next' } })
+    await waitFor(() => {
+      expect(input.getAttribute('data-dirty')).toBe('true')
+    })
+
+    await fireEvent.blur(input)
+    await waitFor(() => {
+      expect(input.getAttribute('data-validating')).toBe('true')
+    })
+    await waitFor(() => {
+      expect(input.getAttribute('data-validating')).toBe('false')
+      expect(input.getAttribute('data-focused')).toBe('false')
+    })
   })
 })

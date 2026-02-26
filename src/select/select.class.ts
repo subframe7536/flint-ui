@@ -10,9 +10,11 @@ export const selectControlVariants = cva(
     },
     variants: {
       size: {
+        xs: 'min-h-7 text-xs',
         sm: 'min-h-8 text-xs',
         md: 'min-h-9 text-sm',
         lg: 'min-h-10 text-sm',
+        xl: 'min-h-11 text-base',
       },
       variant: {
         outline: 'bg-transparent',
@@ -48,15 +50,22 @@ export const selectInputVariants = cva(
         multiHidden: 'sr-only',
       },
       size: {
+        xs: '',
         sm: '',
         md: '',
         lg: '',
+        xl: '',
       },
       readOnly: {
         true: 'cursor-pointer',
       },
     },
     compoundVariants: [
+      {
+        mode: 'single',
+        size: 'xs',
+        class: 'h-6 px-2 text-xs',
+      },
       {
         mode: 'single',
         size: 'sm',
@@ -73,6 +82,16 @@ export const selectInputVariants = cva(
         class: 'h-9 px-3 text-sm',
       },
       {
+        mode: 'single',
+        size: 'xl',
+        class: 'h-10 px-3 text-base',
+      },
+      {
+        mode: 'multiSearch',
+        size: 'xs',
+        class: 'ps-0.5 text-xs',
+      },
+      {
         mode: 'multiSearch',
         size: 'sm',
         class: 'ps-1 text-xs',
@@ -87,6 +106,11 @@ export const selectInputVariants = cva(
         size: 'lg',
         class: 'ps-1.5 text-sm',
       },
+      {
+        mode: 'multiSearch',
+        size: 'xl',
+        class: 'ps-1.5 text-base',
+      },
     ],
   },
 )
@@ -97,9 +121,11 @@ export const selectTriggerIconVariants = cva('text-muted-foreground opacity-80 c
   },
   variants: {
     size: {
+      xs: 'me-1 size-3.5',
       sm: 'me-1.5 size-4',
       md: 'me-2 size-5',
       lg: 'me-2.5 size-6',
+      xl: 'me-3 size-6',
     },
   },
 })
@@ -110,9 +136,11 @@ export const selectLeadingIconVariants = cva('shrink-0 text-muted-foreground', {
   },
   variants: {
     size: {
+      xs: 'ms-1.5 text-sm',
       sm: 'ms-2 text-sm',
       md: 'ms-2.5 text-base',
       lg: 'ms-3 text-base',
+      xl: 'ms-3.5 text-lg',
     },
   },
 })
@@ -125,9 +153,11 @@ export const selectClearVariants = cva(
     },
     variants: {
       size: {
+        xs: 'me-0.5 text-xs',
         sm: 'me-1 text-xs',
         md: 'me-1.5 text-sm',
         lg: 'me-2 text-sm',
+        xl: 'me-2.5 text-base',
       },
     },
   },
@@ -141,9 +171,11 @@ export const selectItemVariants = cva(
     },
     variants: {
       size: {
+        xs: 'min-h-6 text-xs',
         sm: 'min-h-7 text-xs',
         md: 'min-h-8 text-sm',
         lg: 'min-h-9 text-sm',
+        xl: 'min-h-10 text-base',
       },
     },
   },
@@ -157,9 +189,11 @@ export const selectTagVariants = cva(
     },
     variants: {
       size: {
+        xs: 'text-xs',
         sm: 'text-xs',
         md: 'text-sm',
         lg: 'text-sm',
+        xl: 'text-base',
       },
     },
   },

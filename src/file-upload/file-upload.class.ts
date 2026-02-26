@@ -24,7 +24,6 @@ export const fileUploadBaseVariants = cva(
   'group relative inline-flex w-full cursor-pointer items-center justify-center rounded-lg border border-input bg-background text-center outline-none transition-[color,box-shadow] dark:bg-input/30 focus-visible:(border-ring ring-3 ring-ring/50)',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       dropzone: true,
       disabled: false,
@@ -32,12 +31,6 @@ export const fileUploadBaseVariants = cva(
       invalid: false,
     },
     variants: {
-      color: {
-        primary: '',
-        secondary: '',
-        neutral: '',
-        error: '',
-      },
       size: {
         xs: 'min-h-20 gap-1.5 px-2.5 py-2 text-xs',
         sm: 'min-h-24 gap-2 px-3 py-2.5 text-xs',
@@ -52,7 +45,7 @@ export const fileUploadBaseVariants = cva(
         true: 'cursor-not-allowed',
       },
       dragging: {
-        true: '',
+        true: 'border-primary bg-primary/8',
       },
       dropzone: {
         true: 'border-dashed',
@@ -62,13 +55,7 @@ export const fileUploadBaseVariants = cva(
         true: 'border-destructive ring-3 ring-destructive/20 dark:border-destructive/50 dark:ring-destructive/40',
       },
     },
-    compoundVariants: [
-      { color: 'primary', dragging: true, class: 'border-primary bg-primary/8' },
-      { color: 'secondary', dragging: true, class: 'border-secondary bg-secondary/8' },
-      { color: 'neutral', dragging: true, class: 'border-foreground bg-muted/64' },
-      { color: 'error', dragging: true, class: 'border-destructive bg-destructive/8' },
-      { disabled: true, class: 'pointer-events-none bg-muted/32' },
-    ],
+    compoundVariants: [{ disabled: true, class: 'pointer-events-none bg-muted/32' }],
   },
 )
 

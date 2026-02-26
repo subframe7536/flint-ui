@@ -3,6 +3,14 @@ import { Show, createMemo, mergeProps, onMount, splitProps } from 'solid-js'
 
 import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
+import type {
+  FormDisableOption,
+  FormIdentityOptions,
+  FormReadOnlyOption,
+  FormRequiredOption,
+  FormValueOptions,
+} from '../form-field/form-options'
+import { FORM_ID_NAME_DISABLED_KEYS, FORM_INPUT_INTERACTION_KEYS } from '../form-field/form-options'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
 import type { ModelModifiers } from '../shared/input-modifiers'
@@ -23,9 +31,7 @@ import {
   inputTrailingVariants,
 } from './input.class'
 
-type InputStyleVariantProps = Pick<InputVariantProps, 'color' | 'size' | 'variant' | 'highlight'>
-type InputColor = NonNullable<InputBaseProps['color']>
-type InputSize = NonNullable<InputBaseProps['size']>
+type InputStyleVariantProps = Pick<InputVariantProps, 'size' | 'variant' | 'highlight'>
 type InputVariant = NonNullable<InputBaseProps['variant']>
 
 export type InputValue = string | number | boolean | null | undefined
@@ -39,18 +45,19 @@ export interface InputClasses {
   trailingIcon?: string
 }
 
-export interface InputBaseProps extends InputStyleVariantProps {
-  id?: string
-  name?: string
+export interface InputBaseProps
+  extends
+    InputStyleVariantProps,
+    FormIdentityOptions,
+    FormValueOptions<InputValue>,
+    FormRequiredOption,
+    FormReadOnlyOption,
+    FormDisableOption {
   type?: JSX.InputHTMLAttributes<HTMLInputElement>['type']
-  value?: InputValue
   placeholder?: string
-  required?: boolean
-  readOnly?: boolean
   autocomplete?: JSX.InputHTMLAttributes<HTMLInputElement>['autocomplete']
   autofocus?: boolean
   autofocusDelay?: number
-  disabled?: boolean
   icon?: IconName
   leading?: boolean | JSX.Element
   leadingIcon?: IconName
@@ -80,7 +87,6 @@ export function Input(props: InputProps): JSX.Element {
       type: 'text' as NonNullable<JSX.InputHTMLAttributes<HTMLInputElement>['type']>,
       autocomplete: 'off' as const,
       autofocusDelay: 0,
-      color: 'primary' as const,
       variant: 'outline' as const,
       loading: false,
       loadingIcon: 'icon-loading' as IconName,
@@ -91,47 +97,40 @@ export function Input(props: InputProps): JSX.Element {
   const [formProps, baseProps, adornmentStyleProps] = splitProps(
     merged as InputProps,
     [
-      'id',
-      'name',
+      ...FORM_ID_NAME_DISABLED_KEYS,
       'value',
       'required',
-      'disabled',
       'readOnly',
       'modelModifiers',
       'onValueChange',
       'onInput',
       'onChange',
-      'onBlur',
-      'onFocus',
+      ...FORM_INPUT_INTERACTION_KEYS,
     ],
     ['type', 'placeholder', 'autocomplete', 'autofocus', 'autofocusDelay', 'children'],
   )
 
+  const fieldGroup = useFieldGroupContext()
+  const generatedId = useId(() => formProps.id, 'input')
   const field = useFormField(
     () => ({
       id: formProps.id,
       name: formProps.name,
-      size: adornmentStyleProps.size,
-      color: adornmentStyleProps.color,
+      size: adornmentStyleProps.size ?? fieldGroup?.size,
       highlight: adornmentStyleProps.highlight,
       disabled: formProps.disabled,
     }),
-    { deferInputValidation: true },
+    {
+      deferInputValidation: true,
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
   )
-  const fieldGroup = useFieldGroupContext()
-  const generatedId = useId(() => formProps.id, 'input')
 
   let inputEl: HTMLInputElement | undefined
 
-  const inputId = createMemo(() => field.id() ?? generatedId())
-  const resolvedColor = createMemo(() => (field.color() ?? adornmentStyleProps.color) as InputColor)
-  const resolvedSize = createMemo(
-    () => (adornmentStyleProps.size ?? fieldGroup?.size ?? field.size() ?? 'md') as InputSize,
-  )
   const resolvedVariant = createMemo(() => adornmentStyleProps.variant as InputVariant)
-  const resolvedHighlight = createMemo(() => field.highlight() ?? adornmentStyleProps.highlight)
-  const disabled = createMemo(() => field.disabled())
-  const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
+  const resolvedHighlight = field.highlight
   const isLazy = createMemo(() => Boolean(formProps.modelModifiers?.lazy))
 
   const customLeading = createMemo(() =>
@@ -251,11 +250,10 @@ export function Input(props: InputProps): JSX.Element {
       data-slot="root"
       class={inputRootVariants(
         {
-          color: resolvedColor(),
-          size: resolvedSize(),
+          size: field.size(),
           variant: resolvedVariant(),
           highlight: resolvedHighlight(),
-          disabled: disabled(),
+          disabled: field.disabled(),
         },
         adornmentStyleProps.classes?.root,
       )}
@@ -266,7 +264,7 @@ export function Input(props: InputProps): JSX.Element {
           data-slot="leading"
           class={inputLeadingVariants(
             {
-              size: resolvedSize(),
+              size: field.size(),
             },
             adornmentStyleProps.classes?.leading,
           )}
@@ -281,7 +279,7 @@ export function Input(props: InputProps): JSX.Element {
                     data-slot="leadingIcon"
                     class={inputLeadingIconVariants(
                       {
-                        size: resolvedSize(),
+                        size: field.size(),
                         loading: adornmentStyleProps.loading,
                       },
                       adornmentStyleProps.classes?.leadingIcon,
@@ -297,14 +295,14 @@ export function Input(props: InputProps): JSX.Element {
       </Show>
 
       <input
-        id={inputId()}
+        id={field.id()}
         ref={(element) => (inputEl = element)}
         type={baseProps.type}
         value={formProps.value as string | number | string[] | undefined}
         name={field.name()}
         placeholder={baseProps.placeholder}
         required={formProps.required}
-        disabled={disabled()}
+        disabled={field.disabled()}
         readOnly={formProps.readOnly}
         autocomplete={baseProps.autocomplete}
         data-slot="base"
@@ -314,17 +312,17 @@ export function Input(props: InputProps): JSX.Element {
           },
           hasLeading()
             ? inputStartPaddingWithSlotVariants({
-                size: resolvedSize(),
+                size: field.size(),
               })
             : inputStartPaddingNoSlotVariants({
-                size: resolvedSize(),
+                size: field.size(),
               }),
           hasTrailing()
             ? inputEndPaddingWithSlotVariants({
-                size: resolvedSize(),
+                size: field.size(),
               })
             : inputEndPaddingNoSlotVariants({
-                size: resolvedSize(),
+                size: field.size(),
               }),
           adornmentStyleProps.classes?.input,
         )}
@@ -332,7 +330,7 @@ export function Input(props: InputProps): JSX.Element {
         onChange={onChange}
         onBlur={onBlur}
         onFocus={onFocus}
-        {...ariaAttrs()}
+        {...field.ariaAttrs()}
       />
 
       {baseProps.children}
@@ -342,7 +340,7 @@ export function Input(props: InputProps): JSX.Element {
           data-slot="trailing"
           class={inputTrailingVariants(
             {
-              size: resolvedSize(),
+              size: field.size(),
             },
             adornmentStyleProps.classes?.trailing,
           )}
@@ -357,7 +355,7 @@ export function Input(props: InputProps): JSX.Element {
                     data-slot="trailingIcon"
                     class={inputTrailingIconVariants(
                       {
-                        size: resolvedSize(),
+                        size: field.size(),
                         loading: adornmentStyleProps.loading,
                       },
                       adornmentStyleProps.classes?.trailingIcon,

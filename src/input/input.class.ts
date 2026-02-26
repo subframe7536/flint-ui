@@ -5,17 +5,10 @@ export const inputRootVariants = cva(
   'inline-flex w-full items-center overflow-hidden rounded-md border border-input bg-transparent transition-[color,box-shadow] dark:bg-input/30 focus-within:(border-ring ring-3 ring-ring/50) has-[[data-slot=base][aria-invalid=true]]:(border-destructive ring-3 ring-destructive/20) dark:has-[[data-slot=base][aria-invalid=true]]:(border-destructive/50 ring-destructive/40)',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       variant: 'outline',
     },
     variants: {
-      color: {
-        primary: '',
-        secondary: '',
-        neutral: '',
-        error: '',
-      },
       size: {
         xs: 'h-7 text-xs',
         sm: 'h-8 text-xs',

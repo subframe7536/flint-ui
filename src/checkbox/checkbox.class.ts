@@ -50,21 +50,14 @@ export const checkboxContainerVariants = cva('flex items-center', {
 })
 
 export const checkboxBaseVariants = cva(
-  'inline-flex items-center justify-center overflow-hidden rounded-sm border border-input bg-background bg-clip-padding outline-none transition-shadow dark:bg-input/30 focus-visible:(border-ring ring-3 ring-ring/50)',
+  'inline-flex items-center justify-center overflow-hidden rounded-sm border border-input bg-background bg-clip-padding outline-none transition-shadow dark:bg-input/30 focus-visible:(border-ring ring-3 ring-ring/50) data-checked:border-primary',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       disabled: false,
       invalid: false,
     },
     variants: {
-      color: {
-        primary: 'data-checked:border-primary',
-        secondary: 'data-checked:border-secondary',
-        neutral: 'data-checked:border-foreground',
-        error: 'data-checked:border-destructive',
-      },
       size: {
         xs: 'size-3',
         sm: 'size-3.5',
@@ -81,20 +74,6 @@ export const checkboxBaseVariants = cva(
     },
   },
 )
-
-export const checkboxIndicatorVariants = cva('flex size-full items-center justify-center', {
-  defaultVariants: {
-    color: 'primary',
-  },
-  variants: {
-    color: {
-      primary: 'bg-primary text-primary-foreground',
-      secondary: 'bg-secondary text-secondary-foreground',
-      neutral: 'bg-foreground text-background',
-      error: 'bg-destructive text-destructive-foreground',
-    },
-  },
-})
 
 export const checkboxIconVariants = cva('shrink-0', {
   defaultVariants: {
@@ -157,8 +136,7 @@ type CheckboxRootVariantProps = Omit<
 >
 
 export type CheckboxVariantProps = CheckboxRootVariantProps &
-  VariantProps<typeof checkboxContainerVariants> &
-  VariantProps<typeof checkboxIndicatorVariants> & {
+  VariantProps<typeof checkboxContainerVariants> & {
     variant?: 'list' | 'card'
     indicator?: 'start' | 'end' | 'hidden'
   }

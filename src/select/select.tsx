@@ -18,7 +18,15 @@ import {
   splitProps,
 } from 'solid-js'
 
+import { useFieldGroupContext } from '../field-group/field-group-context'
 import { useFormField } from '../form-field/form-field-context'
+import type {
+  FormDisableOption,
+  FormIdentityOptions,
+  FormRequiredOption,
+  FormValueOptions,
+} from '../form-field/form-options'
+import { FORM_ID_NAME_VALUE_REQUIRED_DISABLED_KEYS } from '../form-field/form-options'
 import { Icon, IconButton } from '../icon'
 import type { IconName } from '../icon'
 import { overlayMenuContentVariants } from '../shared/overlay-menu/menu.class'
@@ -119,7 +127,12 @@ export interface SelectClasses {
 type SelectSize = NonNullable<SelectControlVariantProps['size']>
 type SelectVariant = NonNullable<SelectControlVariantProps['variant']>
 
-export interface SelectBaseProps {
+export interface SelectBaseProps
+  extends
+    FormIdentityOptions,
+    FormValueOptions<SelectValue | null | SelectValue[]>,
+    FormRequiredOption,
+    FormDisableOption {
   /** Whether to allow multiple selections. When true, value is `SelectValue[]`. */
   multiple?: boolean
 
@@ -128,10 +141,6 @@ export interface SelectBaseProps {
   /** Custom field name mapping for option objects. */
   fieldNames?: SelectFieldNames
 
-  /** Controlled value. */
-  value?: SelectValue | null | SelectValue[]
-  /** Initial uncontrolled value. */
-  defaultValue?: SelectValue | null | SelectValue[]
   /** Called when the selection changes. */
   onChange?: (value: SelectValue | null | SelectValue[]) => void
 
@@ -191,10 +200,6 @@ export interface SelectBaseProps {
   /** Icon for the dropdown trigger. Default: 'icon-chevron-down'. */
   triggerIcon?: IconName
   closeIcon?: IconName
-
-  id?: string
-  name?: string
-  required?: boolean
 
   // ---- Kobalte passthrough props ----
 
@@ -328,8 +333,6 @@ function escapeRegex(str: string): string {
 export function Select(props: SelectProps): JSX.Element {
   const merged = mergeProps(
     {
-      size: 'md' as const,
-      color: 'primary' as const,
       variant: 'outline' as const,
       placeholder: '',
       allowClear: false,
@@ -339,7 +342,7 @@ export function Select(props: SelectProps): JSX.Element {
 
   const [formProps, searchInteractionProps, renderDisplayProps, styleProps, rootProps] = splitProps(
     merged as SelectProps,
-    ['id', 'name', 'value', 'defaultValue', 'required', 'disabled', 'onChange'],
+    [...FORM_ID_NAME_VALUE_REQUIRED_DISABLED_KEYS, 'onChange'],
     [
       'multiple',
       'showSearch',
@@ -375,24 +378,23 @@ export function Select(props: SelectProps): JSX.Element {
     ['size', 'variant', 'highlight', 'classes'],
   )
 
+  const fieldGroup = useFieldGroupContext()
+  const generatedId = useId(() => formProps.id, 'select')
   // ---- Form field integration ----
   const field = useFormField(
     () => ({
       id: formProps.id,
       name: formProps.name,
-      size: styleProps.size,
+      size: styleProps.size ?? fieldGroup?.size,
       highlight: styleProps.highlight,
       disabled: formProps.disabled,
     }),
-    { bind: false },
+    {
+      bind: false,
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
   )
-
-  const componentId = useId(() => formProps.id, 'select')
-
-  // ---- Resolved visual props ----
-  const resolvedSize = createMemo<SelectSize>(() => (field.size() ?? styleProps.size) as SelectSize)
-
-  const isInvalid = createMemo(() => field.ariaAttrs()?.['aria-invalid'] === true)
 
   // ---- Mode-derived booleans ----
   const isMultiple = createMemo(() => Boolean(searchInteractionProps.multiple))
@@ -902,7 +904,7 @@ export function Select(props: SelectProps): JSX.Element {
         item={itemProps.item}
         data-slot="item"
         onPointerDown={(e) => e.preventDefault()}
-        class={selectItemVariants({ size: resolvedSize() }, styleProps.classes?.item)}
+        class={selectItemVariants({ size: field.size() }, styleProps.classes?.item)}
       >
         {renderItemContent({
           option: raw(),
@@ -968,7 +970,7 @@ export function Select(props: SelectProps): JSX.Element {
           {
             mode: isMultiple() ? (isSearchable() ? 'multiSearch' : 'multiHidden') : 'single',
             readOnly: !isSearchable() && !isMultiple(),
-            size: resolvedSize(),
+            size: field.size(),
           },
           styleProps.classes?.input,
         )}
@@ -1045,7 +1047,7 @@ export function Select(props: SelectProps): JSX.Element {
               name={icon()}
               data-slot="leading-icon"
               class={selectLeadingIconVariants(
-                { size: resolvedSize() },
+                { size: field.size() },
                 styleProps.classes?.leadingIcon,
               )}
             />
@@ -1082,7 +1084,7 @@ export function Select(props: SelectProps): JSX.Element {
                   fallback={
                     <span
                       data-slot="tag"
-                      class={selectTagVariants({ size: resolvedSize() }, styleProps.classes?.tag)}
+                      class={selectTagVariants({ size: field.size() }, styleProps.classes?.tag)}
                     >
                       {option.label}
                       <IconButton
@@ -1121,7 +1123,7 @@ export function Select(props: SelectProps): JSX.Element {
           <IconButton
             name="icon-close"
             data-slot="clear"
-            class={selectClearVariants({ size: resolvedSize() }, styleProps.classes?.clear)}
+            class={selectClearVariants({ size: field.size() }, styleProps.classes?.clear)}
             tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation()
@@ -1137,7 +1139,7 @@ export function Select(props: SelectProps): JSX.Element {
               data-slot="trigger"
               name={renderDisplayProps.triggerIcon ?? 'icon-chevron-down'}
               class={selectTriggerIconVariants(
-                { size: resolvedSize() },
+                { size: field.size() },
                 'outline-none',
                 styleProps.classes?.triggerIcon,
               )}
@@ -1264,7 +1266,7 @@ export function Select(props: SelectProps): JSX.Element {
   // ---- Render ----
   return (
     <Combobox<NormalizedOption, NormalizedGroup>
-      id={componentId()}
+      id={field.id()}
       name={field.name()}
       options={effectiveOptions()}
       optionValue="value"
@@ -1280,7 +1282,7 @@ export function Select(props: SelectProps): JSX.Element {
       triggerMode="manual"
       disabled={field.disabled()}
       required={formProps.required}
-      validationState={isInvalid() ? 'invalid' : 'valid'}
+      validationState={field.invalid() ? 'invalid' : 'valid'}
       allowsEmptyCollection={true}
       shouldFocusWrap={true}
       virtualized={searchInteractionProps.virtualized}
@@ -1303,11 +1305,11 @@ export function Select(props: SelectProps): JSX.Element {
         data-slot="control"
         class={selectControlVariants(
           {
-            size: resolvedSize(),
+            size: field.size(),
             variant: styleProps.variant,
             highlight: field.highlight(),
             disabled: field.disabled(),
-            invalid: isInvalid(),
+            invalid: field.invalid(),
           },
           styleProps.classes?.control,
         )}

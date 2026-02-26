@@ -3,6 +3,8 @@ import type { JSX } from 'solid-js'
 import { Show, createMemo, mergeProps, splitProps } from 'solid-js'
 
 import { useFormField } from '../form-field/form-field-context'
+import type { FormDisableOption, FormIdentityOptions } from '../form-field/form-options'
+import { FORM_ID_NAME_DISABLED_ON_CHANGE_KEYS } from '../form-field/form-options'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
 import { useId } from '../shared/utils'
@@ -19,9 +21,6 @@ import {
   switchWrapperVariants,
 } from './switch.class'
 
-type SwitchColor = NonNullable<SwitchVariantProps['color']>
-type SwitchSize = NonNullable<SwitchVariantProps['size']>
-
 export interface SwitchClasses {
   root?: string
   container?: string
@@ -33,9 +32,8 @@ export interface SwitchClasses {
   description?: string
 }
 
-export interface SwitchBaseProps extends SwitchVariantProps {
-  id?: string
-  name?: string
+export interface SwitchBaseProps
+  extends SwitchVariantProps, FormIdentityOptions, FormDisableOption {
   loading?: boolean
   loadingIcon?: IconName
   checkedIcon?: IconName
@@ -52,7 +50,6 @@ export function Switch(props: SwitchProps): JSX.Element {
   const merged = mergeProps(
     {
       size: 'md' as const,
-      color: 'primary' as const,
       loading: false,
       loadingIcon: 'icon-loading' as IconName,
     },
@@ -61,32 +58,25 @@ export function Switch(props: SwitchProps): JSX.Element {
 
   const [formProps, rootStateProps, displayProps, styleProps, rootProps] = splitProps(
     merged as SwitchProps,
-    ['id', 'name', 'disabled', 'onChange'],
+    [...FORM_ID_NAME_DISABLED_ON_CHANGE_KEYS],
     ['value', 'checked', 'defaultChecked', 'required', 'readOnly'],
     ['loading', 'loadingIcon', 'checkedIcon', 'uncheckedIcon', 'label', 'description'],
-    ['size', 'color', 'classes'],
+    ['size', 'classes'],
   )
 
-  const field = useFormField(() => ({
-    id: formProps.id,
-    name: formProps.name,
-    size: styleProps.size,
-    color: styleProps.color,
-    disabled: formProps.disabled || displayProps.loading,
-  }))
   const generatedId = useId(() => formProps.id, 'switch')
-
-  const inputId = createMemo(() => field.id() ?? generatedId())
-  const rootId = createMemo(() => `${inputId()}-root`)
-  const resolvedColor = createMemo(() => (field.color() ?? styleProps.color) as SwitchColor)
-  const resolvedSize = createMemo(() => (field.size() ?? styleProps.size) as SwitchSize)
-  const disabled = createMemo(() => field.disabled())
-  const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
-  const invalid = createMemo(() => {
-    const value = ariaAttrs()['aria-invalid']
-
-    return value === true || value === 'true'
-  })
+  const field = useFormField(
+    () => ({
+      id: formProps.id,
+      name: formProps.name,
+      size: styleProps.size,
+      disabled: formProps.disabled || displayProps.loading,
+    }),
+    {
+      defaultId: generatedId,
+      defaultSize: 'md',
+    },
+  )
 
   function onChange(nextChecked: boolean): void {
     formProps.onChange?.(nextChecked)
@@ -97,14 +87,14 @@ export function Switch(props: SwitchProps): JSX.Element {
   return (
     <KobalteSwitch.Root
       {...rootStateProps}
-      id={rootId()}
+      id={`${field.id()}-root`}
       name={field.name()}
-      disabled={disabled()}
+      disabled={field.disabled()}
       onChange={onChange}
       data-slot="root"
       class={switchRootVariants(
         {
-          disabled: disabled(),
+          disabled: field.disabled(),
         },
         styleProps.classes?.root,
       )}
@@ -130,21 +120,20 @@ export function Switch(props: SwitchProps): JSX.Element {
               data-slot="container"
               class={switchContainerVariants(
                 {
-                  size: resolvedSize(),
+                  size: field.size(),
                 },
                 styleProps.classes?.container,
               )}
             >
-              <KobalteSwitch.Input id={inputId()} data-slot="input" {...ariaAttrs()} />
+              <KobalteSwitch.Input id={field.id()} data-slot="input" {...field.ariaAttrs()} />
 
               <KobalteSwitch.Control
                 data-slot="base"
                 class={switchBaseVariants(
                   {
-                    color: resolvedColor(),
-                    size: resolvedSize(),
-                    disabled: disabled(),
-                    invalid: invalid(),
+                    size: field.size(),
+                    disabled: field.disabled(),
+                    invalid: field.invalid(),
                   },
                   styleProps.classes?.base,
                 )}
@@ -153,7 +142,7 @@ export function Switch(props: SwitchProps): JSX.Element {
                   data-slot="thumb"
                   class={switchThumbVariants(
                     {
-                      size: resolvedSize(),
+                      size: field.size(),
                     },
                     styleProps.classes?.thumb,
                   )}
@@ -164,7 +153,6 @@ export function Switch(props: SwitchProps): JSX.Element {
                         name={resolvedIconName()}
                         class={switchIconVariants(
                           {
-                            color: resolvedColor(),
                             checked: !displayProps.loading && checked(),
                             unchecked: !displayProps.loading && !checked(),
                             loading: displayProps.loading,
@@ -183,19 +171,19 @@ export function Switch(props: SwitchProps): JSX.Element {
                 data-slot="wrapper"
                 class={switchWrapperVariants(
                   {
-                    size: resolvedSize(),
+                    size: field.size(),
                   },
                   styleProps.classes?.wrapper,
                 )}
               >
                 <Show when={displayProps.label}>
                   <label
-                    for={inputId()}
+                    for={field.id()}
                     data-slot="label"
                     class={switchLabelVariants(
                       {
                         required: rootStateProps.required,
-                        disabled: disabled(),
+                        disabled: field.disabled(),
                       },
                       styleProps.classes?.label,
                     )}
@@ -209,7 +197,7 @@ export function Switch(props: SwitchProps): JSX.Element {
                     data-slot="description"
                     class={switchDescriptionVariants(
                       {
-                        disabled: disabled(),
+                        disabled: field.disabled(),
                       },
                       styleProps.classes?.description,
                     )}

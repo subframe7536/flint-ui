@@ -4,6 +4,13 @@ import { For, Show, createMemo, createSignal, mergeProps, splitProps } from 'sol
 import { Checkbox } from '../checkbox'
 import type { CheckboxProps } from '../checkbox/checkbox'
 import { useFormField } from '../form-field/form-field-context'
+import type {
+  FormDisableOption,
+  FormIdentityOptions,
+  FormRequiredOption,
+  FormValueOptions,
+} from '../form-field/form-options'
+import { FORM_ID_NAME_VALUE_REQUIRED_DISABLED_KEYS } from '../form-field/form-options'
 import { cn, useId } from '../shared/utils'
 
 import type { CheckboxGroupVariantProps } from './checkbox-group.class'
@@ -41,25 +48,21 @@ export interface CheckboxGroupClasses {
   checkbox?: CheckboxProps['classes']
 }
 
-type CheckboxGroupSize = NonNullable<CheckboxProps['size']>
-type CheckboxGroupColor = NonNullable<CheckboxProps['color']>
-
-export interface CheckboxGroupBaseProps extends CheckboxGroupVariantProps {
-  id?: string
-  name?: string
+export interface CheckboxGroupBaseProps
+  extends
+    CheckboxGroupVariantProps,
+    FormIdentityOptions,
+    FormValueOptions<CheckboxGroupValue[]>,
+    FormRequiredOption,
+    FormDisableOption {
   legend?: JSX.Element
   valueKey?: string
   labelKey?: string
   descriptionKey?: string
   items?: CheckboxGroupItem[]
-  color?: CheckboxProps['color']
   indicator?: CheckboxProps['indicator']
   checkedIcon?: CheckboxProps['checkedIcon']
   indeterminateIcon?: CheckboxProps['indeterminateIcon']
-  value?: CheckboxGroupValue[]
-  defaultValue?: CheckboxGroupValue[]
-  required?: boolean
-  disabled?: boolean
   onChange?: (value: CheckboxGroupValue[]) => void
   classes?: CheckboxGroupClasses
 }
@@ -103,7 +106,6 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
       orientation: 'vertical' as const,
       variant: 'list' as const,
       size: 'md' as const,
-      color: 'primary' as const,
       defaultValue: [] as CheckboxGroupValue[],
     },
     props,
@@ -111,37 +113,30 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
 
   const [formProps, collectionProps, styleBehaviorProps] = splitProps(
     merged as CheckboxGroupProps,
-    ['id', 'name', 'value', 'defaultValue', 'required', 'disabled', 'onChange'],
+    [...FORM_ID_NAME_VALUE_REQUIRED_DISABLED_KEYS, 'onChange'],
     ['legend', 'items', 'valueKey', 'labelKey', 'descriptionKey'],
   )
 
+  const groupId = useId(() => formProps.id, 'checkbox-group')
   const field = useFormField(
     () => ({
       id: formProps.id,
       name: formProps.name,
-      color: styleBehaviorProps.color,
       size: styleBehaviorProps.size,
       disabled: formProps.disabled,
     }),
     {
       bind: false,
+      defaultId: groupId,
+      defaultSize: 'md',
     },
   )
 
-  const groupId = useId(() => formProps.id, 'checkbox-group')
   const [uncontrolledValue, setUncontrolledValue] = createSignal<CheckboxGroupValue[]>(
     formProps.defaultValue ?? [],
   )
 
-  const resolvedSize = createMemo(
-    () => (field.size() ?? styleBehaviorProps.size) as CheckboxGroupSize,
-  )
-  const resolvedColor = createMemo(
-    () => (field.color() ?? styleBehaviorProps.color) as CheckboxGroupColor,
-  )
-  const disabled = createMemo(() => field.disabled())
   const selectedValues = createMemo(() => formProps.value ?? uncontrolledValue())
-  const ariaAttrs = createMemo(() => field.ariaAttrs() ?? {})
   const legendId = createMemo(() => `${groupId()}-legend`)
 
   const normalizedItems = createMemo<NormalizedCheckboxGroupItem[]>(() => {
@@ -228,11 +223,11 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
         class={checkboxGroupFieldsetVariants(
           {
             orientation: styleBehaviorProps.orientation,
-            size: resolvedSize(),
+            size: field.size(),
           },
           styleBehaviorProps.classes?.fieldset,
         )}
-        {...(ariaAttrs() as Record<string, string | boolean | undefined>)}
+        {...field.ariaAttrs()}
       >
         <Show when={collectionProps.legend}>
           <legend
@@ -240,7 +235,7 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
             data-slot="legend"
             class={checkboxGroupLegendVariants(
               {
-                size: resolvedSize(),
+                size: field.size(),
                 required: formProps.required,
               },
               styleBehaviorProps.classes?.legend,
@@ -257,11 +252,11 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
               class={cn(
                 checkboxGroupItemVariants({
                   variant: styleBehaviorProps.variant,
-                  disabled: item.disabled || disabled(),
+                  disabled: item.disabled || field.disabled(),
                 }),
                 styleBehaviorProps.variant === 'table' &&
                   checkboxGroupTablePaddingVariants({
-                    size: resolvedSize(),
+                    size: field.size(),
                   }),
                 styleBehaviorProps.variant === 'table' &&
                   checkboxGroupTableOrientationVariants({
@@ -279,10 +274,9 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
                 value={item.value}
                 label={item.label}
                 description={item.description}
-                disabled={item.disabled || disabled()}
+                disabled={item.disabled || field.disabled()}
                 required={formProps.required}
-                size={resolvedSize()}
-                color={resolvedColor()}
+                size={field.size()}
                 variant={
                   styleBehaviorProps.variant === 'table' || styleBehaviorProps.variant === 'card'
                     ? 'card'

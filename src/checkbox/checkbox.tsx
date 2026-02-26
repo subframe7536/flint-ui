@@ -1,11 +1,13 @@
 import * as KobalteCheckbox from '@kobalte/core/checkbox'
 import type { JSX } from 'solid-js'
-import { Show, createMemo, mergeProps, splitProps } from 'solid-js'
+import { Show, mergeProps, splitProps } from 'solid-js'
 
 import { useFormField } from '../form-field/form-field-context'
+import type { FormDisableOption, FormIdentityOptions } from '../form-field/form-options'
+import { FORM_ID_NAME_DISABLED_ON_CHANGE_KEYS } from '../form-field/form-options'
 import type { IconName } from '../icon'
 import { Icon } from '../icon'
-import { useId } from '../shared/utils'
+import { cn, useId } from '../shared/utils'
 
 import type { CheckboxVariantProps } from './checkbox.class'
 import {
@@ -14,14 +16,10 @@ import {
   checkboxContainerVariants,
   checkboxDescriptionVariants,
   checkboxIconVariants,
-  checkboxIndicatorVariants,
   checkboxLabelVariants,
   checkboxRootVariants,
   checkboxWrapperVariants,
 } from './checkbox.class'
-
-type CheckboxColor = NonNullable<CheckboxVariantProps['color']>
-type CheckboxSize = NonNullable<CheckboxVariantProps['size']>
 
 export interface CheckboxClasses {
   root?: string
@@ -34,9 +32,8 @@ export interface CheckboxClasses {
   description?: string
 }
 
-export interface CheckboxBaseProps extends CheckboxVariantProps {
-  id?: string
-  name?: string
+export interface CheckboxBaseProps
+  extends CheckboxVariantProps, FormIdentityOptions, FormDisableOption {
   label?: JSX.Element
   description?: JSX.Element
   formFieldBind?: boolean
@@ -52,7 +49,6 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
   const merged = mergeProps(
     {
       size: 'md' as const,
-      color: 'primary' as const,
       variant: 'list' as const,
       indicator: 'start' as const,
       checkedIcon: 'icon-check' as IconName,
@@ -64,12 +60,11 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
   const [formProps, visualProps, rootProps] = splitProps(
     merged as CheckboxProps,
-    ['id', 'name', 'formFieldBind', 'disabled', 'onChange'],
+    [...FORM_ID_NAME_DISABLED_ON_CHANGE_KEYS, 'formFieldBind'],
     [
       'label',
       'description',
       'size',
-      'color',
       'variant',
       'indicator',
       'checkedIcon',
@@ -78,30 +73,20 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     ],
   )
 
+  const generatedId = useId(() => formProps.id, 'checkbox')
   const field = useFormField(
     () => ({
       id: formProps.id,
       name: formProps.name,
       size: visualProps.size,
-      color: visualProps.color,
       disabled: formProps.disabled,
     }),
     () => ({
       bind: formProps.formFieldBind,
+      defaultId: generatedId,
+      defaultSize: 'md',
     }),
   )
-  const generatedId = useId(() => formProps.id, 'checkbox')
-
-  const inputId = createMemo(() => field.id() ?? generatedId())
-  const rootId = createMemo(() => `${inputId()}-root`)
-  const resolvedColor = createMemo(() => (field.color() ?? visualProps.color) as CheckboxColor)
-  const resolvedSize = createMemo(() => (field.size() ?? visualProps.size) as CheckboxSize)
-
-  const invalid = createMemo(() => {
-    const value = field.ariaAttrs()?.['aria-invalid']
-
-    return value === true || value === 'true'
-  })
 
   function onChange(nextChecked: boolean): void {
     formProps.onChange?.(nextChecked)
@@ -111,7 +96,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
   return (
     <KobalteCheckbox.Root
-      id={rootId()}
+      id={`${field.id()}-root`}
       name={field.name()}
       disabled={field.disabled()}
       onChange={onChange}
@@ -124,7 +109,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
         },
         visualProps.variant === 'card' &&
           checkboxCardPaddingVariants({
-            size: resolvedSize(),
+            size: field.size(),
           }),
         visualProps.classes?.root,
       )}
@@ -136,21 +121,20 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
             data-slot="container"
             class={checkboxContainerVariants(
               {
-                size: resolvedSize(),
+                size: field.size(),
               },
               visualProps.classes?.container,
             )}
           >
-            <KobalteCheckbox.Input id={inputId()} data-slot="input" {...field.ariaAttrs()} />
+            <KobalteCheckbox.Input id={field.id()} data-slot="input" {...field.ariaAttrs()} />
 
             <KobalteCheckbox.Control
               data-slot="base"
               class={checkboxBaseVariants(
                 {
-                  color: resolvedColor(),
-                  size: resolvedSize(),
+                  size: field.size(),
                   disabled: field.disabled(),
-                  invalid: invalid(),
+                  invalid: field.invalid(),
                 },
                 visualProps.indicator === 'hidden' && 'sr-only',
                 visualProps.classes?.base,
@@ -158,10 +142,8 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
             >
               <KobalteCheckbox.Indicator
                 data-slot="indicator"
-                class={checkboxIndicatorVariants(
-                  {
-                    color: resolvedColor(),
-                  },
+                class={cn(
+                  'flex size-full items-center justify-center bg-primary text-primary-foreground',
                   visualProps.classes?.indicator,
                 )}
               >
@@ -172,7 +154,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                       name={visualProps.checkedIcon}
                       class={checkboxIconVariants(
                         {
-                          size: resolvedSize(),
+                          size: field.size(),
                         },
                         visualProps.classes?.icon,
                       )}
@@ -183,7 +165,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                     name={visualProps.indeterminateIcon}
                     class={checkboxIconVariants(
                       {
-                        size: resolvedSize(),
+                        size: field.size(),
                       },
                       visualProps.classes?.icon,
                     )}
@@ -199,14 +181,14 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
               class={checkboxWrapperVariants(
                 {
                   indicator: visualProps.indicator,
-                  size: resolvedSize(),
+                  size: field.size(),
                 },
                 visualProps.classes?.wrapper,
               )}
             >
               <Show when={visualProps.label}>
                 <label
-                  for={inputId()}
+                  for={field.id()}
                   data-slot="label"
                   class={checkboxLabelVariants(
                     {

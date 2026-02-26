@@ -19,6 +19,13 @@ export interface FormValidationError {
   id?: string
 }
 
+export interface FormFieldRuntimeState {
+  touched: boolean
+  dirty: boolean
+  focused: boolean
+  validating: boolean
+}
+
 export interface FormContextValue {
   disabled: boolean
   loading: boolean
@@ -29,6 +36,7 @@ export interface FormContextValue {
   registerInput: (name: string, meta: FormInputMeta) => void
   unregisterInput: (name: string) => void
   getInputMeta: (name: string) => FormInputMeta | undefined
+  getFieldState: (name?: string) => FormFieldRuntimeState
   emitInputEvent: (event: FormInputEvent) => void
   subscribeInputEvents: (listener: (event: FormInputEvent) => void) => () => void
   setErrors: (errors: FormValidationError[]) => void

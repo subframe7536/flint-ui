@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const fieldGroupVariants = cva(
-  'relative [&>*:not(:first-child):not(:last-child)]:rounded-none',
+  'relative isolate [&>*]:relative [&>*:focus-within]:z-2 [&>*:not(:first-child):not(:last-child)]:rounded-none',
   {
     defaultVariants: {
       orientation: 'horizontal',

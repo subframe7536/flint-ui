@@ -3,19 +3,12 @@ import { cva } from 'cls-variant/cva'
 
 export const sliderRootVariants = cva('relative flex touch-none select-none', {
   defaultVariants: {
-    color: 'primary',
     size: 'md',
     orientation: 'horizontal',
     disabled: false,
     highlight: false,
   },
   variants: {
-    color: {
-      primary: '',
-      secondary: '',
-      neutral: '',
-      error: '',
-    },
     size: {
       xs: 'gap-2',
       sm: 'gap-2',
@@ -40,19 +33,12 @@ export const sliderTrackVariants = cva(
   'relative grow select-none before:(absolute rounded-full bg-input content-empty)',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       orientation: 'horizontal',
       disabled: false,
       highlight: false,
     },
     variants: {
-      color: {
-        primary: '',
-        secondary: '',
-        neutral: '',
-        error: '',
-      },
       size: {
         xs: '',
         sm: '',
@@ -86,21 +72,14 @@ export const sliderTrackVariants = cva(
   },
 )
 
-export const sliderRangeVariants = cva('absolute select-none rounded-full', {
+export const sliderRangeVariants = cva('absolute select-none rounded-full bg-primary', {
   defaultVariants: {
-    color: 'primary',
     size: 'md',
     orientation: 'horizontal',
     disabled: false,
     highlight: false,
   },
   variants: {
-    color: {
-      primary: 'bg-primary',
-      secondary: 'bg-secondary',
-      neutral: 'bg-inverted',
-      error: 'bg-destructive',
-    },
     size: {
       xs: '',
       sm: '',
@@ -125,19 +104,12 @@ export const sliderThumbVariants = cva(
   'relative block shrink-0 select-none rounded-full border border-ring bg-white not-dark:bg-clip-padding shadow-xs/5 outline-none transition-[box-shadow,transform] ring-ring/50 data-dragging:(scale-120 shadow-none) data-dragging:ring-3 hover:ring-3 focus-visible:ring-3 dark:border-background',
   {
     defaultVariants: {
-      color: 'primary',
       size: 'md',
       orientation: 'horizontal',
       disabled: false,
       highlight: false,
     },
     variants: {
-      color: {
-        primary: '',
-        secondary: '',
-        neutral: '',
-        error: '',
-      },
       size: {
         xs: 'size-3',
         sm: 'size-3.5',
@@ -161,19 +133,12 @@ export const sliderThumbVariants = cva(
 
 export const sliderInputVariants = cva('', {
   defaultVariants: {
-    color: 'primary',
     size: 'md',
     orientation: 'horizontal',
     disabled: false,
     highlight: false,
   },
   variants: {
-    color: {
-      primary: '',
-      secondary: '',
-      neutral: '',
-      error: '',
-    },
     size: {
       xs: '',
       sm: '',

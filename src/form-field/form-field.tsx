@@ -14,8 +14,8 @@ import { Dynamic } from 'solid-js/web'
 import { useFormContext } from '../form/form-context'
 import { cn, useId } from '../shared/utils'
 
-import type { FormFieldInjectedOptions, InputIdContextValue } from './form-field-context'
-import { FormFieldProvider, InputIdProvider } from './form-field-context'
+import type { FormFieldInjectedOptions } from './form-field-context'
+import { FormFieldProvider } from './form-field-context'
 import type { FormFieldVariantProps } from './form-field.class'
 import {
   formFieldContainerVariants,
@@ -58,6 +58,12 @@ export interface FormFieldBaseProps extends FormFieldVariantProps {
 
 export type FormFieldProps = FormFieldBaseProps
 
+interface RegisteredControl {
+  id: () => string
+  bind: () => boolean
+  key: symbol
+}
+
 export function FormField(props: FormFieldProps): JSX.Element {
   const merged = mergeProps(
     {
@@ -88,15 +94,46 @@ export function FormField(props: FormFieldProps): JSX.Element {
   const formContext = useFormContext()
 
   const ariaId = useId(() => identityValidationProps.id, 'form-field')
-  const [manualInputId, setManualInputId] = createSignal<string | null | undefined>(undefined)
-  const inputId = createMemo(() => {
-    const manualId = manualInputId()
+  const [registeredControls, setRegisteredControls] = createSignal<RegisteredControl[]>([])
 
-    if (manualId === null) {
-      return undefined
+  const registerControl: NonNullable<FormFieldInjectedOptions['registerControl']> = (entry) => {
+    const key = Symbol('form-field-control')
+
+    setRegisteredControls((previous) => [
+      ...previous,
+      {
+        ...entry,
+        key,
+      },
+    ])
+
+    return () => {
+      setRegisteredControls((previous) => previous.filter((control) => control.key !== key))
+    }
+  }
+
+  const selectedControlId = createMemo(() => {
+    const controls = registeredControls()
+
+    for (let index = controls.length - 1; index >= 0; index -= 1) {
+      const control = controls[index]
+
+      if (control && control.bind()) {
+        return control.id()
+      }
     }
 
-    return manualId ?? identityValidationProps.id ?? ariaId()
+    return undefined
+  })
+
+  const resolvedLabelTargetId = createMemo(() => {
+    const controls = registeredControls()
+
+    if (controls.length === 0) {
+      return identityValidationProps.id ?? ariaId()
+    }
+
+    return selectedControlId()
   })
 
   const resolvedError = createMemo(() => {
@@ -131,7 +168,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
     }
 
     formContext.registerInput(name, {
-      id: inputId(),
+      id: resolvedLabelTargetId(),
       pattern: identityValidationProps.errorPattern,
     })
 
@@ -171,12 +208,10 @@ export function FormField(props: FormFieldProps): JSX.Element {
     get ariaId() {
       return ariaId()
     },
-  }
-  const inputIdContextValue: InputIdContextValue = {
-    get id() {
-      return inputId()
+    get controlId() {
+      return selectedControlId()
     },
-    setId: setManualInputId,
+    registerControl,
   }
 
   function NormalizedChildren(): JSX.Element {
@@ -214,111 +249,109 @@ export function FormField(props: FormFieldProps): JSX.Element {
   })
 
   return (
-    <InputIdProvider value={inputIdContextValue}>
-      <FormFieldProvider value={fieldContextValue}>
-        <Dynamic
-          component={identityValidationProps.as}
-          data-slot="root"
-          data-orientation={layoutStyleProps.orientation}
-          class={formFieldSizeVariants(
-            {
-              size: layoutStyleProps.size,
-            },
-            layoutStyleProps.orientation === 'horizontal' &&
-              'flex items-baseline justify-between gap-2',
-            layoutStyleProps.classes?.root,
+    <FormFieldProvider value={fieldContextValue}>
+      <Dynamic
+        component={identityValidationProps.as}
+        data-slot="root"
+        data-orientation={layoutStyleProps.orientation}
+        class={formFieldSizeVariants(
+          {
+            size: layoutStyleProps.size,
+          },
+          layoutStyleProps.orientation === 'horizontal' &&
+            'flex items-baseline justify-between gap-2',
+          layoutStyleProps.classes?.root,
+        )}
+      >
+        <div
+          data-slot="wrapper"
+          class={cn(
+            layoutStyleProps.orientation === 'horizontal' && 'flex-1',
+            layoutStyleProps.classes?.wrapper,
           )}
         >
-          <div
-            data-slot="wrapper"
-            class={cn(
-              layoutStyleProps.orientation === 'horizontal' && 'flex-1',
-              layoutStyleProps.classes?.wrapper,
-            )}
-          >
-            <Show when={contentProps.label}>
-              <div
-                data-slot="labelWrapper"
-                class={cn(
-                  'flex items-center justify-between gap-1',
-                  layoutStyleProps.classes?.labelWrapper,
+          <Show when={contentProps.label}>
+            <div
+              data-slot="labelWrapper"
+              class={cn(
+                'flex items-center justify-between gap-1',
+                layoutStyleProps.classes?.labelWrapper,
+              )}
+            >
+              <label
+                for={resolvedLabelTargetId()}
+                data-slot="label"
+                class={formFieldLabelVariants(
+                  {
+                    required: identityValidationProps.required,
+                  },
+                  layoutStyleProps.classes?.label,
                 )}
               >
-                <label
-                  for={inputId()}
-                  data-slot="label"
-                  class={formFieldLabelVariants(
-                    {
-                      required: identityValidationProps.required,
-                    },
-                    layoutStyleProps.classes?.label,
-                  )}
+                {contentProps.label}
+              </label>
+
+              <Show when={contentProps.hint}>
+                <span
+                  id={`${ariaId()}-hint`}
+                  data-slot="hint"
+                  class={cn('text-muted-foreground', layoutStyleProps.classes?.hint)}
                 >
-                  {contentProps.label}
-                </label>
+                  {contentProps.hint}
+                </span>
+              </Show>
+            </div>
+          </Show>
 
-                <Show when={contentProps.hint}>
-                  <span
-                    id={`${ariaId()}-hint`}
-                    data-slot="hint"
-                    class={cn('text-muted-foreground', layoutStyleProps.classes?.hint)}
-                  >
-                    {contentProps.hint}
-                  </span>
-                </Show>
-              </div>
-            </Show>
+          <Show when={contentProps.description}>
+            <p
+              id={`${ariaId()}-description`}
+              data-slot="description"
+              class={cn('text-muted-foreground', layoutStyleProps.classes?.description)}
+            >
+              {contentProps.description}
+            </p>
+          </Show>
+        </div>
 
-            <Show when={contentProps.description}>
-              <p
-                id={`${ariaId()}-description`}
-                data-slot="description"
-                class={cn('text-muted-foreground', layoutStyleProps.classes?.description)}
-              >
-                {contentProps.description}
-              </p>
-            </Show>
-          </div>
+        <div
+          class={
+            contentProps.label || contentProps.description
+              ? formFieldContainerVariants(
+                  {
+                    orientation: layoutStyleProps.orientation,
+                  },
+                  layoutStyleProps.classes?.container,
+                )
+              : layoutStyleProps.classes?.container
+          }
+        >
+          <NormalizedChildren />
 
-          <div
-            class={
-              contentProps.label || contentProps.description
-                ? formFieldContainerVariants(
-                    {
-                      orientation: layoutStyleProps.orientation,
-                    },
-                    layoutStyleProps.classes?.container,
-                  )
-                : layoutStyleProps.classes?.container
+          <Show
+            when={identityValidationProps.error !== false && shouldShowError()}
+            fallback={
+              <Show when={contentProps.help}>
+                <div
+                  id={`${ariaId()}-help`}
+                  data-slot="help"
+                  class={cn('mt-2 text-muted-foreground', layoutStyleProps.classes?.help)}
+                >
+                  {contentProps.help}
+                </div>
+              </Show>
             }
           >
-            <NormalizedChildren />
-
-            <Show
-              when={identityValidationProps.error !== false && shouldShowError()}
-              fallback={
-                <Show when={contentProps.help}>
-                  <div
-                    id={`${ariaId()}-help`}
-                    data-slot="help"
-                    class={cn('mt-2 text-muted-foreground', layoutStyleProps.classes?.help)}
-                  >
-                    {contentProps.help}
-                  </div>
-                </Show>
-              }
+            <div
+              id={`${ariaId()}-error`}
+              data-slot="error"
+              class={cn('mt-2 text-destructive', layoutStyleProps.classes?.error)}
             >
-              <div
-                id={`${ariaId()}-error`}
-                data-slot="error"
-                class={cn('mt-2 text-destructive', layoutStyleProps.classes?.error)}
-              >
-                {resolvedError() as JSX.Element}
-              </div>
-            </Show>
-          </div>
-        </Dynamic>
-      </FormFieldProvider>
-    </InputIdProvider>
+              {resolvedError() as JSX.Element}
+            </div>
+          </Show>
+        </div>
+      </Dynamic>
+    </FormFieldProvider>
   )
 }

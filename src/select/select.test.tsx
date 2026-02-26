@@ -40,6 +40,19 @@ function queryAllBody(selector: string): NodeListOf<Element> {
 }
 
 describe('Select - single mode', () => {
+  test('supports xs and xl size classes', () => {
+    const screen = render(() => (
+      <>
+        <Select options={FRUITS} size="xs" placeholder="XS" />
+        <Select options={FRUITS} size="xl" placeholder="XL" />
+      </>
+    ))
+
+    const controls = screen.container.querySelectorAll('[data-slot="control"]')
+    expect(controls[0]?.className).toContain('min-h-7')
+    expect(controls[1]?.className).toContain('min-h-11')
+  })
+
   test('applies classes.root override', () => {
     const screen = render(() => (
       <Select options={FRUITS} placeholder="Pick a fruit" classes={{ root: 'root-override' }} />

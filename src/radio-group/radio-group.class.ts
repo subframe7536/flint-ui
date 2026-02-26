@@ -112,34 +112,6 @@ export const radioGroupTableOrientationVariants = cva(
   },
 )
 
-export const radioGroupCardCheckedColorVariants = cva('', {
-  defaultVariants: {
-    color: 'primary',
-  },
-  variants: {
-    color: {
-      primary: 'data-checked:border-primary',
-      secondary: 'data-checked:border-secondary',
-      neutral: 'data-checked:border-foreground',
-      error: 'data-checked:border-destructive',
-    },
-  },
-})
-
-export const radioGroupTableCheckedColorVariants = cva('z-1', {
-  defaultVariants: {
-    color: 'primary',
-  },
-  variants: {
-    color: {
-      primary: 'data-checked:(bg-primary/10 border-primary/50)',
-      secondary: 'data-checked:(bg-secondary/10 border-secondary/50)',
-      neutral: 'data-checked:(bg-muted border-foreground/50)',
-      error: 'data-checked:(bg-destructive/10 border-destructive/50)',
-    },
-  },
-})
-
 export const radioGroupContainerVariants = cva('flex items-center', {
   defaultVariants: {
     size: 'md',
@@ -175,23 +147,6 @@ export const radioGroupBaseVariants = cva(
       },
       invalid: {
         true: 'border-destructive ring-3 ring-destructive/20 dark:border-destructive/50 dark:ring-destructive/40',
-      },
-    },
-  },
-)
-
-export const radioGroupIndicatorVariants = cva(
-  'flex size-full items-center justify-center rounded-full',
-  {
-    defaultVariants: {
-      color: 'primary',
-    },
-    variants: {
-      color: {
-        primary: 'bg-primary',
-        secondary: 'bg-secondary',
-        neutral: 'bg-neutral',
-        error: 'bg-destructive',
       },
     },
   },
@@ -250,8 +205,7 @@ type RadioGroupItemVariantProps = Omit<
 
 export type RadioGroupVariantProps = VariantProps<typeof radioGroupFieldsetVariants> &
   VariantProps<typeof radioGroupLegendVariants> &
-  RadioGroupItemVariantProps &
-  VariantProps<typeof radioGroupIndicatorVariants> & {
+  RadioGroupItemVariantProps & {
     variant?: RadioGroupItemVariant
     indicator?: RadioGroupItemIndicator
   }
