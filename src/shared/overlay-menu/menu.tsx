@@ -129,13 +129,7 @@ export function OverlayMenuBaseContent<
                   props.classes?.itemKbds,
                 )}
               >
-                <For each={item.kbds}>
-                  {(kbd) => (
-                    <Kbd size="sm" data-slot="item-kbd">
-                      {kbd}
-                    </Kbd>
-                  )}
-                </For>
+                <Kbd size="sm" data-slot="item-kbd" value={item.kbds ?? []} />
               </span>
             </Show>
 

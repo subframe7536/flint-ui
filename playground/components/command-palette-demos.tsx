@@ -98,8 +98,7 @@ export function CommandPaletteDemos() {
           classes={{ content: 'top-1/4 translate-y-0' }}
         >
           <Button variant="outline">
-            Search... <Kbd>⌘</Kbd>
-            <Kbd>K</Kbd>
+            Search... <Kbd value={['⌘', 'K']} />
           </Button>
         </Modal>
       </DemoSection>

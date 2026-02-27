@@ -1,7 +1,9 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const kbdVariants = cva(
+export const kbdRootVariants = cva('inline-flex items-center gap-1')
+
+export const kbdItemVariants = cva(
   'inline-flex items-center justify-center rounded font-mono font-medium leading-none uppercase select-none',
   {
     defaultVariants: {
@@ -25,4 +27,4 @@ export const kbdVariants = cva(
   },
 )
 
-export type KbdVariantProps = VariantProps<typeof kbdVariants>
+export type KbdVariantProps = VariantProps<typeof kbdItemVariants>

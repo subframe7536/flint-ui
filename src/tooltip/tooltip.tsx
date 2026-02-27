@@ -1,6 +1,6 @@
 import * as KobalteTooltip from '@kobalte/core/tooltip'
 import type { JSX } from 'solid-js'
-import { For, Show, mergeProps, splitProps } from 'solid-js'
+import { Show, mergeProps, splitProps } from 'solid-js'
 
 import { Kbd } from '../kbd'
 import { cn } from '../shared/utils'
@@ -69,20 +69,15 @@ export function Tooltip(props: TooltipProps): JSX.Element {
               data-slot="kbds"
               class={cn('ms-1 inline-flex items-center gap-1', contentProps.classes?.kbds)}
             >
-              <For each={contentProps.kbds}>
-                {(kbd) => (
-                  <Kbd
-                    data-slot="kbd"
-                    variant="invert"
-                    size="sm"
-                    classes={{
-                      root: contentProps.classes?.kbd,
-                    }}
-                  >
-                    {kbd}
-                  </Kbd>
-                )}
-              </For>
+              <Kbd
+                data-slot="kbd"
+                variant="invert"
+                size="sm"
+                value={contentProps.kbds ?? []}
+                classes={{
+                  item: contentProps.classes?.kbd,
+                }}
+              />
             </span>
           </Show>
         </KobalteTooltip.Content>

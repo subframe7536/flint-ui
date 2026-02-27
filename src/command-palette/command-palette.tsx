@@ -1,6 +1,6 @@
 import { Combobox } from '@kobalte/core/combobox'
 import type { JSX } from 'solid-js'
-import { For, Show, createEffect, createMemo, createSignal, mergeProps } from 'solid-js'
+import { Show, createEffect, createMemo, createSignal, mergeProps } from 'solid-js'
 
 import { Icon, IconButton } from '../icon'
 import type { IconName } from '../icon'
@@ -428,19 +428,14 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
                     merged.classes?.itemTrailingKbds,
                   )}
                 >
-                  <For each={option().kbds}>
-                    {(kbd) => (
-                      <Kbd
-                        size="sm"
-                        data-slot="item-kbd"
-                        classes={{
-                          root: merged.classes?.itemKbd,
-                        }}
-                      >
-                        {kbd}
-                      </Kbd>
-                    )}
-                  </For>
+                  <Kbd
+                    size="sm"
+                    data-slot="item-kbd"
+                    value={option().kbds ?? []}
+                    classes={{
+                      item: merged.classes?.itemKbd,
+                    }}
+                  />
                 </span>
               </Show>
             </span>
