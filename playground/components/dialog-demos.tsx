@@ -6,7 +6,7 @@ import { DemoPage, DemoSection } from './common/demo-page'
 
 const SCROLLABLE_LINES = Array.from({ length: 16 }, (_, index) => `Release note line ${index + 1}`)
 
-export const ModalDemos = () => {
+export const DialogDemos = () => {
   const [preventedCloseCount, setPreventedCloseCount] = createSignal(0)
 
   return (
@@ -23,21 +23,16 @@ export const ModalDemos = () => {
           <Modal
             title="Delete Project"
             description="This action cannot be undone."
-            actions={
-              <Button size="xs" variant="outline">
-                Help
-              </Button>
-            }
             body={
               <p class="text-sm text-zinc-700">
                 The selected project and all related records will be permanently removed.
               </p>
             }
             footer={
-              <div class="flex gap-2">
+              <>
                 <Button variant="outline">Cancel</Button>
                 <Button variant="destructive">Delete</Button>
-              </div>
+              </>
             }
           >
             <Button>Open modal</Button>
@@ -60,7 +55,7 @@ export const ModalDemos = () => {
 
           <Modal
             title="Custom close"
-            close={<span class="text-xs font-semibold">Done</span>}
+            closeIcon={<span class="text-xs font-semibold size-full">Done</span>}
             body="Custom close content rendered in the close button."
           >
             <Button variant="outline">Custom close</Button>

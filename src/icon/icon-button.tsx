@@ -23,11 +23,11 @@ export interface IconButtonBaseProps {
    * Optional icon shown when `loading` is active.
    */
   loadingIcon?: IconName
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'close'
 }
 
 function getSizeClass(size: IconButtonBaseProps['size']) {
-  switch (size ?? 'md') {
+  switch (size) {
     case 'xs':
     case 'sm':
       return 'size-4'
@@ -37,6 +37,7 @@ function getSizeClass(size: IconButtonBaseProps['size']) {
     case 'xl':
       return 'size-6'
   }
+  return undefined
 }
 
 export type IconButtonProps<T extends ValidComponent = 'button'> = PolymorphicProps<

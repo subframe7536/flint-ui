@@ -10,6 +10,7 @@ import { CollapsibleDemos } from './components/collapsible-demos'
 import { CommandPaletteDemos } from './components/command-palette-demos'
 import { Sidebar } from './components/common/sidebar'
 import { ContextMenuDemos } from './components/context-menu-demos'
+import { DialogDemos } from './components/dialog-demos'
 import { DropdownMenuDemos } from './components/dropdown-menu-demos'
 import { FieldGroupDemos } from './components/field-group-demos'
 import { FileUploadDemos } from './components/file-upload-demos'
@@ -19,7 +20,6 @@ import { IconDemos } from './components/icon-demos'
 import { InputDemos } from './components/input-demos'
 import { InputNumberDemos } from './components/input-number-demos'
 import { KbdDemos } from './components/kbd-demos'
-import { ModalDemos } from './components/modal-demos'
 import { PaginationDemos } from './components/pagination-demos'
 import { PopoverDemos } from './components/popover-demos'
 import { ProgressDemos } from './components/progress-demos'
@@ -47,7 +47,7 @@ const PAGES = [
   { key: 'popover', label: 'Popover', group: 'Overlay' },
   { key: 'dropdown-menu', label: 'Dropdown Menu', group: 'Overlay' },
   { key: 'context-menu', label: 'Context Menu', group: 'Overlay' },
-  { key: 'modal', label: 'Modal', group: 'Overlay' },
+  { key: 'dialog', label: 'dialog', group: 'Overlay' },
   { key: 'sheet', label: 'Sheet', group: 'Overlay' },
   { key: 'input', label: 'Input & Textarea', group: 'Data Entry' },
   { key: 'input-number', label: 'Input Number', group: 'Data Entry' },
@@ -114,7 +114,7 @@ function App() {
             <ContextMenuDemos />
           </Match>
           <Match when={page() === 'modal'}>
-            <ModalDemos />
+            <DialogDemos />
           </Match>
           <Match when={page() === 'pagination'}>
             <PaginationDemos />

@@ -25,7 +25,7 @@ export const overlayMenuItemVariants = cva(
 export type OverlayMenuItemVariantProps = VariantProps<typeof overlayMenuItemVariants>
 
 export const overlayMenuContentVariants = cva(
-  'z-50 origin-$kb-popper-content-transform-origin bg-popover text-popover-foreground outline-none data-expanded:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) duration-100',
+  'z-50 origin-$kb-popper-content-transform-origin bg-popover text-popover-foreground outline-none data-expanded:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) duration-150',
   {
     defaultVariants: {
       side: 'right',

@@ -1,17 +1,15 @@
 import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
-import { Modal } from './modal'
-import type { ModalProps } from './modal'
+import { Modal } from './dialog'
 
 describe('Modal', () => {
-  test('renders default shell with title, description, actions, body, footer and close button', () => {
+  test('renders default shell with title, description, body, footer and close button', () => {
     render(() => (
       <Modal
         open
         title="Confirm"
         description="Please confirm"
-        actions={<button type="button">Action</button>}
         body="Modal body"
         footer="Modal footer"
       >
@@ -21,7 +19,6 @@ describe('Modal', () => {
 
     expect(document.body.textContent).toContain('Confirm')
     expect(document.body.textContent).toContain('Please confirm')
-    expect(document.body.textContent).toContain('Action')
     expect(document.body.textContent).toContain('Modal body')
     expect(document.body.textContent).toContain('Modal footer')
     expect(document.body.querySelector('[data-slot="close"]')).not.toBeNull()
@@ -135,7 +132,7 @@ describe('Modal', () => {
         fullscreen
         transition={false}
         classes={{
-          content: 'content-class',
+          dialog: 'content-class',
         }}
         body="Body"
       >
@@ -152,7 +149,7 @@ describe('Modal', () => {
 
   test('supports custom close content', () => {
     render(() => (
-      <Modal open close={<span data-testid="custom-close">X</span>} body="Body">
+      <Modal open closeIcon={<span data-testid="custom-close">X</span>} body="Body">
         <button type="button">Trigger</button>
       </Modal>
     ))
@@ -239,11 +236,5 @@ describe('Modal', () => {
       const contentNode = document.body.querySelector('[data-slot="content"]')
       expect(contentNode?.hasAttribute('data-closed')).toBe(true)
     })
-  })
-
-  test('requires children in type contract', () => {
-    // @ts-expect-error children is required
-    const props: ModalProps = { open: true, body: 'Body' }
-    expect(props).toBeDefined()
   })
 })

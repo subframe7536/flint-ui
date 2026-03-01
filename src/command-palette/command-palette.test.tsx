@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
-import { Modal } from '../modal'
+import { Modal } from '../dialog'
 
 import { CommandPalette } from './command-palette'
 import type { CommandPaletteItem } from './command-palette'
@@ -46,7 +46,9 @@ describe('CommandPalette', () => {
     const screen = render(() => <CommandPalette groups={GROUPS} />)
 
     await waitFor(() => {
-      expect(screen.container.querySelector('[data-slot="listbox"]')?.className).toContain('max-h-72')
+      expect(screen.container.querySelector('[data-slot="listbox"]')?.className).toContain(
+        'max-h-72',
+      )
     })
   })
 
@@ -54,21 +56,27 @@ describe('CommandPalette', () => {
     const xs = render(() => <CommandPalette groups={GROUPS} size="xs" />)
 
     await waitFor(() => {
-      const trailing = xs.container.querySelector('[data-slot="item-trailing"]') as HTMLElement | null
+      const trailing = xs.container.querySelector(
+        '[data-slot="item-trailing"]',
+      ) as HTMLElement | null
       expect(trailing?.classList.contains('gap-1')).toBe(true)
     })
 
     const md = render(() => <CommandPalette groups={GROUPS} size="md" />)
 
     await waitFor(() => {
-      const trailing = md.container.querySelector('[data-slot="item-trailing"]') as HTMLElement | null
+      const trailing = md.container.querySelector(
+        '[data-slot="item-trailing"]',
+      ) as HTMLElement | null
       expect(trailing?.classList.contains('gap-1.5')).toBe(true)
     })
 
     const xl = render(() => <CommandPalette groups={GROUPS} size="xl" />)
 
     await waitFor(() => {
-      const trailing = xl.container.querySelector('[data-slot="item-trailing"]') as HTMLElement | null
+      const trailing = xl.container.querySelector(
+        '[data-slot="item-trailing"]',
+      ) as HTMLElement | null
       expect(trailing?.classList.contains('gap-2')).toBe(true)
     })
   })

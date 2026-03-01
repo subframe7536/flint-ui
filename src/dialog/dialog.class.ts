@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const modalOverlayVariants = cva(
-  'fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs data-expanded:(animate-in fade-in-0) data-closed:(animate-out fade-out-0) duration-100',
+  'fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs data-expanded:(animate-in fade-in-0) data-closed:(animate-out fade-out-0) duration-150',
   {
     defaultVariants: {
       scrollable: false,
@@ -28,11 +28,11 @@ export const modalContentVariants = cva(
         default:
           'fixed left-1/2 top-1/2 grid max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl text-sm sm:max-w-lg',
         scrollable:
-          'relative row-start-2 grid w-full max-w-[calc(100%-2rem)] rounded-xl text-sm sm:max-w-sm',
+          'relative row-start-2 grid w-full max-w-[calc(100%-2rem)] rounded-xl text-sm sm:max-w-lg',
         fullscreen: 'fixed inset-0 flex max-w-none flex-col rounded-none ring-0',
       },
       transition: {
-        true: 'data-expanded:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) duration-100',
+        true: 'data-expanded:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) duration-150',
         false: 'transition-none data-expanded:animate-none data-closed:animate-none',
       },
     },

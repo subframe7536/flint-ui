@@ -261,7 +261,7 @@ export function Sheet(props: SheetProps): JSX.Element {
         <KobalteDialog.Overlay
           data-slot="overlay"
           class={cn(
-            'fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs data-expanded:(animate-in fade-in-0) data-closed:(animate-out fade-out-0) data-ending-style:opacity-0 data-starting-style:opacity-0 duration-100',
+            'fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs data-expanded:(animate-in fade-in-0) data-closed:(animate-out fade-out-0) data-ending-style:opacity-0 data-starting-style:opacity-0 duration-150',
             contentProps.classes?.overlay,
           )}
         />
