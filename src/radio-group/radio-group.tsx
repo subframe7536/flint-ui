@@ -53,13 +53,13 @@ type RadioGroupItemSlots =
 export type RadioGroupItemClasses = SlotClasses<RadioGroupItemSlots>
 
 export interface RadioGroupItemObject {
-  value?: unknown
+  value?: string
   label?: JSX.Element
   description?: JSX.Element
   disabled?: boolean
 }
 
-export type RadioGroupItem = string | number | boolean | null | RadioGroupItemObject
+export type RadioGroupItem = string | RadioGroupItemObject
 
 interface NormalizedRadioGroupItem {
   id: string
@@ -79,9 +79,6 @@ export interface RadioGroupBaseProps
     FormDisableOption,
     FormReadOnlyOption {
   legend?: JSX.Element
-  valueKey?: string
-  labelKey?: string
-  descriptionKey?: string
   items?: RadioGroupItem[]
   onChange?: (value: RadioGroupValue) => void
   classes?: RadioGroupClasses
@@ -93,24 +90,9 @@ export type RadioGroupProps = RadioGroupBaseProps &
     keyof RadioGroupBaseProps | 'id' | 'children' | 'class'
   >
 
-function getAtKey(data: Record<string, unknown>, key: string): unknown {
-  return data[key]
-}
-
-function toValueString(value: unknown, fallback: string): RadioGroupValue {
-  if (value === null || value === undefined) {
-    return fallback
-  }
-
-  return String(value)
-}
-
 export function RadioGroup(props: RadioGroupProps): JSX.Element {
   const merged = mergeProps(
     {
-      valueKey: 'value',
-      labelKey: 'label',
-      descriptionKey: 'description',
       orientation: 'vertical' as const,
       variant: 'list' as const,
       indicator: 'start' as const,
@@ -123,7 +105,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
     merged as RadioGroupProps,
     [...FORM_ID_NAME_DISABLED_ON_CHANGE_KEYS],
     ['value', 'defaultValue', 'required', 'readOnly'],
-    ['legend', 'items', 'valueKey', 'labelKey', 'descriptionKey'],
+    ['legend', 'items'],
     ['variant', 'indicator', 'orientation', 'size', 'classes'],
   )
 
@@ -146,56 +128,29 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
 
   const normalizedItems = createMemo<NormalizedRadioGroupItem[]>(() => {
     const items = collectionProps.items ?? []
-    const valueKey = collectionProps.valueKey ?? 'value'
-    const labelKey = collectionProps.labelKey ?? 'label'
-    const descriptionKey = collectionProps.descriptionKey ?? 'description'
 
     return items.map((item, index) => {
-      if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
-        const value = toValueString(item, String(index))
-        const baseId = `${groupId()}:${value}`
-
+      if (typeof item === 'string') {
+        const baseId = `${groupId()}:${item}`
         return {
           id: baseId,
           inputId: `${baseId}-input`,
-          value,
-          label: value,
+          value: item,
+          label: item,
           disabled: false,
         }
       }
 
-      if (item === null) {
-        const value = String(index)
-        const baseId = `${groupId()}:${value}`
-
-        return {
-          id: baseId,
-          inputId: `${baseId}-input`,
-          value,
-          disabled: false,
-        }
-      }
-
-      const objectItem = item as RadioGroupItemObject
-      const value = toValueString(
-        getAtKey(objectItem as Record<string, unknown>, valueKey),
-        String(index),
-      )
+      const value = item.value ?? String(index)
       const baseId = `${groupId()}:${value}`
-      const label = getAtKey(objectItem as Record<string, unknown>, labelKey) as
-        | JSX.Element
-        | undefined
-      const description = getAtKey(objectItem as Record<string, unknown>, descriptionKey) as
-        | JSX.Element
-        | undefined
 
       return {
         id: baseId,
         inputId: `${baseId}-input`,
         value,
-        label,
-        description,
-        disabled: Boolean(objectItem.disabled),
+        label: item.label,
+        description: item.description,
+        disabled: Boolean(item.disabled),
       }
     })
   })

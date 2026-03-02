@@ -153,30 +153,17 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
                   styleProps.classes?.indicator,
                 )}
               >
-                <Show
-                  when={state.indeterminate()}
-                  fallback={
-                    <Icon
-                      name={styleProps.checkedIcon}
-                      class={checkboxIconVariants(
-                        {
-                          size: field.size(),
-                        },
-                        styleProps.classes?.icon,
-                      )}
-                    />
+                <Icon
+                  name={
+                    state.indeterminate() ? styleProps.indeterminateIcon : styleProps.checkedIcon
                   }
-                >
-                  <Icon
-                    name={styleProps.indeterminateIcon}
-                    class={checkboxIconVariants(
-                      {
-                        size: field.size(),
-                      },
-                      styleProps.classes?.icon,
-                    )}
-                  />
-                </Show>
+                  class={checkboxIconVariants(
+                    {
+                      size: field.size(),
+                    },
+                    styleProps.classes?.icon,
+                  )}
+                />
               </KobalteCheckbox.Indicator>
             </KobalteCheckbox.Control>
           </div>

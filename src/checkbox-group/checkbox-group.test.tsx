@@ -15,17 +15,9 @@ describe('CheckboxGroup', () => {
     expect(screen.getByRole('checkbox', { name: 'Banana' })).not.toBeNull()
   })
 
-  test('maps object items with valueKey, labelKey and descriptionKey', () => {
-    const items = [{ value: 'a', title: 'Alpha', details: 'First option' }]
-    const screen = render(() => (
-      <CheckboxGroup
-        items={items}
-        valueKey="value"
-        labelKey="title"
-        descriptionKey="details"
-        legend="Mapped"
-      />
-    ))
+  test('maps object items using default value/label/description fields', () => {
+    const items = [{ value: 'a', label: 'Alpha', description: 'First option' }]
+    const screen = render(() => <CheckboxGroup items={items} legend="Mapped" />)
 
     expect(screen.getByRole('checkbox', { name: 'Alpha' }).getAttribute('value')).toBe('a')
     expect(screen.getByText('First option')).not.toBeNull()
@@ -114,33 +106,103 @@ describe('CheckboxGroup', () => {
     })
   })
 
-  test('applies orientation, table variant and size classes', () => {
+  test('applies horizontal table layout classes', () => {
     const screen = render(() => (
-      <CheckboxGroup items={['A']} orientation="horizontal" variant="table" size="xl" />
+      <CheckboxGroup items={['A', 'B']} orientation="horizontal" variant="table" size="xl" />
     ))
 
     const fieldset = screen.container.querySelector('[data-slot="fieldset"]')
-    const item = screen.container.querySelector('[data-slot="item"]')
+    const item = screen.container.querySelector('[data-slot="fieldset"] > [data-slot="root"]')
 
     expect(fieldset?.className).toContain('flex-row')
     expect(item?.className).toContain('border')
+    expect(item?.className).toContain('rounded-none')
     expect(item?.className).toContain('p-4.5')
+    expect(item?.className).toContain('first-of-type:rounded-s-lg')
+    expect(item?.className).toContain('last-of-type:rounded-e-lg')
+    expect(item?.className).toContain('not-first-of-type:-ms-px')
   })
 
-  test('toggles item when clicking checkbox root in table variant', async () => {
+  test('applies vertical table layout classes', () => {
+    const screen = render(() => <CheckboxGroup items={['A', 'B']} variant="table" size="xl" />)
+
+    const fieldset = screen.container.querySelector('[data-slot="fieldset"]')
+    const item = screen.container.querySelector('[data-slot="fieldset"] > [data-slot="root"]')
+
+    expect(fieldset?.className).toContain('flex-col')
+    expect(item?.className).toContain('first-of-type:rounded-t-lg')
+    expect(item?.className).toContain('last-of-type:rounded-b-lg')
+    expect(item?.className).toContain('not-first-of-type:-mt-px')
+  })
+
+  test('renders checkbox items as direct fieldset children', () => {
+    const screen = render(() => <CheckboxGroup items={['A', 'B']} variant="table" />)
+
+    const directItems = screen.container.querySelectorAll(
+      '[data-slot="fieldset"] > [data-slot="root"]',
+    )
+
+    expect(directItems).toHaveLength(2)
+    expect(
+      screen.container.querySelector(
+        '[data-slot="fieldset"] > [data-slot="root"] [data-slot="root"]',
+      ),
+    ).toBeNull()
+  })
+
+  test('toggles item when clicking table item root', async () => {
     const screen = render(() => <CheckboxGroup items={['A']} variant="table" />)
 
     const checkbox = screen.getByRole('checkbox', { name: 'A' }) as HTMLInputElement
-    const item = screen.container.querySelector('[data-slot="item"]')
-    const checkboxRoot = item?.querySelector('[data-slot="root"]') as HTMLElement
+    const item = screen.container.querySelector('[data-slot="fieldset"] > [data-slot="root"]')
 
     expect(checkbox.checked).toBe(false)
 
-    await fireEvent.click(checkboxRoot)
+    await fireEvent.click(item as HTMLElement)
 
     await waitFor(() => {
       expect(checkbox.checked).toBe(true)
     })
+  })
+
+  test('does not toggle item when clicking list item root', async () => {
+    const screen = render(() => <CheckboxGroup items={['A', 'B']} defaultValue={['A']} />)
+
+    const checkboxA = screen.getByRole('checkbox', { name: 'A' }) as HTMLInputElement
+    const checkboxB = screen.getByRole('checkbox', { name: 'B' }) as HTMLInputElement
+    const items = screen.container.querySelectorAll('[data-slot="fieldset"] > [data-slot="root"]')
+
+    expect(checkboxA.checked).toBe(true)
+    expect(checkboxB.checked).toBe(false)
+
+    await fireEvent.click(items[1] as HTMLElement)
+
+    await waitFor(() => {
+      expect(checkboxA.checked).toBe(true)
+      expect(checkboxB.checked).toBe(false)
+    })
+  })
+
+  test('applies flattened classes to item and checkbox slots', () => {
+    const screen = render(() => (
+      <CheckboxGroup
+        items={['A']}
+        variant="table"
+        classes={{
+          item: 'item-override',
+          base: 'base-override',
+          label: 'label-override',
+        }}
+      />
+    ))
+
+    const item = screen.container.querySelector('[data-slot="fieldset"] > [data-slot="root"]')
+    const base = screen.container.querySelector('[data-slot="base"]')
+    const label = screen.container.querySelector('[data-slot="label"]')
+
+    expect(item?.className).toContain('item-override')
+    expect(base?.className).toContain('base-override')
+    expect(label?.className).toContain('label-override')
   })
 
   test('validates on change when validateOn is change', async () => {

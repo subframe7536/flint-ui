@@ -15,11 +15,9 @@ describe('RadioGroup', () => {
     expect(screen.getByRole('radio', { name: 'Pro' })).not.toBeNull()
   })
 
-  test('maps object items using valueKey, labelKey and descriptionKey', () => {
-    const items = [{ value: 'pro', title: 'Pro', note: 'Best value' }]
-    const screen = render(() => (
-      <RadioGroup items={items} valueKey="value" labelKey="title" descriptionKey="note" />
-    ))
+  test('maps object items using default value/label/description fields', () => {
+    const items = [{ value: 'pro', label: 'Pro', description: 'Best value' }]
+    const screen = render(() => <RadioGroup items={items} />)
 
     const input = screen.container.querySelector('[data-slot="input"]')
     expect(input?.getAttribute('value')).toBe('pro')
@@ -119,9 +117,25 @@ describe('RadioGroup', () => {
 
     expect(fieldset?.className).toContain('flex-row')
     expect(firstItem?.className).toContain('border')
+    expect(firstItem?.className).toContain('border-muted')
     expect(firstItem?.className).toContain('p-4.5')
+    expect(firstItem?.className).toContain('first-of-type:rounded-s-lg')
+    expect(firstItem?.className).toContain('last-of-type:rounded-e-lg')
+    expect(firstItem?.className).toContain('not-first-of-type:-ms-px')
     expect(firstInput?.className).toContain('peer')
     expect(firstBase?.className).toContain('peer-focus-visible:effect-fv-border')
+  })
+
+  test('applies vertical table layout classes', () => {
+    const screen = render(() => <RadioGroup items={['A', 'B']} variant="table" size="xl" />)
+
+    const fieldset = screen.container.querySelector('[data-slot="fieldset"]')
+    const firstItem = screen.container.querySelector('[data-slot="item"]')
+
+    expect(fieldset?.className).toContain('flex-col')
+    expect(firstItem?.className).toContain('first-of-type:rounded-t-lg')
+    expect(firstItem?.className).toContain('last-of-type:rounded-b-lg')
+    expect(firstItem?.className).toContain('not-first-of-type:-mt-px')
   })
 
   test('selects option when clicking table item container', async () => {

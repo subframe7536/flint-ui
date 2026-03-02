@@ -43,6 +43,10 @@ export const checkboxGroupItemVariants = cva('', {
       lg: 'p-4',
       xl: 'p-4.5',
     },
+    tableOrientation: {
+      horizontal: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg not-first-of-type:-ms-px',
+      vertical: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg not-first-of-type:-mt-px',
+    },
     disabled: {
       true: 'effect-dis',
     },

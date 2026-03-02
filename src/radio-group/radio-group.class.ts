@@ -46,17 +46,15 @@ export const radioGroupItemVariants = cva('flex items-start', {
     },
     variant: {
       card: 'rounded-lg border data-checked:border-primary',
-      table: 'relative border data-checked:(bg-primary/10 border-primary/50)',
+      table: 'relative border border-muted data-checked:(bg-primary/10 border-primary/50 z-1)',
     },
     indicator: {
       start: 'flex-row',
       end: 'flex-row-reverse',
     },
     tableOrientation: {
-      horizontal:
-        'first-of-type:rounded-s-lg not-last-of-type:b-e-transparent last-of-type:rounded-e-lg',
-      vertical:
-        'first-of-type:rounded-t-lg not-last-of-type:b-b-transparent last-of-type:rounded-b-lg',
+      horizontal: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg not-first-of-type:-ms-px',
+      vertical: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg not-first-of-type:-mt-px',
     },
     disabled: {
       true: 'effect-dis',
