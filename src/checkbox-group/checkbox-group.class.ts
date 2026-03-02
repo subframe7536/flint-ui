@@ -1,22 +1,14 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const checkboxGroupFieldsetVariants = cva('flex gap-x-2', {
+export const checkboxGroupFieldsetVariants = cva('flex', {
   defaultVariants: {
     orientation: 'vertical',
-    size: 'md',
   },
   variants: {
     orientation: {
       horizontal: 'flex-row',
       vertical: 'flex-col',
-    },
-    size: {
-      xs: 'gap-y-0.5',
-      sm: 'gap-y-0.5',
-      md: 'gap-y-1',
-      lg: 'gap-y-1',
-      xl: 'gap-y-1.5',
     },
   },
 })
@@ -44,9 +36,6 @@ export const checkboxGroupItemVariants = cva('', {
     disabled: false,
   },
   variants: {
-    variant: {
-      table: 'border',
-    },
     tableSize: {
       xs: 'p-2.5',
       sm: 'p-3',
@@ -54,16 +43,11 @@ export const checkboxGroupItemVariants = cva('', {
       lg: 'p-4',
       xl: 'p-4.5',
     },
-    tableOrientation: {
-      horizontal: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg -ms-px first:ms-0',
-      vertical: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
-    },
     disabled: {
       true: 'effect-dis',
     },
   },
 })
-
 export type CheckboxGroupVariantProps = VariantProps<typeof checkboxGroupFieldsetVariants> &
   VariantProps<typeof checkboxGroupLegendVariants> & {
     variant?: 'list' | 'card' | 'table'

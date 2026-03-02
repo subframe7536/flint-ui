@@ -47,7 +47,7 @@ const PAGES = [
   { key: 'popover', label: 'Popover', group: 'Overlay' },
   { key: 'dropdown-menu', label: 'Dropdown Menu', group: 'Overlay' },
   { key: 'context-menu', label: 'Context Menu', group: 'Overlay' },
-  { key: 'dialog', label: 'dialog', group: 'Overlay' },
+  { key: 'dialog', label: 'Dialog', group: 'Overlay' },
   { key: 'sheet', label: 'Sheet', group: 'Overlay' },
   { key: 'input', label: 'Input & Textarea', group: 'Data Entry' },
   { key: 'input-number', label: 'Input Number', group: 'Data Entry' },
@@ -113,7 +113,7 @@ function App() {
           <Match when={page() === 'context-menu'}>
             <ContextMenuDemos />
           </Match>
-          <Match when={page() === 'modal'}>
+          <Match when={page() === 'dialog'}>
             <DialogDemos />
           </Match>
           <Match when={page() === 'pagination'}>

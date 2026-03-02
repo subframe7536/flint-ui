@@ -87,9 +87,6 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
 
   const fieldGroup = useFieldGroupContext()
   const [loadingAutoState, setLoadingAutoState] = createSignal(false)
-  const resolvedSize = createMemo<ButtonVariantProps['size']>(
-    () => styleProps.size || fieldGroup?.size,
-  )
 
   const isLoading = createMemo(() =>
     Boolean(stateProps.loading || (stateProps.loadingAuto && loadingAutoState())),
@@ -126,7 +123,7 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
       class={buttonVariants(
         {
           variant: styleProps.variant,
-          size: resolvedSize(),
+          size: styleProps.size || fieldGroup?.size,
         },
         isLoading() && 'cursor-wait opacity-80',
         styleProps.classes?.root,

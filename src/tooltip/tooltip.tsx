@@ -71,7 +71,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
             size="sm"
             value={contentProps.kbds}
             classes={{
-              root: cn('ms-1', contentProps.classes?.kbds),
+              root: ['ms-1', contentProps.classes?.kbds],
               item: contentProps.classes?.kbd,
             }}
           />

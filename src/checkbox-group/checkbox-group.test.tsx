@@ -16,11 +16,11 @@ describe('CheckboxGroup', () => {
   })
 
   test('maps object items with valueKey, labelKey and descriptionKey', () => {
-    const items = [{ meta: { key: 'a' }, title: 'Alpha', details: 'First option' }]
+    const items = [{ value: 'a', title: 'Alpha', details: 'First option' }]
     const screen = render(() => (
       <CheckboxGroup
         items={items}
-        valueKey="meta.key"
+        valueKey="value"
         labelKey="title"
         descriptionKey="details"
         legend="Mapped"
@@ -141,34 +141,6 @@ describe('CheckboxGroup', () => {
     await waitFor(() => {
       expect(checkbox.checked).toBe(true)
     })
-  })
-
-  test('applies classes.root on group and items', () => {
-    const screen = render(() => (
-      <CheckboxGroup
-        classes={{ root: 'group-root-override' }}
-        items={[
-          {
-            value: 'A',
-            label: 'A',
-            classes: {
-              root: 'item-root-override',
-              checkbox: {
-                root: 'checkbox-root-override',
-              },
-            },
-          },
-        ]}
-      />
-    ))
-
-    const root = screen.container.querySelector('[data-slot="root"]')
-    const item = screen.container.querySelector('[data-slot="item"]')
-    const checkboxRoot = item?.querySelector('[data-slot="root"]')
-
-    expect(root?.className).toContain('group-root-override')
-    expect(item?.className).toContain('item-root-override')
-    expect(checkboxRoot?.className).toContain('checkbox-root-override')
   })
 
   test('validates on change when validateOn is change', async () => {

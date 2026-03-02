@@ -16,9 +16,9 @@ describe('RadioGroup', () => {
   })
 
   test('maps object items using valueKey, labelKey and descriptionKey', () => {
-    const items = [{ meta: { key: 'pro' }, title: 'Pro', note: 'Best value' }]
+    const items = [{ value: 'pro', title: 'Pro', note: 'Best value' }]
     const screen = render(() => (
-      <RadioGroup items={items} valueKey="meta.key" labelKey="title" descriptionKey="note" />
+      <RadioGroup items={items} valueKey="value" labelKey="title" descriptionKey="note" />
     ))
 
     const input = screen.container.querySelector('[data-slot="input"]')
@@ -158,32 +158,6 @@ describe('RadioGroup', () => {
       expect(radioA.checked).toBe(true)
       expect(radioB.checked).toBe(false)
     })
-  })
-
-  test('applies classes.root on group and per-item classes.root', () => {
-    const screen = render(() => (
-      <RadioGroup
-        classes={{ root: 'group-root-override' }}
-        items={[
-          {
-            value: 'A',
-            label: 'A',
-            classes: {
-              root: 'item-root-override',
-              container: 'item-container-override',
-            },
-          },
-        ]}
-      />
-    ))
-
-    const root = screen.container.querySelector('[data-slot="root"]')
-    const item = screen.container.querySelector('[data-slot="item"]')
-    const container = screen.container.querySelector('[data-slot="container"]')
-
-    expect(root?.className).toContain('group-root-override')
-    expect(item?.className).toContain('item-root-override')
-    expect(container?.className).toContain('item-container-override')
   })
 
   test('validates on change when validateOn is change', async () => {

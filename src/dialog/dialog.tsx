@@ -48,7 +48,7 @@ export interface ModalBaseProps {
 export type ModalProps = ModalBaseProps &
   Omit<KobalteDialog.DialogRootProps, keyof ModalBaseProps | 'class'>
 
-export function Modal(props: ModalProps): JSX.Element {
+export function Dialog(props: ModalProps): JSX.Element {
   const merged = mergeProps(
     {
       overlay: true,
@@ -210,7 +210,7 @@ export function Modal(props: ModalProps): JSX.Element {
       </Show>
 
       <Show when={contentProps.body}>
-        <div data-slot="body" class={cn('px-6 pb-6 pt-0 text-sm', contentProps.classes?.body)}>
+        <div data-slot="body" class={cn('px-6 pb-6 text-sm', contentProps.classes?.body)}>
           {contentProps.body}
         </div>
       </Show>

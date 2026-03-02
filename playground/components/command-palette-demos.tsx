@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, onMount } from 'solid-js'
 
-import { Button, CommandPalette, Kbd, Modal } from '../../src'
+import { Button, CommandPalette, Kbd, Dialog } from '../../src'
 import type { CommandPaletteGroup } from '../../src'
 
 import { DemoPage, DemoSection } from './common/demo-page'
@@ -96,19 +96,19 @@ export function CommandPaletteDemos() {
         title="Usage"
         description="Click the button or press ⌘K to open the command palette."
       >
-        <Modal
+        <Dialog
           open={paletteOpen()}
           onOpenChange={setPaletteOpen}
           close={false}
           body={
             <CommandPalette groups={BASIC_GROUPS} close onClose={() => setPaletteOpen(false)} />
           }
-          classes={{ dialog: 'top-1/4 translate-y-0 w-240', body: 'p-0' }}
+          classes={{ dialog: 'top-1/4 translate-y-0', body: 'p-0' }}
         >
           <Button variant="outline">
             Search... <Kbd value={['⌘', 'K']} />
           </Button>
-        </Modal>
+        </Dialog>
       </DemoSection>
 
       <DemoSection title="Basic" description="Groups of items with icons, kbds, and descriptions.">

@@ -21,7 +21,7 @@ These rules apply to all future component ports:
     - Preferred: `fooVariants({ size: 'md' }, local.classes?.root)`
     - Forbidden (conditional): `cn(cond && fooVariants({ size: 'md' }), extra)`
     - Preferred (conditional): `cond ? fooVariants({ size: 'md' }, extra) : extra`
-15. `classes` props are end-user override APIs and should keep the same semantics. This rule only targets internal component implementation style composition.
+15. `classes` props are end-user override APIs and should keep the same semantics. This rule only targets internal component implementation style composition. NO need to use `cn` if multiple classes need to pass since param can be an array.
 16. Do not use empty-string placeholders in `cva` variant options.
     - Forbidden: `variants: { size: { sm: '', md: '' } }`
     - Preferred: move the condition to JSX class composition, or split into non-empty helper `cva`.

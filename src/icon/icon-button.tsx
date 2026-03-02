@@ -26,7 +26,7 @@ export interface IconButtonBaseProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 }
 
-export function getIconSizeClass(size: IconButtonBaseProps['size']) {
+function getIconSizeClass(size: IconButtonBaseProps['size']) {
   switch (size) {
     case 'xs':
     case 'sm':

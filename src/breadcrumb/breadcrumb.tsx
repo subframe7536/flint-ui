@@ -2,12 +2,12 @@ import type { JSX, ValidComponent } from 'solid-js'
 import { For, Show, createMemo, mergeProps } from 'solid-js'
 
 import { Button } from '../button'
-import { getIconSizeClass, Icon } from '../icon'
+import { Icon } from '../icon'
 import type { IconName } from '../icon'
 import type { SlotClasses } from '../shared/slot-class'
 import { cn } from '../shared/utils'
 
-import { breadcrumbLinkVariants, breadcrumbListVariants } from './breadcrumb.class'
+import { breadcrumbListVariants } from './breadcrumb.class'
 import type { BreadcrumbVariantProps } from './breadcrumb.class'
 
 export interface BreadcrumbItem {
@@ -19,7 +19,6 @@ export interface BreadcrumbItem {
   rel?: string
   active?: boolean
   disabled?: boolean
-  class?: string
   onClick?: JSX.EventHandler<HTMLAnchorElement, MouseEvent>
 }
 
@@ -44,6 +43,22 @@ export interface BreadcrumbBaseProps extends BreadcrumbVariantProps {
 }
 
 export type BreadcrumbProps = BreadcrumbBaseProps
+
+export function getIconSize(size: string | undefined) {
+  switch (size) {
+    case 'xs':
+      return 12
+    case 'sm':
+      return 13
+    case 'md':
+      return 14
+    case 'lg':
+      return 15
+    case 'xl':
+      return 16
+  }
+  return undefined
+}
 
 export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
   const merged = mergeProps(
@@ -75,7 +90,6 @@ export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
             const isDisabled = () => Boolean(item.disabled || isCurrent())
             const href = () => item.to ?? item.href
             const linkHref = () => (isDisabled() ? undefined : href())
-            const isClickable = () => Boolean(linkHref() || item.onClick)
 
             return (
               <>
@@ -106,15 +120,7 @@ export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
                     onClick={item.onClick}
                     leading={item.icon}
                     classes={{
-                      root: breadcrumbLinkVariants(
-                        {
-                          active: isCurrent(),
-                          disabled: isDisabled(),
-                          clickable: isClickable(),
-                        },
-                        merged.classes?.link,
-                        item.class,
-                      ),
+                      root: ['min-w-0', merged.classes?.link],
                       leading: merged.classes?.leading,
                       label: merged.classes?.label,
                     }}
@@ -129,11 +135,10 @@ export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
                     aria-hidden="true"
                     class={cn(
                       'inline-flex shrink-0 items-center justify-center',
-                      getIconSizeClass(merged.size),
                       merged.classes?.separator,
                     )}
                   >
-                    <Icon name={merged.separator} />
+                    <Icon name={merged.separator} size={getIconSize(merged.size)} />
                   </li>
                 </Show>
               </>

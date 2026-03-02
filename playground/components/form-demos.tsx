@@ -39,6 +39,11 @@ const RADIO_ITEMS = [
     description: 'For teams and scaling',
   },
   {
+    value: 'ultra',
+    label: 'Ultra',
+    description: 'For power user',
+  },
+  {
     value: 'enterprise',
     label: 'Enterprise',
     description: 'For regulated workloads',

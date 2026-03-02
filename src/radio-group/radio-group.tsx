@@ -17,14 +17,10 @@ import { cn, useId } from '../shared/utils'
 import type { RadioGroupVariantProps } from './radio-group.class'
 import {
   radioGroupBaseVariants,
-  radioGroupCardPaddingVariants,
   radioGroupContainerVariants,
-  radioGroupDotVariants,
   radioGroupFieldsetVariants,
   radioGroupItemVariants,
   radioGroupLegendVariants,
-  radioGroupTableOrientationVariants,
-  radioGroupTablePaddingVariants,
   radioGroupWrapperVariants,
 } from './radio-group.class'
 
@@ -38,7 +34,6 @@ type RadioGroupSlots =
   | 'container'
   | 'base'
   | 'indicator'
-  | 'dot'
   | 'wrapper'
   | 'label'
   | 'description'
@@ -62,8 +57,6 @@ export interface RadioGroupItemObject {
   label?: JSX.Element
   description?: JSX.Element
   disabled?: boolean
-  classes?: RadioGroupItemClasses
-  [key: string]: unknown
 }
 
 export type RadioGroupItem = string | number | boolean | null | RadioGroupItemObject
@@ -75,7 +68,6 @@ interface NormalizedRadioGroupItem {
   label?: JSX.Element
   description?: JSX.Element
   disabled: boolean
-  classes?: RadioGroupItemClasses
 }
 
 export interface RadioGroupBaseProps
@@ -101,10 +93,8 @@ export type RadioGroupProps = RadioGroupBaseProps &
     keyof RadioGroupBaseProps | 'id' | 'children' | 'class'
   >
 
-function getAtPath(data: Record<string, unknown>, path: string): unknown {
-  return path
-    .split('.')
-    .reduce<unknown>((value, key) => (value as Record<string, unknown> | undefined)?.[key], data)
+function getAtKey(data: Record<string, unknown>, key: string): unknown {
+  return data[key]
 }
 
 function toValueString(value: unknown, fallback: string): RadioGroupValue {
@@ -188,14 +178,14 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
 
       const objectItem = item as RadioGroupItemObject
       const value = toValueString(
-        getAtPath(objectItem as Record<string, unknown>, valueKey),
+        getAtKey(objectItem as Record<string, unknown>, valueKey),
         String(index),
       )
       const baseId = `${groupId()}:${value}`
-      const label = getAtPath(objectItem as Record<string, unknown>, labelKey) as
+      const label = getAtKey(objectItem as Record<string, unknown>, labelKey) as
         | JSX.Element
         | undefined
-      const description = getAtPath(objectItem as Record<string, unknown>, descriptionKey) as
+      const description = getAtKey(objectItem as Record<string, unknown>, descriptionKey) as
         | JSX.Element
         | undefined
 
@@ -206,7 +196,6 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
         label,
         description,
         disabled: Boolean(objectItem.disabled),
-        classes: objectItem.classes,
       }
     })
   })
@@ -236,8 +225,8 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
         class={radioGroupFieldsetVariants(
           {
             orientation: styleProps.orientation,
-            size: field.size(),
           },
+          styleProps.variant !== 'table' && 'gap-2',
           styleProps.classes?.fieldset,
         )}
       >
@@ -270,23 +259,11 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                   size: field.size(),
                   variant: styleProps.variant === 'list' ? undefined : styleProps.variant,
                   indicator: styleProps.indicator === 'hidden' ? undefined : styleProps.indicator,
+                  tableOrientation:
+                    styleProps.variant === 'table' ? styleProps.orientation : undefined,
                   disabled: item.disabled || field.disabled(),
                 },
-                styleProps.variant === 'card' &&
-                  radioGroupCardPaddingVariants({ size: field.size() }),
-                styleProps.variant === 'table' &&
-                  radioGroupTablePaddingVariants({
-                    size: field.size(),
-                  }),
-                styleProps.variant === 'table' &&
-                  radioGroupTableOrientationVariants({
-                    orientation: styleProps.orientation,
-                  }),
-                styleProps.variant === 'card' && 'data-checked:border-primary',
-                styleProps.variant === 'table' &&
-                  'z-1 data-checked:(bg-primary/10 border-primary/50)',
                 styleProps.classes?.item,
-                item.classes?.root,
               )}
             >
               <div
@@ -296,7 +273,6 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                     size: field.size(),
                   },
                   styleProps.classes?.container,
-                  item.classes?.container,
                 )}
               >
                 <KobalteRadioGroup.ItemInput id={item.inputId} class="peer" data-slot="input" />
@@ -310,28 +286,15 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                     },
                     styleProps.indicator === 'hidden' && 'sr-only',
                     styleProps.classes?.base,
-                    item.classes?.base,
                   )}
                 >
                   <KobalteRadioGroup.ItemIndicator
                     data-slot="indicator"
                     class={cn(
-                      'flex size-full items-center justify-center rounded-full bg-primary',
+                      'flex size-full items-center justify-center rounded-full ring-(4 primary inset ring)',
                       styleProps.classes?.indicator,
-                      item.classes?.indicator,
                     )}
-                  >
-                    <span
-                      data-slot="dot"
-                      class={radioGroupDotVariants(
-                        {
-                          size: field.size(),
-                        },
-                        styleProps.classes?.dot,
-                        item.classes?.dot,
-                      )}
-                    />
-                  </KobalteRadioGroup.ItemIndicator>
+                  />
                 </KobalteRadioGroup.ItemControl>
               </div>
 
@@ -343,7 +306,6 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                       indicator: styleProps.indicator,
                     },
                     styleProps.classes?.wrapper,
-                    item.classes?.wrapper,
                   )}
                 >
                   <Show when={item.label}>
@@ -352,11 +314,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                       fallback={
                         <p
                           data-slot="label"
-                          class={cn(
-                            'font-medium text-foreground',
-                            styleProps.classes?.label,
-                            item.classes?.label,
-                          )}
+                          class={cn('font-medium text-foreground', styleProps.classes?.label)}
                         >
                           {item.label}
                         </p>
@@ -365,11 +323,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                       <label
                         for={item.inputId}
                         data-slot="label"
-                        class={cn(
-                          'font-medium text-foreground',
-                          styleProps.classes?.label,
-                          item.classes?.label,
-                        )}
+                        class={cn('font-medium text-foreground', styleProps.classes?.label)}
                       >
                         {item.label}
                       </label>
@@ -379,11 +333,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                   <Show when={item.description}>
                     <p
                       data-slot="description"
-                      class={cn(
-                        'text-muted-foreground',
-                        styleProps.classes?.description,
-                        item.classes?.description,
-                      )}
+                      class={cn('text-muted-foreground', styleProps.classes?.description)}
                     >
                       {item.description}
                     </p>

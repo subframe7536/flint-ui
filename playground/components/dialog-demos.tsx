@@ -1,6 +1,6 @@
 import { For, createSignal } from 'solid-js'
 
-import { Button, Modal } from '../../src'
+import { Button, Dialog } from '../../src'
 
 import { DemoPage, DemoSection } from './common/demo-page'
 
@@ -12,7 +12,7 @@ export const DialogDemos = () => {
   return (
     <DemoPage
       eyebrow="Rock UI Playground"
-      title="Modal"
+      title="Dialog"
       description="Dialog overlays for confirmations, rich body content, and controlled dismiss behavior."
     >
       <DemoSection
@@ -20,7 +20,7 @@ export const DialogDemos = () => {
         description="Header, description, actions, body, and footer slots."
       >
         <div class="flex flex-wrap gap-3 items-center">
-          <Modal
+          <Dialog
             title="Delete Project"
             description="This action cannot be undone."
             body={
@@ -35,8 +35,8 @@ export const DialogDemos = () => {
               </>
             }
           >
-            <Button>Open modal</Button>
-          </Modal>
+            <Button>Open dialog</Button>
+          </Dialog>
         </div>
       </DemoSection>
 
@@ -45,21 +45,21 @@ export const DialogDemos = () => {
         description="`close` supports default button, hidden, and custom JSX content."
       >
         <div class="flex flex-wrap gap-3 items-center">
-          <Modal
+          <Dialog
             title="No close button"
             close={false}
             body="This dialog has no top-right close button."
           >
             <Button variant="outline">Close=false</Button>
-          </Modal>
+          </Dialog>
 
-          <Modal
+          <Dialog
             title="Custom close"
             closeIcon={<span class="text-xs font-semibold size-full">Done</span>}
             body="Custom close content rendered in the close button."
           >
             <Button variant="outline">Custom close</Button>
-          </Modal>
+          </Dialog>
         </div>
       </DemoSection>
 
@@ -68,10 +68,10 @@ export const DialogDemos = () => {
         description="Scrollable body with prevent-close callback when dismiss is disabled."
       >
         <div class="flex flex-wrap gap-3 items-center">
-          <Modal
+          <Dialog
             scrollable
             title="Release Notes"
-            description="Scrollable modal content."
+            description="Scrollable dialog content."
             body={
               <div class="space-y-1">
                 <For each={SCROLLABLE_LINES}>
@@ -80,14 +80,14 @@ export const DialogDemos = () => {
               </div>
             }
           >
-            <Button variant="secondary">Scrollable modal</Button>
-          </Modal>
+            <Button variant="secondary">Scrollable dialog</Button>
+          </Dialog>
 
-          <Modal
+          <Dialog
             defaultOpen
             dismissible={false}
             onClosePrevent={() => setPreventedCloseCount((value) => value + 1)}
-            title="Persistent modal"
+            title="Persistent dialog"
             body={
               <p class="text-sm text-zinc-700">
                 Prevented close attempts: <span class="font-medium">{preventedCloseCount()}</span>
@@ -95,7 +95,7 @@ export const DialogDemos = () => {
             }
           >
             <Button variant="outline">Dismiss blocked</Button>
-          </Modal>
+          </Dialog>
         </div>
       </DemoSection>
     </DemoPage>

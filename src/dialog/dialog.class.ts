@@ -17,7 +17,7 @@ export const modalOverlayVariants = cva(
 )
 
 export const modalContentVariants = cva(
-  'z-50 min-w-0 max-h-full min-h-0 border bg-background text-foreground outline-none ring-1 ring-foreground/10',
+  'z-50 max-h-full border bg-background text-foreground outline-none ring-1 ring-foreground/10',
   {
     defaultVariants: {
       layout: 'default',
@@ -26,14 +26,14 @@ export const modalContentVariants = cva(
     variants: {
       layout: {
         default:
-          'fixed left-1/2 top-1/2 grid max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl text-sm sm:max-w-lg',
+          'fixed left-1/2 top-1/2 grid max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl text-sm w-full sm:max-w-lg',
         scrollable:
           'relative row-start-2 grid w-full max-w-[calc(100%-2rem)] rounded-xl text-sm sm:max-w-lg',
         fullscreen: 'fixed inset-0 flex max-w-none flex-col rounded-none ring-0',
       },
       transition: {
         true: 'data-expanded:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) duration-150',
-        false: 'transition-none data-expanded:animate-none data-closed:animate-none',
+        false: 'transition-none data-expanded:transition-none data-closed:transition-none',
       },
     },
   },

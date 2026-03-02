@@ -27,13 +27,8 @@ export interface CheckboxGroupItemObject {
   label?: JSX.Element
   description?: JSX.Element
   disabled?: boolean
-  classes?: {
-    root?: string
-    checkbox?: CheckboxProps['classes']
-  }
   checkedIcon?: CheckboxProps['checkedIcon']
   indeterminateIcon?: CheckboxProps['indeterminateIcon']
-  [key: string]: unknown
 }
 
 export type CheckboxGroupItem = string | number | boolean | null | CheckboxGroupItemObject
@@ -73,18 +68,12 @@ interface NormalizedCheckboxGroupItem {
   label?: JSX.Element
   description?: JSX.Element
   disabled: boolean
-  classes?: {
-    root?: string
-    checkbox?: CheckboxProps['classes']
-  }
   checkedIcon?: CheckboxProps['checkedIcon']
   indeterminateIcon?: CheckboxProps['indeterminateIcon']
 }
 
 function getAtPath(data: Record<string, unknown>, path: string): unknown {
-  return path
-    .split('.')
-    .reduce<unknown>((value, key) => (value as Record<string, unknown> | undefined)?.[key], data)
+  return data[path]
 }
 
 function toValueString(value: unknown, fallback: string): CheckboxGroupValue {
@@ -185,7 +174,6 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
         label,
         description,
         disabled: Boolean(objectItem.disabled),
-        classes: objectItem.classes,
         checkedIcon: objectItem.checkedIcon,
         indeterminateIcon: objectItem.indeterminateIcon,
       }
@@ -221,8 +209,8 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
         class={checkboxGroupFieldsetVariants(
           {
             orientation: styleBehaviorProps.orientation,
-            size: field.size(),
           },
+          styleBehaviorProps.variant !== 'table' && 'gap-2',
           styleBehaviorProps.classes?.fieldset,
         )}
         {...field.ariaAttrs()}
@@ -245,28 +233,32 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
 
         <For each={normalizedItems()}>
           {(item) => {
-            const isTableVariant = styleBehaviorProps.variant === 'table'
             const isItemDisabled = item.disabled || field.disabled()
+            const isChecked = () => selectedValues().includes(item.value)
 
             return (
               <div
                 data-slot="item"
+                data-checked={isChecked() ? '' : undefined}
                 class={checkboxGroupItemVariants(
                   {
-                    variant: isTableVariant ? 'table' : undefined,
-                    tableSize: isTableVariant ? field.size() : undefined,
-                    tableOrientation: isTableVariant ? styleBehaviorProps.orientation : undefined,
+                    tableSize: styleBehaviorProps.variant === 'table' ? field.size() : undefined,
                     disabled: isItemDisabled,
                   },
+                  styleBehaviorProps.variant === 'table' && [
+                    'relative border data-checked:(bg-primary/10 border-primary/50) data-checked:z-1',
+                    styleBehaviorProps.orientation === 'horizontal'
+                      ? 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg'
+                      : 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg',
+                  ],
                   styleBehaviorProps.classes?.item,
-                  item.classes?.root,
                 )}
               >
                 <Checkbox
                   id={item.id}
                   name={field.name()}
                   formFieldBind={false}
-                  checked={selectedValues().includes(item.value)}
+                  checked={isChecked()}
                   value={item.value}
                   label={item.label}
                   description={item.description}
@@ -277,7 +269,14 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
                   indicator={styleBehaviorProps.indicator}
                   checkedIcon={item.checkedIcon ?? styleBehaviorProps.checkedIcon}
                   indeterminateIcon={item.indeterminateIcon ?? styleBehaviorProps.indeterminateIcon}
-                  classes={{ ...styleBehaviorProps.classes?.checkbox, ...item.classes?.checkbox }}
+                  classes={{
+                    ...styleBehaviorProps.classes?.checkbox,
+                    root: [
+                      styleBehaviorProps.variant === 'table' &&
+                        'w-full rounded-none border-none p-0 data-checked:(border-none rounded-none)',
+                      styleBehaviorProps.classes?.checkbox?.root,
+                    ],
+                  }}
                   onChange={(checked) => onItemCheckedChange(item.value, checked)}
                 />
               </div>

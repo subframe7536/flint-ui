@@ -461,7 +461,10 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
               data-slot="search-icon"
               loading={merged.loading}
               loadingIcon={merged.loadingIcon}
-              class={cn('text-muted-foreground pointer-events-none', merged.classes?.searchIcon)}
+              class={cn(
+                'size-5 text-muted-foreground pointer-events-none',
+                merged.classes?.searchIcon,
+              )}
             />
           }
         >

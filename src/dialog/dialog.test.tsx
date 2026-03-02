@@ -1,12 +1,12 @@
 import { fireEvent, render, waitFor } from '@solidjs/testing-library'
 import { describe, expect, test, vi } from 'vitest'
 
-import { Modal } from './dialog'
+import { Dialog } from './dialog'
 
 describe('Modal', () => {
   test('renders default shell with title, description, body, footer and close button', () => {
     render(() => (
-      <Modal
+      <Dialog
         open
         title="Confirm"
         description="Please confirm"
@@ -14,7 +14,7 @@ describe('Modal', () => {
         footer="Modal footer"
       >
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.textContent).toContain('Confirm')
@@ -30,14 +30,14 @@ describe('Modal', () => {
 
   test('renders custom header slot and overrides default title/description section', () => {
     render(() => (
-      <Modal
+      <Dialog
         open
         title="Default title"
         description="Default description"
         header={<div data-testid="custom-header">Custom Header</div>}
       >
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.querySelector('[data-testid="custom-header"]')?.textContent).toContain(
@@ -49,9 +49,9 @@ describe('Modal', () => {
 
   test('renders body content and keeps shell sections', () => {
     render(() => (
-      <Modal open title="Dialog title" body={<div data-testid="custom-body">Body Content</div>}>
+      <Dialog open title="Dialog title" body={<div data-testid="custom-body">Body Content</div>}>
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.querySelector('[data-testid="custom-body"]')?.textContent).toContain(
@@ -64,9 +64,9 @@ describe('Modal', () => {
     const onOpenChange = vi.fn()
 
     const screen = render(() => (
-      <Modal onOpenChange={onOpenChange} title="Settings" body="Body">
+      <Dialog onOpenChange={onOpenChange} title="Settings" body="Body">
         <button type="button">Open modal</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.querySelector('[data-slot="dialog"]')).toBeNull()
@@ -90,9 +90,9 @@ describe('Modal', () => {
 
   test('renders into portal by default', () => {
     const screen = render(() => (
-      <Modal open title="Portal default" body="Body">
+      <Dialog open title="Portal default" body="Body">
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(screen.container.querySelector('[data-slot="dialog"]')).toBeNull()
@@ -101,9 +101,9 @@ describe('Modal', () => {
 
   test('supports overlay=false', () => {
     render(() => (
-      <Modal open overlay={false} body="Body">
+      <Dialog open overlay={false} body="Body">
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.querySelector('[data-slot="overlay"]')).toBeNull()
@@ -111,9 +111,9 @@ describe('Modal', () => {
 
   test('supports scrollable overlay mode', () => {
     render(() => (
-      <Modal open scrollable body="Scrollable body">
+      <Dialog open scrollable body="Scrollable body">
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     const overlays = document.body.querySelectorAll('[data-slot="overlay"]')
@@ -127,7 +127,7 @@ describe('Modal', () => {
 
   test('applies fullscreen + transition=false classes', () => {
     render(() => (
-      <Modal
+      <Dialog
         open
         fullscreen
         transition={false}
@@ -137,7 +137,7 @@ describe('Modal', () => {
         body="Body"
       >
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     const content = document.body.querySelector('[data-slot="dialog"]')
@@ -149,9 +149,9 @@ describe('Modal', () => {
 
   test('supports custom close content', () => {
     render(() => (
-      <Modal open closeIcon={<span data-testid="custom-close">X</span>} body="Body">
+      <Dialog open closeIcon={<span data-testid="custom-close">X</span>} body="Body">
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.querySelector('[data-testid="custom-close"]')?.textContent).toBe('X')
@@ -159,9 +159,9 @@ describe('Modal', () => {
 
   test('hides close button when close=false', () => {
     render(() => (
-      <Modal open close={false} body="Body">
+      <Dialog open close={false} body="Body">
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     expect(document.body.querySelector('[data-slot="close"]')).toBeNull()
@@ -171,9 +171,9 @@ describe('Modal', () => {
     const onClosePrevent = vi.fn()
 
     render(() => (
-      <Modal defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body">
+      <Dialog defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body">
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     const content = document.body.querySelector('[data-slot="dialog"]') as HTMLElement
@@ -194,9 +194,9 @@ describe('Modal', () => {
         <button type="button" data-testid="outside">
           Outside target
         </button>
-        <Modal defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body">
+        <Dialog defaultOpen dismissible={false} onClosePrevent={onClosePrevent} body="Body">
           <button type="button">Trigger</button>
-        </Modal>
+        </Dialog>
       </>
     ))
 
@@ -214,7 +214,7 @@ describe('Modal', () => {
     const onOpenChange = vi.fn()
 
     render(() => (
-      <Modal
+      <Dialog
         defaultOpen
         dismissible
         onClosePrevent={onClosePrevent}
@@ -222,7 +222,7 @@ describe('Modal', () => {
         body="Body"
       >
         <button type="button">Trigger</button>
-      </Modal>
+      </Dialog>
     ))
 
     const content = document.body.querySelector('[data-slot="dialog"]') as HTMLElement

@@ -1,27 +1,19 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const radioGroupFieldsetVariants = cva('flex gap-x-2', {
+export const radioGroupFieldsetVariants = cva('flex', {
   defaultVariants: {
     orientation: 'vertical',
-    size: 'md',
   },
   variants: {
     orientation: {
       horizontal: 'flex-row',
       vertical: 'flex-col',
     },
-    size: {
-      xs: 'gap-y-0.5',
-      sm: 'gap-y-0.5',
-      md: 'gap-y-1',
-      lg: 'gap-y-1',
-      xl: 'gap-y-1.5',
-    },
   },
 })
 
-export const radioGroupLegendVariants = cva('mb-1 block font-medium text-foreground', {
+export const radioGroupLegendVariants = cva('mb-2 block font-medium text-foreground', {
   defaultVariants: {
     size: 'md',
   },
@@ -53,63 +45,76 @@ export const radioGroupItemVariants = cva('flex items-start', {
       xl: 'text-base',
     },
     variant: {
-      card: 'rounded-lg border',
-      table: 'border',
+      card: 'rounded-lg border data-checked:border-primary',
+      table: 'relative border data-checked:(bg-primary/10 border-primary/50)',
     },
     indicator: {
       start: 'flex-row',
       end: 'flex-row-reverse',
     },
+    tableOrientation: {
+      horizontal:
+        'first-of-type:rounded-s-lg not-last-of-type:b-e-transparent last-of-type:rounded-e-lg',
+      vertical:
+        'first-of-type:rounded-t-lg not-last-of-type:b-b-transparent last-of-type:rounded-b-lg',
+    },
     disabled: {
       true: 'effect-dis',
     },
   },
+  compoundVariants: [
+    {
+      variant: 'card',
+      size: 'xs',
+      class: 'p-2.5',
+    },
+    {
+      variant: 'card',
+      size: 'sm',
+      class: 'p-3',
+    },
+    {
+      variant: 'card',
+      size: 'md',
+      class: 'p-3.5',
+    },
+    {
+      variant: 'card',
+      size: 'lg',
+      class: 'p-4',
+    },
+    {
+      variant: 'card',
+      size: 'xl',
+      class: 'p-4.5',
+    },
+    {
+      variant: 'table',
+      size: 'xs',
+      class: 'p-2.5',
+    },
+    {
+      variant: 'table',
+      size: 'sm',
+      class: 'p-3',
+    },
+    {
+      variant: 'table',
+      size: 'md',
+      class: 'p-3.5',
+    },
+    {
+      variant: 'table',
+      size: 'lg',
+      class: 'p-4',
+    },
+    {
+      variant: 'table',
+      size: 'xl',
+      class: 'p-4.5',
+    },
+  ],
 })
-
-export const radioGroupCardPaddingVariants = cva('p-3.5', {
-  defaultVariants: {
-    size: 'md',
-  },
-  variants: {
-    size: {
-      xs: 'p-2.5',
-      sm: 'p-3',
-      md: 'p-3.5',
-      lg: 'p-4',
-      xl: 'p-4.5',
-    },
-  },
-})
-
-export const radioGroupTablePaddingVariants = cva('p-3.5', {
-  defaultVariants: {
-    size: 'md',
-  },
-  variants: {
-    size: {
-      xs: 'p-2.5',
-      sm: 'p-3',
-      md: 'p-3.5',
-      lg: 'p-4',
-      xl: 'p-4.5',
-    },
-  },
-})
-
-export const radioGroupTableOrientationVariants = cva(
-  'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
-  {
-    defaultVariants: {
-      orientation: 'vertical',
-    },
-    variants: {
-      orientation: {
-        horizontal: 'first-of-type:rounded-s-lg last-of-type:rounded-e-lg -ms-px first:ms-0',
-        vertical: 'first-of-type:rounded-t-lg last-of-type:rounded-b-lg -mt-px first:mt-0',
-      },
-    },
-  },
-)
 
 export const radioGroupContainerVariants = cva('flex items-center', {
   defaultVariants: {
@@ -148,21 +153,6 @@ export const radioGroupBaseVariants = cva(
   },
 )
 
-export const radioGroupDotVariants = cva('rounded-full bg-primary-foreground', {
-  defaultVariants: {
-    size: 'md',
-  },
-  variants: {
-    size: {
-      xs: 'size-1',
-      sm: 'size-1',
-      md: 'size-1.5',
-      lg: 'size-1.5',
-      xl: 'size-2',
-    },
-  },
-})
-
 export const radioGroupWrapperVariants = cva('w-full', {
   defaultVariants: {
     indicator: 'start',
@@ -180,7 +170,7 @@ type RadioGroupItemVariant = 'list' | 'card' | 'table'
 type RadioGroupItemIndicator = 'start' | 'end' | 'hidden'
 type RadioGroupItemVariantProps = Omit<
   VariantProps<typeof radioGroupItemVariants>,
-  'variant' | 'indicator'
+  'variant' | 'indicator' | 'tableOrientation'
 >
 
 export type RadioGroupVariantProps = VariantProps<typeof radioGroupFieldsetVariants> &
