@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, onMount } from 'solid-js'
 
-import { Button, CommandPalette, Kbd, Dialog } from '../../src'
+import { Button, CommandPalette, Kbd, Popup } from '../../src'
 import type { CommandPaletteGroup } from '../../src'
 
 import { DemoPage, DemoSection } from './common/demo-page'
@@ -96,28 +96,27 @@ export function CommandPaletteDemos() {
         title="Usage"
         description="Click the button or press ⌘K to open the command palette."
       >
-        <Dialog
+        <Popup
           open={paletteOpen()}
           onOpenChange={setPaletteOpen}
-          close={false}
-          body={
+          content={
             <CommandPalette
               groups={BASIC_GROUPS}
               close
               onClose={() => setPaletteOpen(false)}
               footer={
-                <div class="flex items-center justify-between gap-4 text-xs">
-                  <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
+                <div class="text-xs flex gap-4 items-center justify-between">
+                  <div class="flex gap-4 items-center">
+                    <div class="flex gap-2 items-center">
                       <Kbd value={['↑', '↓']} />
                       <span>Navigate</span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex gap-2 items-center">
                       <Kbd value={['↵']} />
                       <span>Open</span>
                     </div>
                   </div>
-                  <div class="flex items-center gap-2">
+                  <div class="flex gap-2 items-center">
                     <Kbd value={['Esc']} />
                     <span>Close</span>
                   </div>
@@ -125,12 +124,12 @@ export function CommandPaletteDemos() {
               }
             />
           }
-          classes={{ content: 'top-1/4 translate-y-0', body: 'p-0' }}
+          classes={{ content: 'top-1/4 translate-y-0' }}
         >
           <Button variant="outline">
             Search... <Kbd value={['⌘', 'K']} />
           </Button>
-        </Dialog>
+        </Popup>
       </DemoSection>
 
       <DemoSection title="Basic" description="Groups of items with icons, kbds, and descriptions.">

@@ -24,8 +24,25 @@ describe('Modal', () => {
     expect(document.body.querySelector('[data-slot="close"]')).not.toBeNull()
 
     const content = document.body.querySelector('[data-slot="content"]')
-    expect(content?.className).toContain('bg-background')
+    const card = content?.querySelector('[data-slot="root"]')
+
+    expect(card?.className).toContain('bg-background')
+    expect(card?.className).toContain('ring-1')
     expect(content?.className).toContain('data-expanded:(animate-in fade-in-0 zoom-in-95)')
+  })
+
+  test('composes dialog as popup container + card shell', () => {
+    render(() => (
+      <Dialog open title="Composed" body="Body">
+        <button type="button">Trigger</button>
+      </Dialog>
+    ))
+
+    const content = document.body.querySelector('[data-slot="content"]')
+    const card = content?.querySelector('[data-slot="root"]')
+
+    expect(content).not.toBeNull()
+    expect(card).not.toBeNull()
   })
 
   test('renders custom header slot and overrides default title/description section', () => {
@@ -142,7 +159,7 @@ describe('Modal', () => {
 
     const content = document.body.querySelector('[data-slot="content"]')
 
-    expect(content?.className).toContain('fixed inset-0 flex max-w-none flex-col rounded-none')
+    expect(content?.className).toContain('fixed inset-0 flex max-w-none flex-col')
     expect(content?.className).toContain('transition-none')
     expect(content?.className).toContain('content-class')
   })

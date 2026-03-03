@@ -337,6 +337,11 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
       open={true}
       onOpenChange={() => {}}
       value={null}
+      data-slot="root"
+      class={cn(
+        'flex flex-col min-h-0 divide-(y border) bg-background rounded-xl',
+        merged.classes?.root,
+      )}
       onChange={handleChange}
       onInputChange={updateSearch}
       allowsEmptyCollection={true}
@@ -447,8 +452,6 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
           </Show>
         </Combobox.Section>
       )}
-      data-slot="root"
-      class={cn('flex flex-col min-h-0 divide-y divide-border', merged.classes?.root)}
     >
       {/* ── Input area ─────────────────────────────────────────────────── */}
       <Combobox.Control<NormalizedItem>

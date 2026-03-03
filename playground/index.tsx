@@ -22,6 +22,7 @@ import { InputNumberDemos } from './components/input-number-demos'
 import { KbdDemos } from './components/kbd-demos'
 import { PaginationDemos } from './components/pagination-demos'
 import { PopoverDemos } from './components/popover-demos'
+import { PopupDemos } from './components/popup-demos'
 import { ProgressDemos } from './components/progress-demos'
 import { SelectDemos } from './components/select-demos'
 import { SeparatorDemos } from './components/separator-demos'
@@ -44,6 +45,7 @@ const PAGES = [
   { key: 'progress', label: 'Progress', group: 'Feedback' },
   { key: 'command-palette', label: 'Command Palette', group: 'Overlay' },
   { key: 'tooltip', label: 'Tooltip', group: 'Overlay' },
+  { key: 'popup', label: 'Popup', group: 'Overlay' },
   { key: 'popover', label: 'Popover', group: 'Overlay' },
   { key: 'dropdown-menu', label: 'Dropdown Menu', group: 'Overlay' },
   { key: 'context-menu', label: 'Context Menu', group: 'Overlay' },
@@ -103,6 +105,9 @@ function App() {
           </Match>
           <Match when={page() === 'tooltip'}>
             <TooltipDemos />
+          </Match>
+          <Match when={page() === 'popup'}>
+            <PopupDemos />
           </Match>
           <Match when={page() === 'popover'}>
             <PopoverDemos />
