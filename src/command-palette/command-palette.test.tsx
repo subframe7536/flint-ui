@@ -344,12 +344,14 @@ describe('CommandPalette', () => {
           inputWrapper: 'input-wrapper-override',
           input: 'input-override',
           listbox: 'listbox-override',
+          footer: 'footer-override',
           group: 'group-override',
           label: 'label-override',
           item: 'item-override',
           search: 'search-override',
           close: 'close-override',
         }}
+        footer={<span>Footer content</span>}
       />
     ))
 
@@ -366,6 +368,9 @@ describe('CommandPalette', () => {
       expect(screen.container.querySelector('[data-slot="listbox"]')?.className).toContain(
         'listbox-override',
       )
+      expect(screen.container.querySelector('[data-slot="footer"]')?.className).toContain(
+        'footer-override',
+      )
       expect(screen.container.querySelector('[data-slot="group"]')?.className).toContain(
         'group-override',
       )
@@ -381,6 +386,17 @@ describe('CommandPalette', () => {
       expect(screen.container.querySelector('[data-slot="close"]')?.className).toContain(
         'close-override',
       )
+    })
+  })
+
+  test('renders footer content when footer is provided', async () => {
+    const screen = render(() => (
+      <CommandPalette groups={GROUPS} footer={<span>Palette Footer</span>} />
+    ))
+
+    await waitFor(() => {
+      expect(screen.getByText('Palette Footer')).toBeTruthy()
+      expect(screen.container.querySelector('[data-slot="footer"]')).not.toBeNull()
     })
   })
 

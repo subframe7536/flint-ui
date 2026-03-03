@@ -101,7 +101,29 @@ export function CommandPaletteDemos() {
           onOpenChange={setPaletteOpen}
           close={false}
           body={
-            <CommandPalette groups={BASIC_GROUPS} close onClose={() => setPaletteOpen(false)} />
+            <CommandPalette
+              groups={BASIC_GROUPS}
+              close
+              onClose={() => setPaletteOpen(false)}
+              footer={
+                <div class="flex items-center justify-between gap-4 text-xs">
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                      <Kbd value={['↑', '↓']} />
+                      <span>Navigate</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <Kbd value={['↵']} />
+                      <span>Open</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <Kbd value={['Esc']} />
+                    <span>Close</span>
+                  </div>
+                </div>
+              }
+            />
           }
           classes={{ content: 'top-1/4 translate-y-0', body: 'p-0' }}
         >

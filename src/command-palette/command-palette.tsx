@@ -46,6 +46,7 @@ type CommandPaletteSlots =
   | 'inputWrapper'
   | 'input'
   | 'listbox'
+  | 'footer'
   | 'group'
   | 'label'
   | 'item'
@@ -92,6 +93,8 @@ export interface CommandPaletteProps {
   loading?: boolean
   /** Custom empty state content. Defaults to "No results." */
   empty?: JSX.Element
+  /** Optional footer content rendered below the list/empty state. */
+  footer?: JSX.Element
   classes?: CommandPaletteClasses
 }
 
@@ -523,6 +526,15 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
             merged.classes?.listbox,
           )}
         />
+      </Show>
+
+      <Show when={merged.footer}>
+        <div
+          data-slot="footer"
+          class={cn('p-3 text-sm text-muted-foreground', merged.classes?.footer)}
+        >
+          {merged.footer}
+        </div>
       </Show>
     </Combobox>
   )

@@ -6,11 +6,14 @@
 - [x] checkbox group table clickable area should expand, border overlapped should handle
 - [x] card style port from zaidan/ example and update demo
 - [x] checkout slot name semantically with nuxt-ui, unify classes.root
-- [ ] add footer slot in command palette
+- [x] add footer slot in command palette
+- [ ] extract overlay part from dialog into new `Popup` component (no padding, pure container), and dialog should become popup + card
 - [ ] prefer to use rest props to simplify splitProps groups
 - [ ] reuse common cva, extract common classes into unocss shortcuts
 - [ ] remove context bridge in select/file-upload, migrate custom render usage from function to jsx for fine grain update, reuse parent components's props first
 
 # Future
 
+- [ ] inline and drop kobalte
+- [ ] make cn / cva return undefined when no class
 - [ ] refine demo into doc?
