@@ -1,10 +1,10 @@
-export interface ModelModifiers<T = unknown> {
-  string?: string extends T ? boolean : never
-  number?: number extends T ? boolean : never
-  trim?: string extends T ? boolean : never
+export type EmptyValueMode = 'preserve' | 'null' | 'undefined'
+
+export interface ModelModifiers {
+  trim?: boolean
   lazy?: boolean
-  nullable?: null extends T ? boolean : never
-  optional?: boolean
+  number?: boolean
+  empty?: EmptyValueMode
 }
 
 export interface ApplyInputModifiersOptions {
@@ -23,7 +23,7 @@ export function looseToNumber(value: unknown): unknown {
 
 export function applyInputModifiers<T>(
   value: string | null | undefined,
-  modelModifiers?: ModelModifiers<T>,
+  modelModifiers?: ModelModifiers,
   options?: ApplyInputModifiersOptions,
 ): T {
   let nextValue: unknown = value
@@ -36,11 +36,11 @@ export function applyInputModifiers<T>(
     nextValue = looseToNumber(nextValue)
   }
 
-  if (modelModifiers?.nullable && (nextValue === '' || nextValue === 0 || nextValue === false)) {
+  if (modelModifiers?.empty === 'null' && nextValue === '') {
     nextValue = null
   }
 
-  if (modelModifiers?.optional && (nextValue === '' || nextValue === 0 || nextValue === false)) {
+  if (modelModifiers?.empty === 'undefined' && nextValue === '') {
     nextValue = undefined
   }
 

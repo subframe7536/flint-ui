@@ -1,5 +1,6 @@
 import type { JSX } from 'solid-js'
-import { createMemo, createSignal, splitProps } from 'solid-js'
+import { createMemo, splitProps } from 'solid-js'
+import { createStore, produce, reconcile } from 'solid-js/store'
 
 import type { SlotClasses } from '../shared/slot-class'
 import { cn, useId } from '../shared/utils'
@@ -55,6 +56,13 @@ interface FormFieldRuntimeEntry {
   focused: boolean
   validatingCount: number
   blurred: boolean
+}
+
+interface FormRuntimeStore {
+  loading: boolean
+  errors: FormValidationError[]
+  inputs: Record<string, FormInputMeta>
+  fieldStates: Record<string, FormFieldRuntimeEntry>
 }
 
 const EMPTY_FIELD_RUNTIME_STATE: FormFieldRuntimeState = {
@@ -128,10 +136,12 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
   )
 
   const formId = useId(() => stateProps.id, 'form')
-  const [loading, setLoading] = createSignal(false)
-  const [errors, setErrors] = createSignal<FormValidationError[]>([])
-  const [inputs, setInputs] = createSignal<Record<string, FormInputMeta>>({})
-  const [fieldStates, setFieldStates] = createSignal<Record<string, FormFieldRuntimeEntry>>({})
+  const [formState, setFormState] = createStore<FormRuntimeStore>({
+    loading: false,
+    errors: [],
+    inputs: {},
+    fieldStates: {},
+  })
 
   const listeners = new Set<(event: FormInputEvent) => void>()
 
@@ -140,34 +150,35 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
       return
     }
 
-    setFieldStates((previous) => {
-      const current = previous[name] ?? createFieldRuntimeEntry()
-      const next = {
-        ...current,
-        ...patch,
-      }
+    setFormState(
+      'fieldStates',
+      produce((currentStates) => {
+        const current = currentStates[name] ?? createFieldRuntimeEntry()
+        const next = {
+          ...current,
+          ...patch,
+        }
 
-      if (isSameRuntimeEntry(current, next)) {
-        return previous
-      }
+        if (isSameRuntimeEntry(current, next)) {
+          return
+        }
 
-      return {
-        ...previous,
-        [name]: next,
-      }
-    })
+        currentStates[name] = next
+      }),
+    )
   }
 
   function removeFieldState(name: string): void {
-    setFieldStates((previous) => {
-      if (!(name in previous)) {
-        return previous
-      }
+    setFormState(
+      'fieldStates',
+      produce((currentStates) => {
+        if (!(name in currentStates)) {
+          return
+        }
 
-      const next = { ...previous }
-      delete next[name]
-      return next
-    })
+        delete currentStates[name]
+      }),
+    )
   }
 
   function updateValidatingState(names: string[], delta: 1 | -1): void {
@@ -177,37 +188,32 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
       return
     }
 
-    setFieldStates((previous) => {
-      let next: Record<string, FormFieldRuntimeEntry> | undefined
+    setFormState(
+      'fieldStates',
+      produce((currentStates) => {
+        for (const name of uniqueNames) {
+          const current = currentStates[name] ?? createFieldRuntimeEntry()
+          const validatingCount = Math.max(0, current.validatingCount + delta)
 
-      for (const name of uniqueNames) {
-        const current = previous[name] ?? createFieldRuntimeEntry()
-        const validatingCount = Math.max(0, current.validatingCount + delta)
+          if (validatingCount === current.validatingCount) {
+            continue
+          }
 
-        if (validatingCount === current.validatingCount) {
-          continue
+          currentStates[name] = {
+            ...current,
+            validatingCount,
+          }
         }
-
-        if (!next) {
-          next = { ...previous }
-        }
-
-        next[name] = {
-          ...current,
-          validatingCount,
-        }
-      }
-
-      return next ?? previous
-    })
+      }),
+    )
   }
 
   function isFieldBlurred(name: string): boolean {
-    return Boolean(fieldStates()[name]?.blurred)
+    return Boolean(formState.fieldStates[name]?.blurred)
   }
 
   async function handleInputEvent(event: FormInputEvent): Promise<void> {
-    if ((stateProps.validateOn ?? DEFAULT_VALIDATE_ON).includes(event.type) && !loading()) {
+    if ((stateProps.validateOn ?? DEFAULT_VALIDATE_ON).includes(event.type) && !formState.loading) {
       if (event.type !== 'input') {
         if (event.name) {
           await runValidation(event.name)
@@ -264,28 +270,28 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
   }
 
   function registerInput(name: string, meta: FormInputMeta): void {
-    setInputs((previous) => ({
-      ...previous,
-      [name]: meta,
-    }))
+    setFormState('inputs', name, reconcile(meta))
   }
 
   function unregisterInput(name: string): void {
-    setInputs((previous) => {
-      const next = { ...previous }
-      delete next[name]
-      return next
-    })
+    setFormState(
+      'inputs',
+      produce((currentInputs) => {
+        if (!(name in currentInputs)) {
+          return
+        }
+
+        delete currentInputs[name]
+      }),
+    )
     removeFieldState(name)
   }
 
   function getInputMeta(name: string): FormInputMeta | undefined {
-    return inputs()[name]
+    return formState.inputs[name]
   }
 
   function resolveErrorIds(nextErrors: FormValidationError[]): FormValidationError[] {
-    const inputMap = inputs()
-
     return nextErrors.map((error) => {
       if (!error.name) {
         return error
@@ -293,7 +299,7 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
 
       return {
         ...error,
-        id: inputMap[error.name]?.id,
+        id: formState.inputs[error.name]?.id,
       }
     })
   }
@@ -308,24 +314,26 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
   }
 
   async function runValidation(target?: string | string[]): Promise<FormValidationError[]> {
-    const targets = target ? (Array.isArray(target) ? target : [target]) : Object.keys(inputs())
+    const targets = target
+      ? (Array.isArray(target) ? target : [target])
+      : Object.keys(formState.inputs)
     updateValidatingState(targets, 1)
 
     try {
       const allErrors = await getErrors()
 
       if (!target) {
-        setErrors(allErrors)
+        setFormState('errors', reconcile(allErrors))
         return allErrors
       }
 
       const names = Array.isArray(target) ? target : [target]
       const nextErrors = [
-        ...errors().filter((error) => !matchesValidationTarget(error, names, inputs())),
-        ...allErrors.filter((error) => matchesValidationTarget(error, names, inputs())),
+        ...formState.errors.filter((error) => !matchesValidationTarget(error, names, formState.inputs)),
+        ...allErrors.filter((error) => matchesValidationTarget(error, names, formState.inputs)),
       ]
 
-      setErrors(nextErrors)
+      setFormState('errors', reconcile(nextErrors))
       return nextErrors
     } finally {
       updateValidatingState(targets, -1)
@@ -339,10 +347,10 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
       return stateProps.disabled ?? false
     },
     get loading() {
-      return loading()
+      return formState.loading
     },
     get errors() {
-      return errors()
+      return formState.errors
     },
     get state() {
       return stateAccessor()
@@ -361,12 +369,12 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
         return EMPTY_FIELD_RUNTIME_STATE
       }
 
-      return toFieldRuntimeState(fieldStates()[name])
+      return toFieldRuntimeState(formState.fieldStates[name])
     },
     emitInputEvent,
     subscribeInputEvents,
     setErrors: (nextErrors) => {
-      setErrors(resolveErrorIds(nextErrors))
+      setFormState('errors', reconcile(resolveErrorIds(nextErrors)))
     },
   }
 
@@ -377,8 +385,8 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
 
     if (renderProps.children.length > 0) {
       return (renderProps.children as (props: FormRenderProps) => JSX.Element)({
-        errors: errors(),
-        loading: loading(),
+        errors: formState.errors,
+        loading: formState.loading,
       })
     }
 
@@ -389,7 +397,7 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
     event.preventDefault()
 
     const submitEvent = event as FormSubmitEvent<TState>
-    setLoading(Boolean(eventProps.loadingAuto ?? true))
+    setFormState('loading', Boolean(eventProps.loadingAuto ?? true))
 
     try {
       const currentErrors = await runValidation()
@@ -404,26 +412,20 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
 
       submitEvent.data = stateProps.state
       await eventProps.onSubmit?.(submitEvent)
-      setFieldStates((previous) => {
-        let changed = false
-        const next = { ...previous }
+      setFormState(
+        'fieldStates',
+        produce((currentStates) => {
+          for (const name of Object.keys(currentStates)) {
+            if (!currentStates[name]?.dirty) {
+              continue
+            }
 
-        for (const [name, state] of Object.entries(previous)) {
-          if (!state.dirty) {
-            continue
+            currentStates[name]!.dirty = false
           }
-
-          changed = true
-          next[name] = {
-            ...state,
-            dirty: false,
-          }
-        }
-
-        return changed ? next : previous
-      })
+        }),
+      )
     } finally {
-      setLoading(false)
+      setFormState('loading', false)
     }
   }
 
@@ -432,7 +434,7 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
       <form
         id={formId()}
         class={cn('w-full data-loading:opacity-80', renderProps.classes?.root)}
-        data-loading={loading() ? '' : undefined}
+        data-loading={formState.loading ? '' : undefined}
         onSubmit={onSubmit}
         {...restProps}
       >

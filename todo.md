@@ -12,7 +12,8 @@
 - [x] bug: in overlay components demo, only `tab` twice can focus next trigger
 - [x] prefer to use rest props to simplify splitProps groups
 - [x] reuse common cva, extract common classes into unocss shortcuts
-- [ ] refactor form state with `createStore`
+- [x] refactor form state with `createStore`
+- [ ] refactor form system, use `https://github.com/open-circle/formisch` + `valibot`
 - [ ] remove context bridge in select/file-upload, migrate custom render usage from function to jsx for fine grain update, reuse parent components's props first
 - [ ] bug: uncontrolled switch in demo does not work
 - [ ] bug: input number horizen does not work

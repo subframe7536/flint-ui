@@ -139,7 +139,7 @@ describe('Textarea', () => {
     expect(focusSpy).toHaveBeenCalledTimes(0)
   })
 
-  test('applies trim, number, lazy, nullable and optional modifiers', async () => {
+  test('applies trim, number, lazy and empty value strategy modifiers', async () => {
     const onTrim = vi.fn()
     const onNumber = vi.fn()
     const onLazy = vi.fn()
@@ -151,8 +151,8 @@ describe('Textarea', () => {
         <Textarea onValueChange={onTrim} modelModifiers={{ trim: true }} />
         <Textarea onValueChange={onNumber} modelModifiers={{ number: true }} />
         <Textarea onValueChange={onLazy} modelModifiers={{ lazy: true }} />
-        <Textarea onValueChange={onNullable} modelModifiers={{ nullable: true }} />
-        <Textarea onValueChange={onOptional} modelModifiers={{ optional: true }} />
+        <Textarea onValueChange={onNullable} modelModifiers={{ empty: 'null' }} />
+        <Textarea onValueChange={onOptional} modelModifiers={{ empty: 'undefined' }} />
       </>
     ))
     const [trimInput, numberInput, lazyInput, nullableInput, optionalInput] =

@@ -30,6 +30,7 @@ type TextareaStyleVariantProps = Pick<
 >
 
 export type TextareaValue = string | number | undefined
+export type TextareaChangeValue = TextareaValue | null
 
 type TextareaSlots = 'root' | 'header' | 'base' | 'footer'
 
@@ -51,8 +52,8 @@ export interface TextareaBaseProps
   maxrows?: number
   header?: JSX.Element
   footer?: JSX.Element
-  modelModifiers?: ModelModifiers<TextareaValue>
-  onValueChange?: (value: TextareaValue) => void
+  modelModifiers?: ModelModifiers
+  onValueChange?: (value: TextareaChangeValue) => void
   onInput?: JSX.EventHandlerUnion<HTMLTextAreaElement, InputEvent>
   onChange?: JSX.EventHandlerUnion<HTMLTextAreaElement, Event>
   onBlur?: JSX.FocusEventHandlerUnion<HTMLTextAreaElement, FocusEvent>
@@ -124,7 +125,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
   const isLazy = createMemo(() => Boolean(formProps.modelModifiers?.lazy))
 
   function updateInputValue(value: string | null | undefined): void {
-    const nextValue = applyInputModifiers<TextareaValue>(value, formProps.modelModifiers)
+    const nextValue = applyInputModifiers<TextareaChangeValue>(value, formProps.modelModifiers)
 
     formProps.onValueChange?.(nextValue)
     field.emitFormInput()

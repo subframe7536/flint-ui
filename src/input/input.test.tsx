@@ -215,7 +215,7 @@ describe('Input', () => {
     expect(onValueChange).toHaveBeenNthCalledWith(2, 6.2)
   })
 
-  test('supports lazy, nullable and optional modifiers', async () => {
+  test('supports lazy and empty value strategy modifiers', async () => {
     const lazyChange = vi.fn()
     const nullableChange = vi.fn()
     const optionalChange = vi.fn()
@@ -223,8 +223,8 @@ describe('Input', () => {
     const screen = render(() => (
       <>
         <Input onValueChange={lazyChange} modelModifiers={{ lazy: true }} />
-        <Input onValueChange={nullableChange} modelModifiers={{ nullable: true }} />
-        <Input onValueChange={optionalChange} modelModifiers={{ optional: true }} />
+        <Input onValueChange={nullableChange} modelModifiers={{ empty: 'null' }} />
+        <Input onValueChange={optionalChange} modelModifiers={{ empty: 'undefined' }} />
       </>
     ))
     const [lazyInput, nullableInput, optionalInput] = screen.getAllByRole('textbox')
