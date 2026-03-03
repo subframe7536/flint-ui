@@ -13,7 +13,7 @@
 - [x] prefer to use rest props to simplify splitProps groups
 - [x] reuse common cva, extract common classes into unocss shortcuts
 - [x] refactor form state with `createStore`
-- [ ] refactor form system, use `https://github.com/open-circle/formisch` + `valibot`
+- [ ] cleanup form system and test standard schema with `valibot`
 - [ ] remove context bridge in select/file-upload, migrate custom render usage from function to jsx for fine grain update, reuse parent components's props first
 - [ ] bug: uncontrolled switch in demo does not work
 - [ ] bug: input number horizen does not work

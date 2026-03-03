@@ -17,7 +17,7 @@ describe('Separator', () => {
     expect(root?.className).toContain('flex-row')
     expect(root?.className).toContain('text-muted')
     expect(borders.length).toBe(1)
-    expect(borders[0]?.className).toContain('border-t')
+    expect(borders[0]?.className).toContain('b-t')
   })
 
   test('renders vertical orientation', () => {
@@ -54,36 +54,16 @@ describe('Separator', () => {
     const lg = render(() => <Separator size="lg" />)
     const xl = render(() => <Separator size="xl" />)
 
-    expect(xs.container.querySelector('[data-slot="border"]')?.className).toContain(
-      'border-t-$sep-size',
-    )
-    expect(sm.container.querySelector('[data-slot="border"]')?.className).toContain(
-      'border-t-$sep-size',
-    )
-    expect(md.container.querySelector('[data-slot="border"]')?.className).toContain(
-      'border-t-$sep-size',
-    )
-    expect(lg.container.querySelector('[data-slot="border"]')?.className).toContain(
-      'border-t-$sep-size',
-    )
-    expect(xl.container.querySelector('[data-slot="border"]')?.className).toContain(
-      'border-t-$sep-size',
-    )
-    expect(xs.container.querySelector('[data-slot="border"]')?.className).toContain(
-      '[--sep-size:1px]',
-    )
-    expect(sm.container.querySelector('[data-slot="border"]')?.className).toContain(
-      '[--sep-size:2px]',
-    )
-    expect(md.container.querySelector('[data-slot="border"]')?.className).toContain(
-      '[--sep-size:3px]',
-    )
-    expect(lg.container.querySelector('[data-slot="border"]')?.className).toContain(
-      '[--sep-size:4px]',
-    )
-    expect(xl.container.querySelector('[data-slot="border"]')?.className).toContain(
-      '[--sep-size:5px]',
-    )
+    expect(xs.container.querySelector('[data-slot="border"]')?.className).toContain('b-t')
+    expect(sm.container.querySelector('[data-slot="border"]')?.className).toContain('b-t')
+    expect(md.container.querySelector('[data-slot="border"]')?.className).toContain('b-t')
+    expect(lg.container.querySelector('[data-slot="border"]')?.className).toContain('b-t')
+    expect(xl.container.querySelector('[data-slot="border"]')?.className).toContain('b-t')
+    expect(xs.container.querySelector('[data-slot="border"]')?.className).toContain('b-1')
+    expect(sm.container.querySelector('[data-slot="border"]')?.className).toContain('b-2')
+    expect(md.container.querySelector('[data-slot="border"]')?.className).toContain('b-3')
+    expect(lg.container.querySelector('[data-slot="border"]')?.className).toContain('b-4')
+    expect(xl.container.querySelector('[data-slot="border"]')?.className).toContain('b-5')
   })
 
   test('uses root color inheritance for border color', () => {

@@ -112,8 +112,7 @@ describe('InputNumber', () => {
     const base = screen.container.querySelector('[data-slot="base"]')
 
     expect(base?.className).toContain('h-11')
-    expect(base?.className).toContain('bg-muted')
-    expect(base?.className).toContain('ring-1')
+    expect(base?.className).toContain('surface-subtle')
   })
 
   test('applies classes.root override', () => {
