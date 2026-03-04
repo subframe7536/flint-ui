@@ -169,19 +169,20 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
   }
 
   function onRawValueChange(value: number): void {
+    field.setFormValue(value)
     formProps.onRawValueChange?.(value)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   const onBlur: JSX.FocusEventHandlerUnion<HTMLInputElement, FocusEvent> = (event) => {
     callHandler(event, formProps.onBlur as any)
-    field.emitFormBlur()
+    field.emit('blur')
   }
 
   const onFocus: JSX.FocusEventHandlerUnion<HTMLInputElement, FocusEvent> = (event) => {
     callHandler(event, formProps.onFocus as any)
-    field.emitFormFocus()
+    field.emit('focus')
   }
 
   onMount(() => {

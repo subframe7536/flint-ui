@@ -255,7 +255,9 @@ describe('Textarea', () => {
     })
 
     const textarea = input()
+    const root = textarea.closest('[data-slot="root"]')
     expect(textarea.getAttribute('aria-invalid')).toBe('true')
+    expect(root?.hasAttribute('data-invalid')).toBe(true)
 
     const describedBy = textarea.getAttribute('aria-describedby') ?? ''
     expect(describedBy).toContain('-error')

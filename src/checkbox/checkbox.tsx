@@ -82,17 +82,20 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       size: styleProps.size,
       disabled: formProps.disabled,
     }),
-    () => ({
-      bind: formProps.formFieldBind,
+    {
+      get bind() {
+        return formProps.formFieldBind
+      },
       defaultId: generatedId,
       defaultSize: 'md',
-    }),
+    },
   )
 
   function onChange(nextChecked: boolean): void {
+    field.setFormValue(nextChecked)
     formProps.onChange?.(nextChecked)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   return (

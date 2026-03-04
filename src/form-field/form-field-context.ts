@@ -1,17 +1,17 @@
 import type { Accessor, JSX } from 'solid-js'
 import { createMemo, onCleanup } from 'solid-js'
 
-import type { FormFieldRuntimeState } from '../form/form-context'
+import type { FormFieldRuntimeState, FormInputEventType } from '../form/form-context'
 import { useFormContext } from '../form/form-context'
 import { createContextProvider } from '../shared/create-context-provider'
 
-export interface FormFieldInjectedOptions {
+export interface FormFieldContextOptions {
   error?: boolean | string | JSX.Element
   name?: string
+  path?: string[]
   size?: FormFieldSize
   eagerValidation?: boolean
   validateOnInputDelay?: number
-  errorPattern?: RegExp
   hint?: JSX.Element
   description?: JSX.Element
   help?: JSX.Element
@@ -48,16 +48,14 @@ export interface UseFormFieldReturn {
   dirty: Accessor<boolean>
   focused: Accessor<boolean>
   validating: Accessor<boolean>
-  emitFormBlur: () => void
-  emitFormFocus: () => void
-  emitFormChange: () => void
-  emitFormInput: () => void
+  setFormValue: (value: unknown) => void
+  emit: (type: FormInputEventType) => void
 }
 
 export type FormFieldSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 export const [FormFieldProvider, useFormFieldContext] =
-  createContextProvider<FormFieldInjectedOptions | null>('FormField', null)
+  createContextProvider<FormFieldContextOptions | null>('FormField', null)
 
 const EMPTY_RUNTIME_STATE: FormFieldRuntimeState = {
   touched: false,
@@ -123,31 +121,24 @@ export function useFormField(
     }
   })
 
-  function emitFormEvent(type: 'blur' | 'change' | 'focus' | 'input', eager?: boolean): void {
+  function emitFormEvent(type: FormInputEventType, eager?: boolean): void {
     if (!formContext) {
       return
     }
 
     formContext.emitInputEvent({
       type,
-      name: name(),
+      name: formField?.path,
       eager,
     })
   }
 
-  function emitFormBlur(): void {
-    emitFormEvent('blur')
-  }
+  function emit(type: FormInputEventType): void {
+    if (type !== 'input') {
+      emitFormEvent(type)
+      return
+    }
 
-  function emitFormFocus(): void {
-    emitFormEvent('focus')
-  }
-
-  function emitFormChange(): void {
-    emitFormEvent('change')
-  }
-
-  function emitFormInput(): void {
     const delay = formField?.validateOnInputDelay ?? formContext?.validateOnInputDelay ?? 300
     const eagerValidation = Boolean(!options().deferInputValidation || formField?.eagerValidation)
 
@@ -158,6 +149,25 @@ export function useFormField(
     inputTimer = setTimeout(() => {
       emitFormEvent('input', eagerValidation)
     }, delay)
+  }
+
+  function setFormValue(value: unknown): void {
+    if (!formContext) {
+      return
+    }
+
+    const fieldPath = formField?.path
+    if (fieldPath) {
+      formContext.setFieldValue(fieldPath, value)
+      return
+    }
+
+    const fieldName = name()
+    if (!fieldName) {
+      return
+    }
+
+    formContext.setFieldValue(fieldName, value)
   }
 
   const ariaAttrs = createMemo<Record<string, string | boolean | undefined>>(() => {
@@ -203,9 +213,7 @@ export function useFormField(
     dirty,
     focused,
     validating,
-    emitFormBlur,
-    emitFormFocus,
-    emitFormChange,
-    emitFormInput,
+    setFormValue,
+    emit,
   } satisfies UseFormFieldReturn
 }

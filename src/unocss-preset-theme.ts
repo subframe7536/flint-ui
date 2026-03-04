@@ -359,8 +359,8 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
       },
     ],
     shortcuts: [
-      ['effect-fv', 'outline-none ring-3px ring-ring/50'],
-      ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/50'],
+      ['effect-fv', 'outline-none ring-3px ring-ring/30'],
+      ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/30'],
       ['surface-highlight', 'ring-1 ring-border/50'],
       ['surface-soft', 'b-transparent bg-muted/50 hover:bg-muted'],
       ['surface-subtle', 'border bg-muted'],

@@ -6,6 +6,8 @@ import solid from 'vite-plugin-solid'
 const base: InlineConfig = {
   entry: ['./src/index.ts'],
   exports: true,
+  inlineOnly: false,
+  noExternal: ['valibot'],
 }
 // export both js and jsx
 export default defineConfig([
@@ -19,7 +21,7 @@ export default defineConfig([
       }),
       solid(),
     ],
-    dts: { parallel: true },
+    dts: true,
   },
   {
     ...base,

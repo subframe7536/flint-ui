@@ -1,6 +1,17 @@
 import { createSignal } from 'solid-js'
+import * as v from 'valibot'
 
-import { Button, Form, FormField, Input, Select, Textarea } from '../../src'
+import {
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Form,
+  FormField,
+  Input,
+  RadioGroup,
+  Select,
+  Textarea,
+} from '../../src'
 import type { SelectOption } from '../../src/select/select'
 
 import { DemoPage, DemoSection } from './common/demo-page'
@@ -11,12 +22,59 @@ const ROLE_OPTIONS: SelectOption[] = [
   { label: 'Manager', value: 'manager' },
 ]
 
+const SCHEMA_CHANNEL_OPTIONS = [
+  { value: 'alpha', label: 'Alpha', description: 'Early feature previews' },
+  { value: 'beta', label: 'Beta', description: 'Stable pre-release updates' },
+  { value: 'stable', label: 'Stable', description: 'Production-safe builds' },
+]
+
+const SCHEMA_PLAN_OPTIONS = [
+  { value: 'starter', label: 'Starter', description: 'Personal projects' },
+  { value: 'pro', label: 'Pro', description: 'Team collaboration' },
+  { value: 'enterprise', label: 'Enterprise', description: 'Compliance and scale' },
+]
+
 export const FormFieldDemos = () => {
   const [formState, setFormState] = createSignal({
     name: '',
     email: '',
     bio: '',
     role: '' as string | null,
+  })
+
+  const schemaFormSchema = v.object({
+    username: v.pipe(
+      v.string(),
+      v.minLength(1, 'Username is required.'),
+      v.minLength(3, 'Username must be at least 3 characters.'),
+    ),
+    email: v.pipe(
+      v.string(),
+      v.minLength(1, 'Email is required.'),
+      v.email('Enter a valid email.'),
+    ),
+    agree: v.pipe(v.boolean(), v.value(true, 'You must accept the terms.')),
+    channels: v.pipe(v.array(v.string()), v.nonEmpty('Select at least one release channel.')),
+    plan: v.picklist(['starter', 'pro', 'enterprise'], 'Select a plan.'),
+    role: v.pipe(v.string(), v.minLength(1, 'Please select a role.')),
+  })
+
+  const [nestedFormState, setNestedFormState] = createSignal({
+    user: {
+      name: '',
+      email: '',
+    },
+  })
+
+  const nestedFormSchema = v.object({
+    user: v.object({
+      name: v.pipe(v.string(), v.minLength(1, 'Name is required.')),
+      email: v.pipe(
+        v.string(),
+        v.minLength(1, 'Email is required.'),
+        v.email('Enter a valid email.'),
+      ),
+    }),
   })
 
   const updateField = (field: string, value: string | null) => {
@@ -144,6 +202,79 @@ export const FormFieldDemos = () => {
             <Button type="submit" variant="secondary">
               Validate
             </Button>
+          </div>
+        </Form>
+      </DemoSection>
+
+      <DemoSection
+        title="Schema Validation (Valibot)"
+        description="Validation via a valibot schema with input, checkbox, group, radio, and select fields."
+      >
+        <Form schema={schemaFormSchema}>
+          <div class="max-w-md space-y-4">
+            <FormField name="username" label="Username" required>
+              <Input placeholder="johndoe" />
+            </FormField>
+
+            <FormField name="email" label="Email" required>
+              <Input type="email" placeholder="john@example.com" />
+            </FormField>
+
+            <FormField name="agree" label="Terms" required>
+              <Checkbox label="I agree to the terms of service" />
+            </FormField>
+
+            <FormField name="channels" label="Release Channels" required>
+              <CheckboxGroup items={SCHEMA_CHANNEL_OPTIONS} variant="table" />
+            </FormField>
+
+            <FormField name="plan" label="Plan" required>
+              <RadioGroup items={SCHEMA_PLAN_OPTIONS} variant="table" />
+            </FormField>
+
+            <FormField name="role" label="Role" required>
+              <Select options={ROLE_OPTIONS} placeholder="Choose a role..." />
+            </FormField>
+
+            <Button type="submit">Submit</Button>
+          </div>
+        </Form>
+      </DemoSection>
+
+      <DemoSection
+        title="Nested Schema with Array Names"
+        description="Array name props with nested valibot schema validation."
+      >
+        <Form state={nestedFormState()} schema={nestedFormSchema}>
+          <div class="max-w-md space-y-4">
+            <FormField name={['user', 'name']} label="User Name" required>
+              <Input
+                value={nestedFormState().user.name}
+                onValueChange={(v) =>
+                  setNestedFormState((prev) => ({
+                    ...prev,
+                    user: { ...prev.user, name: String(v) },
+                  }))
+                }
+                placeholder="Jane Doe"
+              />
+            </FormField>
+
+            <FormField name={['user', 'email']} label="User Email" required>
+              <Input
+                type="email"
+                value={nestedFormState().user.email}
+                onValueChange={(v) =>
+                  setNestedFormState((prev) => ({
+                    ...prev,
+                    user: { ...prev.user, email: String(v) },
+                  }))
+                }
+                placeholder="jane@example.com"
+              />
+            </FormField>
+
+            <Button type="submit">Submit</Button>
           </div>
         </Form>
       </DemoSection>

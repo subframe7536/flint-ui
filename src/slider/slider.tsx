@@ -188,13 +188,18 @@ export function Slider(props: SliderProps): JSX.Element {
       setUncontrolledValues([...values])
     }
 
-    formProps.onValueChange?.(toPublicValue(values))
-    field.emitFormInput()
+    const nextValue = toPublicValue(values)
+    field.setFormValue(nextValue)
+    formProps.onValueChange?.(nextValue)
+    field.emit('input')
   }
 
   function onChange(values: number[]): void {
-    formProps.onChange?.(toPublicValue(values))
-    field.emitFormChange()
+    const nextValue = toPublicValue(values)
+
+    field.setFormValue(nextValue)
+    formProps.onChange?.(nextValue)
+    field.emit('change')
   }
 
   return (
@@ -262,8 +267,8 @@ export function Slider(props: SliderProps): JSX.Element {
               },
               styleProps.classes?.thumb,
             )}
-            onFocus={() => field.emitFormFocus()}
-            onBlur={() => field.emitFormBlur()}
+            onFocus={() => field.emit('focus')}
+            onBlur={() => field.emit('blur')}
           >
             <KobalteSlider.Input id={inputIdForIndex(thumbIndex)} {...field.ariaAttrs()} />
           </KobalteSlider.Thumb>

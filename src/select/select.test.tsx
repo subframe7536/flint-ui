@@ -668,7 +668,9 @@ describe('Select - form integration', () => {
     })
 
     const input = screen.getByRole('combobox')
+    const control = input.closest('[data-slot="base"]')
     expect(input.getAttribute('aria-invalid')).toBe('true')
+    expect(control?.hasAttribute('data-invalid')).toBe(true)
   })
 
   test('emits form change event on selection', async () => {

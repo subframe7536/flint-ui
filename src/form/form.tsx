@@ -1,5 +1,5 @@
 import type { JSX } from 'solid-js'
-import { createMemo, splitProps } from 'solid-js'
+import { splitProps } from 'solid-js'
 import { createStore, produce, reconcile } from 'solid-js/store'
 
 import type { SlotClasses } from '../shared/slot-class'
@@ -14,6 +14,8 @@ import type {
   FormValidationError,
 } from './form-context'
 import { FormProvider } from './form-context'
+import { pathStartsWith, pathToKey, toFieldPath } from './form-path'
+import type { StandardSchemaV1 } from './standard-schema'
 
 type FormState = object
 
@@ -37,6 +39,7 @@ export type FormClasses = SlotClasses<FormSlots>
 export interface FormBaseProps<TState extends FormState = FormState> {
   id?: string
   state?: TState
+  schema?: StandardSchemaV1<TState>
   validate?: (state: TState | undefined) => FormValidationError[] | Promise<FormValidationError[]>
   validateOn?: FormInputEventType[]
   validateOnInputDelay?: number
@@ -58,11 +61,22 @@ interface FormFieldRuntimeEntry {
   blurred: boolean
 }
 
+interface FormFieldEntry {
+  path: string[]
+  meta: FormInputMeta
+  runtime: FormFieldRuntimeEntry
+}
+
+interface FormFieldIdentity {
+  key: string
+  path: string[]
+}
+
 interface FormRuntimeStore {
   loading: boolean
   errors: FormValidationError[]
-  inputs: Record<string, FormInputMeta>
-  fieldStates: Record<string, FormFieldRuntimeEntry>
+  fields: Record<string, FormFieldEntry>
+  state: Record<string, unknown>
 }
 
 const EMPTY_FIELD_RUNTIME_STATE: FormFieldRuntimeState = {
@@ -97,40 +111,79 @@ function toFieldRuntimeState(entry: FormFieldRuntimeEntry | undefined): FormFiel
   }
 }
 
-function isSameRuntimeEntry(a: FormFieldRuntimeEntry, b: FormFieldRuntimeEntry): boolean {
-  return (
-    a.touched === b.touched &&
-    a.dirty === b.dirty &&
-    a.focused === b.focused &&
-    a.validatingCount === b.validatingCount &&
-    a.blurred === b.blurred
-  )
+function toFieldIdentity(name: string | string[] | undefined): FormFieldIdentity | undefined {
+  const path = toFieldPath(name)
+  if (!path) {
+    return undefined
+  }
+
+  return {
+    key: pathToKey(path),
+    path,
+  }
 }
 
-function matchesValidationTarget(
-  error: FormValidationError,
-  names: string[],
-  inputs: Record<string, FormInputMeta>,
-): boolean {
-  if (!error.name) {
+function createFieldEntry(identity: FormFieldIdentity, meta: FormInputMeta = {}): FormFieldEntry {
+  return {
+    path: [...identity.path],
+    meta: { ...meta },
+    runtime: createFieldRuntimeEntry(),
+  }
+}
+
+function setValueAtPath(target: unknown, path: string[] | undefined, value: unknown): void {
+  if (!target || typeof target !== 'object' || !path || path.length === 0) {
+    return
+  }
+
+  let current: Record<string, unknown> = target as Record<string, unknown>
+
+  for (let index = 0; index < path.length - 1; index += 1) {
+    const key = path[index]!
+    const next = current[key]
+
+    if (!next || typeof next !== 'object') {
+      current[key] = {}
+    }
+
+    current = current[key] as Record<string, unknown>
+  }
+
+  const leafKey = path[path.length - 1]!
+  current[leafKey] = value
+}
+
+function matchesField(error: FormValidationError, targets: FormFieldIdentity[]): boolean {
+  const errorPath = toFieldPath(error.name)
+  if (!errorPath) {
     return false
   }
 
-  if (names.includes(error.name)) {
-    return true
-  }
-
-  return names.some((name) => {
-    const pattern = inputs[name]?.pattern
-    return pattern ? pattern.test(error.name!) : false
-  })
+  return targets.some((target) => pathStartsWith(errorPath, target.path))
 }
 
 const DEFAULT_VALIDATE_ON: FormInputEventType[] = ['input', 'blur', 'change']
+
+async function validateStandardSchema(
+  state: unknown,
+  schema: StandardSchemaV1,
+): Promise<FormValidationError[]> {
+  const result = await schema['~standard'].validate(state)
+
+  if (!result.issues) {
+    return []
+  }
+
+  return result.issues.map((issue) => ({
+    name: issue.path?.map((s) => String(typeof s === 'object' ? s.key : s)),
+    message: issue.message,
+  }))
+}
+
 export function Form<TState extends FormState = FormState>(props: FormProps<TState>): JSX.Element {
   const [stateProps, eventProps, renderProps, restProps] = splitProps(
     props as FormProps<TState>,
-    ['id', 'state', 'validate', 'validateOn', 'validateOnInputDelay', 'disabled'],
+    ['id', 'state', 'schema', 'validate', 'validateOn', 'validateOnInputDelay', 'disabled'],
     ['loadingAuto', 'onSubmit', 'onError'],
     ['classes', 'children'],
   )
@@ -139,212 +192,238 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
   const [formState, setFormState] = createStore<FormRuntimeStore>({
     loading: false,
     errors: [],
-    inputs: {},
-    fieldStates: {},
+    fields: {},
+    state: {},
   })
 
-  const listeners = new Set<(event: FormInputEvent) => void>()
-
-  function patchFieldState(name: string, patch: Partial<FormFieldRuntimeEntry>): void {
-    if (!name) {
-      return
+  function getValidationState(): TState | undefined {
+    if (stateProps.state !== undefined) {
+      return stateProps.state
     }
 
+    return formState.state as TState
+  }
+
+  function upsertField(identity: FormFieldIdentity, meta: FormInputMeta): void {
     setFormState(
-      'fieldStates',
-      produce((currentStates) => {
-        const current = currentStates[name] ?? createFieldRuntimeEntry()
-        const next = {
+      'fields',
+      produce((currentFields) => {
+        const current = currentFields[identity.key]
+        if (!current) {
+          currentFields[identity.key] = createFieldEntry(identity, meta)
+          return
+        }
+
+        currentFields[identity.key] = {
           ...current,
-          ...patch,
+          path: [...identity.path],
+          meta: {
+            ...current.meta,
+            ...meta,
+          },
         }
-
-        if (isSameRuntimeEntry(current, next)) {
-          return
-        }
-
-        currentStates[name] = next
       }),
     )
   }
 
-  function removeFieldState(name: string): void {
-    setFormState(
-      'fieldStates',
-      produce((currentStates) => {
-        if (!(name in currentStates)) {
-          return
-        }
-
-        delete currentStates[name]
-      }),
-    )
-  }
-
-  function updateValidatingState(names: string[], delta: 1 | -1): void {
-    const uniqueNames = [...new Set(names.filter(Boolean))]
-
-    if (uniqueNames.length === 0) {
+  function patchFieldRuntime(
+    identity: FormFieldIdentity | undefined,
+    patch: Partial<FormFieldRuntimeEntry>,
+  ): void {
+    if (!identity) {
       return
     }
 
     setFormState(
-      'fieldStates',
-      produce((currentStates) => {
-        for (const name of uniqueNames) {
-          const current = currentStates[name] ?? createFieldRuntimeEntry()
-          const validatingCount = Math.max(0, current.validatingCount + delta)
+      'fields',
+      produce((currentFields) => {
+        const current = currentFields[identity.key] ?? createFieldEntry(identity)
+        currentFields[identity.key] = {
+          ...current,
+          path: [...identity.path],
+          runtime: {
+            ...current.runtime,
+            ...patch,
+          },
+        }
+      }),
+    )
+  }
 
-          if (validatingCount === current.validatingCount) {
+  function removeField(identity: FormFieldIdentity | undefined): void {
+    if (!identity) {
+      return
+    }
+
+    setFormState(
+      'fields',
+      produce((currentFields) => {
+        if (!(identity.key in currentFields)) {
+          return
+        }
+
+        delete currentFields[identity.key]
+      }),
+    )
+  }
+
+  function updateValidatingCount(targets: FormFieldIdentity[], delta: 1 | -1): void {
+    const identities = [...new Map(targets.map((target) => [target.key, target])).values()]
+    if (identities.length === 0) {
+      return
+    }
+
+    setFormState(
+      'fields',
+      produce((currentFields) => {
+        for (const identity of identities) {
+          const current = currentFields[identity.key] ?? createFieldEntry(identity)
+          const validatingCount = Math.max(0, current.runtime.validatingCount + delta)
+
+          if (validatingCount === current.runtime.validatingCount) {
             continue
           }
 
-          currentStates[name] = {
+          currentFields[identity.key] = {
             ...current,
-            validatingCount,
+            path: [...identity.path],
+            runtime: {
+              ...current.runtime,
+              validatingCount,
+            },
           }
         }
       }),
     )
   }
 
-  function isFieldBlurred(name: string): boolean {
-    return Boolean(formState.fieldStates[name]?.blurred)
+  function isFieldBlurred(identity: FormFieldIdentity | undefined): boolean {
+    if (!identity) {
+      return false
+    }
+
+    return Boolean(formState.fields[identity.key]?.runtime.blurred)
   }
 
   async function handleInputEvent(event: FormInputEvent): Promise<void> {
-    if ((stateProps.validateOn ?? DEFAULT_VALIDATE_ON).includes(event.type) && !formState.loading) {
-      if (event.type !== 'input') {
-        if (event.name) {
-          await runValidation(event.name)
+    const identity = toFieldIdentity(event.name)
+    const shouldValidate = (stateProps.validateOn ?? DEFAULT_VALIDATE_ON).includes(event.type)
+
+    if (shouldValidate && !formState.loading && identity) {
+      if (event.type === 'input') {
+        if (event.eager || isFieldBlurred(identity)) {
+          await runValidation([identity])
         }
-      } else if (event.eager || (event.name && isFieldBlurred(event.name))) {
-        if (event.name) {
-          await runValidation(event.name)
-        }
+      } else {
+        await runValidation([identity])
       }
     }
 
-    if (!event.name) {
-      return
-    }
-
-    if (event.type === 'blur') {
-      patchFieldState(event.name, {
-        blurred: true,
-        touched: true,
-        focused: false,
-      })
-    }
-
-    if (event.type === 'focus' || event.type === 'change' || event.type === 'input') {
-      patchFieldState(event.name, {
-        touched: true,
-      })
-    }
-
-    if (event.type === 'focus') {
-      patchFieldState(event.name, {
-        focused: true,
-      })
-    }
-
-    if (event.type === 'change' || event.type === 'input') {
-      patchFieldState(event.name, {
-        dirty: true,
-      })
+    switch (event.type) {
+      case 'blur':
+        patchFieldRuntime(identity, {
+          blurred: true,
+          touched: true,
+          focused: false,
+        })
+        return
+      case 'focus':
+        patchFieldRuntime(identity, {
+          touched: true,
+          focused: true,
+        })
+        return
+      case 'change':
+      case 'input':
+        patchFieldRuntime(identity, {
+          touched: true,
+          dirty: true,
+        })
+        return
     }
   }
 
   function emitInputEvent(event: FormInputEvent): void {
     void handleInputEvent(event)
+  }
 
-    for (const listener of listeners) {
-      listener(event)
+  function registerInput(name: string | string[], meta: FormInputMeta): void {
+    const identity = toFieldIdentity(name)
+    if (!identity) {
+      return
     }
+
+    upsertField(identity, meta)
   }
 
-  function subscribeInputEvents(listener: (event: FormInputEvent) => void): () => void {
-    listeners.add(listener)
-    return () => listeners.delete(listener)
+  function unregisterInput(name: string | string[]): void {
+    removeField(toFieldIdentity(name))
   }
 
-  function registerInput(name: string, meta: FormInputMeta): void {
-    setFormState('inputs', name, reconcile(meta))
-  }
+  function getInputMeta(name: string | string[]): FormInputMeta | undefined {
+    const identity = toFieldIdentity(name)
+    if (!identity) {
+      return undefined
+    }
 
-  function unregisterInput(name: string): void {
-    setFormState(
-      'inputs',
-      produce((currentInputs) => {
-        if (!(name in currentInputs)) {
-          return
-        }
-
-        delete currentInputs[name]
-      }),
-    )
-    removeFieldState(name)
-  }
-
-  function getInputMeta(name: string): FormInputMeta | undefined {
-    return formState.inputs[name]
+    return formState.fields[identity.key]?.meta
   }
 
   function resolveErrorIds(nextErrors: FormValidationError[]): FormValidationError[] {
     return nextErrors.map((error) => {
-      if (!error.name) {
+      const identity = toFieldIdentity(error.name)
+      if (!identity) {
         return error
       }
 
       return {
         ...error,
-        id: formState.inputs[error.name]?.id,
+        id: formState.fields[identity.key]?.meta.id,
       }
     })
   }
 
   async function getErrors(): Promise<FormValidationError[]> {
-    const validationErrors = await stateProps.validate?.(stateProps.state)
-    if (!validationErrors) {
-      return []
-    }
+    const validationState = getValidationState()
+    const schemaErrors = stateProps.schema
+      ? await validateStandardSchema(validationState, stateProps.schema)
+      : []
+    const validationErrors = (await stateProps.validate?.(validationState)) ?? []
 
-    return resolveErrorIds(validationErrors)
+    const allErrors = [...schemaErrors, ...validationErrors]
+    return resolveErrorIds(allErrors)
   }
 
-  async function runValidation(target?: string | string[]): Promise<FormValidationError[]> {
-    const targets = target
-      ? Array.isArray(target)
-        ? target
-        : [target]
-      : Object.keys(formState.inputs)
-    updateValidatingState(targets, 1)
+  function allFieldIdentities(): FormFieldIdentity[] {
+    return Object.entries(formState.fields).map(([key, entry]) => ({
+      key,
+      path: entry.path,
+    }))
+  }
+
+  async function runValidation(targets?: FormFieldIdentity[]): Promise<FormValidationError[]> {
+    const targetIdentities = targets ?? allFieldIdentities()
+    updateValidatingCount(targetIdentities, 1)
 
     try {
       const allErrors = await getErrors()
 
-      if (!target) {
+      if (!targets) {
         setFormState('errors', reconcile(allErrors))
         return allErrors
       }
 
-      const names = Array.isArray(target) ? target : [target]
       const nextErrors = [
-        ...formState.errors.filter(
-          (error) => !matchesValidationTarget(error, names, formState.inputs),
-        ),
-        ...allErrors.filter((error) => matchesValidationTarget(error, names, formState.inputs)),
+        ...formState.errors.filter((error) => !matchesField(error, targetIdentities)),
+        ...allErrors.filter((error) => matchesField(error, targetIdentities)),
       ]
 
       setFormState('errors', reconcile(nextErrors))
       return nextErrors
     } finally {
-      updateValidatingState(targets, -1)
+      updateValidatingCount(targetIdentities, -1)
     }
   }
-
-  const stateAccessor = createMemo(() => stateProps.state as Record<string, unknown> | undefined)
 
   const contextValue: FormContextValue = {
     get disabled() {
@@ -356,9 +435,6 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
     get errors() {
       return formState.errors
     },
-    get state() {
-      return stateAccessor()
-    },
     get validateOn() {
       return stateProps.validateOn ?? DEFAULT_VALIDATE_ON
     },
@@ -369,14 +445,32 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
     unregisterInput,
     getInputMeta,
     getFieldState: (name) => {
-      if (!name) {
+      const identity = toFieldIdentity(name)
+      if (!identity) {
         return EMPTY_FIELD_RUNTIME_STATE
       }
 
-      return toFieldRuntimeState(formState.fieldStates[name])
+      return toFieldRuntimeState(formState.fields[identity.key]?.runtime)
+    },
+    setFieldValue: (name, value) => {
+      const path = toFieldPath(name)
+      if (!path) {
+        return
+      }
+
+      if (stateProps.state !== undefined) {
+        setValueAtPath(stateProps.state, path, value)
+        return
+      }
+
+      setFormState(
+        'state',
+        produce((currentState) => {
+          setValueAtPath(currentState, path, value)
+        }),
+      )
     },
     emitInputEvent,
-    subscribeInputEvents,
     setErrors: (nextErrors) => {
       setFormState('errors', reconcile(resolveErrorIds(nextErrors)))
     },
@@ -414,17 +508,24 @@ export function Form<TState extends FormState = FormState>(props: FormProps<TSta
         return
       }
 
-      submitEvent.data = stateProps.state
+      submitEvent.data = getValidationState()
       await eventProps.onSubmit?.(submitEvent)
       setFormState(
-        'fieldStates',
-        produce((currentStates) => {
-          for (const name of Object.keys(currentStates)) {
-            if (!currentStates[name]?.dirty) {
+        'fields',
+        produce((currentFields) => {
+          for (const key of Object.keys(currentFields)) {
+            const runtime = currentFields[key]?.runtime
+            if (!runtime?.dirty) {
               continue
             }
 
-            currentStates[name]!.dirty = false
+            currentFields[key] = {
+              ...currentFields[key]!,
+              runtime: {
+                ...runtime,
+                dirty: false,
+              },
+            }
           }
         }),
       )

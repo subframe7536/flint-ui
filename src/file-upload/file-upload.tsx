@@ -305,9 +305,12 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
   }
 
   function emitValueChange(files: File[]): void {
-    formProps.onValueChange?.(resolveValue(files))
-    field.emitFormChange()
-    field.emitFormInput()
+    const nextValue = resolveValue(files)
+
+    field.setFormValue(nextValue)
+    formProps.onValueChange?.(nextValue)
+    field.emit('change')
+    field.emit('input')
   }
 
   function handleFileReject(files: FileRejection[]): void {
@@ -528,8 +531,8 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
               field.disabled() && 'bg-muted/32',
               styleProps.classes?.base,
             )}
-            onFocus={() => field.emitFormFocus()}
-            onBlur={() => field.emitFormBlur()}
+            onFocus={() => field.emit('focus')}
+            onBlur={() => field.emit('blur')}
           >
             {renderBaseContent()}
           </KobalteFileField.Trigger>
@@ -548,8 +551,8 @@ export function FileUpload(props: FileUploadProps): JSX.Element {
             field.disabled() && 'bg-muted/32',
             styleProps.classes?.base,
           )}
-          onFocus={() => field.emitFormFocus()}
-          onBlur={() => field.emitFormBlur()}
+          onFocus={() => field.emit('focus')}
+          onBlur={() => field.emit('blur')}
           onDragOver={() => {
             if (!field.disabled()) {
               setDragging(true)

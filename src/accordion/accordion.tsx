@@ -115,13 +115,10 @@ export function Accordion(props: AccordionProps): JSX.Element {
               </KobalteAccordion.Trigger>
             </KobalteAccordion.Header>
 
-            <KobalteAccordion.Content
-              data-slot="content"
-              class="text-sm overflow-hidden data-closed:animate-accordion-up data-expanded:animate-accordion-down"
-            >
+            <KobalteAccordion.Content class="text-sm overflow-hidden data-closed:animate-accordion-up data-expanded:animate-accordion-down">
               <Show when={item.content}>
                 <div
-                  data-slot="content-inner"
+                  data-slot="content"
                   class={cn(
                     'h-$kb-collapsible-content-height pb-2.5 [&_a]:(underline underline-offset-3 hover:text-foreground) [&_p:not(:last-child)]:mb-4',
                     renderProps.classes?.content,

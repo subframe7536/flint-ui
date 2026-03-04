@@ -12,10 +12,11 @@ import {
 import { Dynamic } from 'solid-js/web'
 
 import { useFormContext } from '../form/form-context'
+import { pathStartsWith, pathToKey, toFieldPath } from '../form/form-path'
 import type { SlotClasses } from '../shared/slot-class'
 import { cn, useId } from '../shared/utils'
 
-import type { FormFieldInjectedOptions } from './form-field-context'
+import type { FormFieldContextOptions } from './form-field-context'
 import { FormFieldProvider } from './form-field-context'
 import type { FormFieldVariantProps } from './form-field.class'
 import {
@@ -44,8 +45,7 @@ export interface FormFieldRenderProps {
 export interface FormFieldBaseProps extends FormFieldVariantProps {
   as?: ValidComponent
   id?: string
-  name?: string
-  errorPattern?: RegExp
+  name?: string | string[]
   label?: JSX.Element
   description?: JSX.Element
   help?: JSX.Element
@@ -59,12 +59,6 @@ export interface FormFieldBaseProps extends FormFieldVariantProps {
 }
 
 export type FormFieldProps = FormFieldBaseProps
-
-interface RegisteredControl {
-  id: () => string
-  bind: () => boolean
-  key: symbol
-}
 
 export function FormField(props: FormFieldProps): JSX.Element {
   const merged = mergeProps(
@@ -80,16 +74,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
 
   const [fieldProps, contentProps, styleProps, restProps] = splitProps(
     merged as FormFieldProps,
-    [
-      'as',
-      'id',
-      'name',
-      'errorPattern',
-      'error',
-      'required',
-      'eagerValidation',
-      'validateOnInputDelay',
-    ],
+    ['as', 'id', 'name', 'error', 'required', 'eagerValidation', 'validateOnInputDelay'],
     ['label', 'description', 'hint', 'help', 'children'],
     ['orientation', 'size', 'classes'],
   )
@@ -97,18 +82,16 @@ export function FormField(props: FormFieldProps): JSX.Element {
   const formContext = useFormContext()
 
   const ariaId = useId(() => fieldProps.id, 'form-field')
-  const [registeredControls, setRegisteredControls] = createSignal<RegisteredControl[]>([])
+  const [registeredControls, setRegisteredControls] = createSignal<
+    { id: () => string; bind: () => boolean; key: symbol }[]
+  >([])
 
-  const registerControl: NonNullable<FormFieldInjectedOptions['registerControl']> = (entry) => {
+  const fieldPath = createMemo(() => toFieldPath(fieldProps.name))
+
+  const registerControl: NonNullable<FormFieldContextOptions['registerControl']> = (entry) => {
     const key = Symbol('form-field-control')
 
-    setRegisteredControls((previous) => [
-      ...previous,
-      {
-        ...entry,
-        key,
-      },
-    ])
+    setRegisteredControls((previous) => [...previous, { ...entry, key }])
 
     return () => {
       setRegisteredControls((previous) => previous.filter((control) => control.key !== key))
@@ -148,44 +131,57 @@ export function FormField(props: FormFieldProps): JSX.Element {
       return fieldProps.error
     }
 
-    if (!fieldProps.name || !formContext) {
+    if (!formContext) {
+      return undefined
+    }
+
+    const fp = fieldPath()
+    if (!fp) {
       return undefined
     }
 
     const error = formContext.errors.find((fieldError) => {
-      if (fieldError.name === fieldProps.name) {
-        return true
+      const errorPath = toFieldPath(fieldError.name)
+      if (!errorPath) {
+        return false
       }
 
-      return Boolean(fieldProps.errorPattern?.test(fieldError.name ?? ''))
+      return pathStartsWith(errorPath, fp)
     })
 
     return error?.message
   })
 
   createEffect(() => {
-    const name = fieldProps.name
+    const fp = fieldPath()
 
-    if (!formContext || !name) {
+    if (!formContext || !fp) {
       return
     }
 
-    formContext.registerInput(name, {
+    formContext.registerInput(fp, {
       id: resolvedLabelTargetId(),
-      pattern: fieldProps.errorPattern,
     })
 
     onCleanup(() => {
-      formContext.unregisterInput(name)
+      formContext.unregisterInput(fp)
     })
   })
 
-  const fieldContextValue: FormFieldInjectedOptions = {
+  const nameKey = createMemo(() => {
+    const fp = fieldPath()
+    return fp ? pathToKey(fp) : undefined
+  })
+
+  const fieldContextValue: FormFieldContextOptions = {
     get error() {
       return resolvedError()
     },
     get name() {
-      return fieldProps.name
+      return nameKey()
+    },
+    get path() {
+      return fieldPath()
     },
     get size() {
       return styleProps.size
@@ -195,9 +191,6 @@ export function FormField(props: FormFieldProps): JSX.Element {
     },
     get validateOnInputDelay() {
       return fieldProps.validateOnInputDelay
-    },
-    get errorPattern() {
-      return fieldProps.errorPattern
     },
     get hint() {
       return contentProps.hint
@@ -216,6 +209,20 @@ export function FormField(props: FormFieldProps): JSX.Element {
     },
     registerControl,
   }
+
+  const shouldShowError = createMemo(() => {
+    const value = resolvedError()
+
+    if (value === undefined || value === null || value === false || value === true) {
+      return false
+    }
+
+    if (typeof value === 'string') {
+      return value.length > 0
+    }
+
+    return true
+  })
 
   function NormalizedChildren(): JSX.Element {
     const resolvedChildren = children(() => {
@@ -236,20 +243,6 @@ export function FormField(props: FormFieldProps): JSX.Element {
 
     return <>{resolvedChildren()}</>
   }
-
-  const shouldShowError = createMemo(() => {
-    const value = resolvedError()
-
-    if (value === undefined || value === null || value === false || value === true) {
-      return false
-    }
-
-    if (typeof value === 'string') {
-      return value.length > 0
-    }
-
-    return true
-  })
 
   return (
     <FormFieldProvider value={fieldContextValue}>

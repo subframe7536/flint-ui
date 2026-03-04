@@ -155,9 +155,10 @@ export function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
       setUncontrolledValue(nextValues)
     }
 
+    field.setFormValue(nextValues)
     formProps.onChange?.(nextValues)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   return (

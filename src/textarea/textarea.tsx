@@ -127,8 +127,9 @@ export function Textarea(props: TextareaProps): JSX.Element {
   function updateInputValue(value: string | null | undefined): void {
     const nextValue = applyInputModifiers<TextareaChangeValue>(value, formProps.modelModifiers)
 
+    field.setFormValue(nextValue)
     formProps.onValueChange?.(nextValue)
-    field.emitFormInput()
+    field.emit('input')
   }
 
   function autoResize(): void {
@@ -180,17 +181,17 @@ export function Textarea(props: TextareaProps): JSX.Element {
       event.currentTarget.value = value.trim()
     }
 
-    field.emitFormChange()
+    field.emit('change')
     callHandler(event, formProps.onChange as JSX.EventHandlerUnion<HTMLTextAreaElement, Event>)
   }
 
   const onBlur: JSX.FocusEventHandlerUnion<HTMLTextAreaElement, FocusEvent> = (event) => {
-    field.emitFormBlur()
+    field.emit('blur')
     callHandler(event, formProps.onBlur as any)
   }
 
   const onFocus: JSX.FocusEventHandlerUnion<HTMLTextAreaElement, FocusEvent> = (event) => {
-    field.emitFormFocus()
+    field.emit('focus')
     callHandler(event, formProps.onFocus as any)
   }
 
@@ -234,6 +235,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
   return (
     <div
       data-slot="root"
+      data-invalid={field.invalid() ? '' : undefined}
       class={textareaRootVariants(
         {
           size: field.size(),

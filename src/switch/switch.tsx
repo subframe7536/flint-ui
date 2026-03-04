@@ -77,9 +77,10 @@ export function Switch(props: SwitchProps): JSX.Element {
   )
 
   function onChange(nextChecked: boolean): void {
+    field.setFormValue(nextChecked)
     formProps.onChange?.(nextChecked)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   return (

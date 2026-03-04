@@ -174,8 +174,9 @@ export function Input(props: InputProps): JSX.Element {
       number: baseProps.type === 'number',
     })
 
+    field.setFormValue(nextValue)
     formProps.onValueChange?.(nextValue)
-    field.emitFormInput()
+    field.emit('input')
   }
 
   const onInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (event) => {
@@ -197,17 +198,17 @@ export function Input(props: InputProps): JSX.Element {
       event.currentTarget.value = value.trim()
     }
 
-    field.emitFormChange()
+    field.emit('change')
     callHandler(event, formProps.onChange as JSX.EventHandlerUnion<HTMLInputElement, Event>)
   }
 
   const onBlur: JSX.FocusEventHandlerUnion<HTMLInputElement, FocusEvent> = (event) => {
-    field.emitFormBlur()
+    field.emit('blur')
     callHandler(event, formProps.onBlur as any)
   }
 
   const onFocus: JSX.FocusEventHandlerUnion<HTMLInputElement, FocusEvent> = (event) => {
-    field.emitFormFocus()
+    field.emit('focus')
     callHandler(event, formProps.onFocus as any)
   }
 

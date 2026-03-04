@@ -21,13 +21,16 @@
 - [ ] bug: slider controlled demo does not trigger hover ring, all button hover should become pointer cursor
 - [ ] bug: after select menu selected, only `tab` twice can focus next trigger
 - [ ] bug: focus ring should be override when form item is invalid
+- [ ] bug: input should compatible to IME
+- [ ] bug: uncontrolled switch in demo not works
+- [ ] bug: form field standard schema demo, email input cannot cleanup when press backspace, text `a` - press backspace -> `undefined`
 
 # Future
 
 - [ ] adjust command palette text/padding size
 - [ ] adjust dropmenu transition
 - [ ] context menu trigger timing
-- [ ] polish and cleanup select control
+- [ ] polish and cleanup select control / input variants
+- [ ] polish theme, like ring color etc.
 - [ ] inline and drop kobalte
-- [ ] make cn / cva return undefined when no class
 - [ ] refine demo into doc?

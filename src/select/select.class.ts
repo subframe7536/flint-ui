@@ -3,13 +3,12 @@ import { cva } from 'cls-variant/cva'
 
 import {
   SURFACE_HIGHLIGHT_VARIANT,
-  SURFACE_INVALID_VARIANT,
   SURFACE_VARIANT_CLASSES,
   TEXT_SIZE_VARIANT,
 } from '../shared/cva-common.class'
 
 export const selectControlVariants = cva(
-  'flex w-full cursor-pointer items-center rounded-md border border-input bg-transparent text-foreground outline-none transition-[color,box-shadow] dark:bg-input/30 focus-within:effect-fv-border',
+  'flex w-full cursor-pointer items-center rounded-md border border-input bg-transparent text-foreground outline-none transition-[color,box-shadow] dark:bg-input/30 focus-within:effect-fv-border data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -28,7 +27,6 @@ export const selectControlVariants = cva(
       disabled: {
         true: 'effect-dis',
       },
-      invalid: SURFACE_INVALID_VARIANT,
     },
   },
 )

@@ -155,9 +155,10 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
   })
 
   function onChange(nextValue: string): void {
+    field.setFormValue(nextValue)
     formProps.onChange?.(nextValue)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   return (

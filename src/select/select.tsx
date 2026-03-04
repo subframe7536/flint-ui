@@ -595,9 +595,10 @@ export function Select(props: SelectProps): JSX.Element {
   function handleSingleChange(option: NormalizedOption | null): void {
     const nextValue = option ? (option.raw.value ?? option.value) : null
 
+    field.setFormValue(nextValue)
     formProps.onChange?.(nextValue as SelectValue | null)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   function handleMultipleChange(options: NormalizedOption[]): void {
@@ -605,9 +606,10 @@ export function Select(props: SelectProps): JSX.Element {
 
     const nextValue = options.map((o) => (o.raw.value ?? o.value) as SelectValue)
 
+    field.setFormValue(nextValue)
     formProps.onChange?.(nextValue)
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   // ---- Dismiss flag: prevents hasMatches flash during ESC/Tab close ----
@@ -780,9 +782,10 @@ export function Select(props: SelectProps): JSX.Element {
   // ---- Clear handler ----
   function handleClear(clearFn: () => void): void {
     clearFn()
+    field.setFormValue(isMultiple() ? [] : null)
     searchInteractionProps.onClear?.()
-    field.emitFormChange()
-    field.emitFormInput()
+    field.emit('change')
+    field.emit('input')
   }
 
   // ---- Scroll end handler (infinite scroll) ----
@@ -1034,8 +1037,8 @@ export function Select(props: SelectProps): JSX.Element {
 
           e.preventDefault()
         }}
-        onFocus={() => field.emitFormFocus()}
-        onBlur={() => field.emitFormBlur()}
+        onFocus={() => field.emit('focus')}
+        onBlur={() => field.emit('blur')}
       />
     )
 
@@ -1296,13 +1299,13 @@ export function Select(props: SelectProps): JSX.Element {
       <ContextBridge />
       <Combobox.Control<NormalizedOption>
         data-slot="base"
+        data-invalid={field.invalid() ? '' : undefined}
         class={selectControlVariants(
           {
             size: field.size(),
             variant: styleProps.variant,
             highlight: field.highlight(),
             disabled: field.disabled(),
-            invalid: field.invalid(),
           },
           styleProps.classes?.base,
         )}

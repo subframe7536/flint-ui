@@ -37,11 +37,11 @@ function FieldControl(props: {
         if (props.state) {
           props.state.value = event.currentTarget.value
         }
-        field.emitFormInput()
+        field.emit('input')
       }}
-      onChange={() => field.emitFormChange()}
-      onBlur={() => field.emitFormBlur()}
-      onFocus={() => field.emitFormFocus()}
+      onChange={() => field.emit('change')}
+      onBlur={() => field.emit('blur')}
+      onFocus={() => field.emit('focus')}
     />
   )
 }
@@ -259,5 +259,24 @@ describe('FormField', () => {
 
     const root = screen.container.querySelector('[data-slot="root"]')
     expect(root?.className).toContain('root-override')
+  })
+
+  test('supports array name prop', async () => {
+    const state = { user: { email: '' } }
+
+    const screen = render(() => (
+      <Form state={state} validate={() => [{ name: ['user', 'email'], message: 'Email required' }]}>
+        <FormField name={['user', 'email']} label="Email">
+          <FieldControl state={{ value: '' }} />
+        </FormField>
+      </Form>
+    ))
+
+    const form = screen.container.querySelector('form') as HTMLFormElement
+    await fireEvent.submit(form)
+
+    await waitFor(() => {
+      expect(screen.getByText('Email required')).not.toBeNull()
+    })
   })
 })

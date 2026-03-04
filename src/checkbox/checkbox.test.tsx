@@ -110,6 +110,42 @@ describe('Checkbox', () => {
     })
   })
 
+  test('updates form state for uncontrolled checkbox inside form', async () => {
+    const state = { agree: false }
+
+    const screen = render(() => (
+      <Form
+        state={state}
+        validateOn={['change']}
+        validateOnInputDelay={0}
+        validate={(currentState) => {
+          if (currentState?.agree) {
+            return []
+          }
+
+          return [{ name: 'agree', message: 'You must agree' }]
+        }}
+      >
+        <FormField name="agree" label="Agree">
+          <Checkbox />
+        </FormField>
+      </Form>
+    ))
+
+    await fireEvent.submit(screen.container.querySelector('form') as HTMLFormElement)
+    await waitFor(() => {
+      expect(screen.getByText('You must agree')).not.toBeNull()
+    })
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Agree' })
+    await fireEvent.click(checkbox)
+
+    await waitFor(() => {
+      expect(state.agree).toBe(true)
+      expect(screen.queryByText('You must agree')).toBeNull()
+    })
+  })
+
   test('applies card variant, end indicator and size classes', () => {
     const screen = render(() => (
       <Checkbox
