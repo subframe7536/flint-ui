@@ -23,21 +23,18 @@
 - [x] bug: focus ring should be override when form item is invalid
 - [x] bug: input should compatible to IME
 - [x] bug: form field standard schema demo, email input cannot cleanup when press backspace, text `a` - press backspace -> `undefined`
+- [x] tooltip variant
+- [ ] polish and cleanup select control / input / input number variants
+- [ ] bug: input composition event handle
+- [ ] adjust dropmenu transition
+- [ ] context menu trigger timing
 
 # Future
 
-- [ ] input composition event handle
-- [ ] input number style polish
 - [ ] invalid state should become `data-*` driven css instead of a variant in cva
 - [ ] refactor: overlay components should consider children as content, and provider optional trigger prop
 - [ ] custom true/false value in form elements
-- [ ] tooltip variant
-- [ ] adjust command palette text/padding size
-- [ ] adjust dropmenu transition
-- [ ] context menu trigger timing
-- [ ] polish and cleanup select control / input variants
 - [ ] polish theme, like ring color etc.
 - [ ] transform to tailwind class syntax, optional unocss transform to simplify
-- [ ] tooltip vs popover
 - [ ] inline and drop kobalte
 - [ ] refine demo into doc?

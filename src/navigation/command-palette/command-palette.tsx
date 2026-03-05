@@ -378,7 +378,10 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
               <Show when={option().prefix || option().itemLabel || option().suffix}>
                 <span
                   data-slot="itemLabel"
-                  class={cn('inline-flex gap-2 truncate items-baseline', merged.classes?.itemLabel)}
+                  class={cn(
+                    'inline-flex gap-2 truncate items-baseline text-sm',
+                    merged.classes?.itemLabel,
+                  )}
                 >
                   <Show when={option().prefix}>
                     <span
@@ -394,7 +397,10 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
                   <Show when={option().suffix}>
                     <span
                       data-slot="itemLabelSuffix"
-                      class={cn('text-muted-foreground shrink-0', merged.classes?.itemLabelSuffix)}
+                      class={cn(
+                        'text-muted-foreground shrink-0 text-xs',
+                        merged.classes?.itemLabelSuffix,
+                      )}
                     >
                       {option().suffix}
                     </span>

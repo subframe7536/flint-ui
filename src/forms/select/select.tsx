@@ -591,6 +591,10 @@ export function Select(props: SelectProps): JSX.Element {
   let isDismissing = false
   let isSearchComposing = false
   let skipNextCommittedSearchValue: string | null = null
+  let hasPendingSearchCompositionCommit = false
+  let shouldCancelSearchCompositionCommit = false
+  let pendingSearchCompositionCommitToken = 0
+  let valueBeforeSearchComposition = ''
 
   // ---- Input change handler ----
   function handleInputChange(inputValue: string): void {
@@ -981,6 +985,49 @@ export function Select(props: SelectProps): JSX.Element {
               openMenu()
             }
           }}
+          onCompositionStart={(event: CompositionEvent) => {
+            if (!isSearchable()) {
+              return
+            }
+
+            isSearchComposing = true
+            hasPendingSearchCompositionCommit = false
+            shouldCancelSearchCompositionCommit = false
+            valueBeforeSearchComposition = (event.currentTarget as HTMLInputElement).value
+          }}
+          onCompositionEnd={(event: CompositionEvent) => {
+            if (!isSearchable()) {
+              return
+            }
+
+            const finalValue = (event.currentTarget as HTMLInputElement).value
+            const commitToken = ++pendingSearchCompositionCommitToken
+
+            isSearchComposing = false
+            hasPendingSearchCompositionCommit = true
+
+            queueMicrotask(() => {
+              if (commitToken !== pendingSearchCompositionCommitToken) {
+                return
+              }
+
+              hasPendingSearchCompositionCommit = false
+
+              if (shouldCancelSearchCompositionCommit) {
+                shouldCancelSearchCompositionCommit = false
+                if (inputRef) {
+                  inputRef.value = valueBeforeSearchComposition
+                }
+                return
+              }
+
+              handleInputChange(finalValue)
+              skipNextCommittedSearchValue = finalValue
+              if (finalValue.trim() !== '') {
+                openMenu()
+              }
+            })
+          }}
           onClick={() => {
             if (searchInteractionProps.openOnClick === 'control') {
               // With triggerMode="manual", clicks don't auto-open.
@@ -1053,7 +1100,12 @@ export function Select(props: SelectProps): JSX.Element {
             e.preventDefault()
           }}
           onFocus={() => field.emit('focus')}
-          onBlur={() => field.emit('blur')}
+          onBlur={() => {
+            if (isSearchComposing || hasPendingSearchCompositionCommit) {
+              shouldCancelSearchCompositionCommit = true
+            }
+            field.emit('blur')
+          }}
         />
       )
     }

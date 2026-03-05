@@ -15,13 +15,8 @@ type TooltipSlots = 'content' | 'trigger' | 'text' | 'kbds' | 'kbd'
 export type TooltipClasses = SlotClasses<TooltipSlots>
 
 export interface TooltipBaseProps {
-  open?: boolean
-  defaultOpen?: boolean
-  onOpenChange?: (open: boolean) => void
   placement?: TooltipSide
-  openDelay?: number
-  closeDelay?: number
-  disabled?: boolean
+  invert?: boolean
   text?: JSX.Element
   kbds?: string[]
   classes?: TooltipClasses
@@ -37,10 +32,17 @@ export function Tooltip(props: TooltipProps): JSX.Element {
       placement: 'top' as const,
       openDelay: 0,
       closeDelay: 0,
+      invert: false,
     },
     props,
   ) as TooltipProps
-  const [contentProps, restProps] = splitProps(merged, ['text', 'kbds', 'classes', 'children'])
+  const [contentProps, restProps] = splitProps(merged, [
+    'text',
+    'kbds',
+    'invert',
+    'classes',
+    'children',
+  ])
 
   const isDisabled = () => Boolean(restProps.disabled)
 
@@ -59,7 +61,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
         <KobalteTooltip.Content
           data-slot="content"
           class={tooltipContentVariants(
-            { side: restProps.placement },
+            { side: restProps.placement, invert: contentProps.invert! },
             contentProps.classes?.content,
           )}
         >
@@ -70,12 +72,11 @@ export function Tooltip(props: TooltipProps): JSX.Element {
           </Show>
 
           <Kbd
-            data-slot="kbd"
-            variant="invert"
+            variant={contentProps.invert ? 'invert' : undefined}
             size="sm"
             value={contentProps.kbds}
             classes={{
-              root: ['ms-1', contentProps.classes?.kbds],
+              root: [contentProps.text && 'ms-1', contentProps.classes?.kbds],
               item: contentProps.classes?.kbd,
             }}
           />
