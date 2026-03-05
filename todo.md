@@ -27,10 +27,15 @@
 
 # Future
 
+- [ ] refactor: overlay components should consider children as content, and provider optional trigger prop
+- [ ] custom true/false value in form elements
+- [ ] tooltip variant
 - [ ] adjust command palette text/padding size
 - [ ] adjust dropmenu transition
 - [ ] context menu trigger timing
 - [ ] polish and cleanup select control / input variants
 - [ ] polish theme, like ring color etc.
+- [ ] transform to tailwind class syntax, optional unocss transform to simplify
+- [ ] tooltip vs popover
 - [ ] inline and drop kobalte
 - [ ] refine demo into doc?

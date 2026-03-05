@@ -143,13 +143,6 @@ export interface SelectBaseProps
   /** Called when the selection changes. */
   onChange?: (value: SelectValue | null | SelectValue[]) => void
 
-  /** Controlled open state of the dropdown. */
-  open?: boolean
-  /** Default open state. */
-  defaultOpen?: boolean
-  /** Called when the dropdown opens/closes. */
-  onOpenChange?: (isOpen: boolean) => void
-
   /** Enable search input. Defaults to `false`. */
   showSearch?: boolean
   /** Controlled search value. */
@@ -199,29 +192,6 @@ export interface SelectBaseProps
   /** Icon for the dropdown trigger. Default: 'icon-chevron-down'. */
   triggerIcon?: IconName
   closeIcon?: IconName
-
-  // ---- Kobalte passthrough props ----
-
-  /** Enable virtual scrolling for large option lists. */
-  virtualized?: boolean
-  /** Dropdown placement relative to trigger. */
-  placement?: 'top' | 'bottom' | 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end'
-  /** Distance (px) between dropdown and trigger. */
-  gutter?: number
-  /** Whether dropdown should match trigger width. */
-  sameWidth?: boolean
-  /** Allow dropdown to overlap the trigger when overflowing. */
-  overlap?: boolean
-  /** Make combobox modal for screen readers. */
-  modal?: boolean
-  /** Prevent body scroll when dropdown is open. */
-  preventScroll?: boolean
-  /** Auto-flip dropdown when it overflows viewport. */
-  flip?: boolean | string
-  /** Slide dropdown along trigger when overflowing. */
-  slide?: boolean
-  /** Force mount the dropdown portal (useful for animations). */
-  forceMount?: boolean
 
   /** Called when the user scrolls near the bottom of the listbox. Use for infinite loading. */
   onScrollEnd?: () => void
