@@ -8,6 +8,7 @@ const VARIANTS = ['outline', 'soft', 'subtle', 'ghost'] as const
 
 export const InputNumberDemos = () => {
   const [controlledValue, setControlledValue] = createSignal(10)
+  const [pressHoldValue, setPressHoldValue] = createSignal(12)
 
   return (
     <DemoPage
@@ -59,6 +60,30 @@ export const InputNumberDemos = () => {
             highlight
           />
           <p class="text-xs text-zinc-600">Current value: {controlledValue()}</p>
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Long press"
+        description="Press and hold increment or decrement to continuously step the value."
+      >
+        <div class="max-w-xs space-y-2">
+          <InputNumber
+            value={pressHoldValue()}
+            onRawValueChange={(v) => {
+              if (Number.isFinite(v)) {
+                setPressHoldValue(v)
+              }
+            }}
+            minValue={0}
+            maxValue={99}
+            step={1}
+            variant="soft"
+          />
+          <p class="text-xs text-zinc-600">
+            Hold <span class="font-medium">+</span> or <span class="font-medium">−</span> to repeat.
+            Current value: {pressHoldValue()}
+          </p>
         </div>
       </DemoSection>
 

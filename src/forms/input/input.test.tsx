@@ -362,6 +362,7 @@ describe('Input', () => {
 
     expect(root?.className).toContain('focus-within:effect-fv-border')
     expect(root?.className).toContain('effect-invalid')
+    expect(root?.className).toContain('focus-within:data-invalid:effect-invalid')
     expect(root?.className).toContain('root-override')
   })
 

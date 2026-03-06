@@ -19,7 +19,7 @@ import { FORM_ID_NAME_DISABLED_KEYS, FORM_INPUT_INTERACTION_KEYS } from '../form
 
 import type { InputVariantProps } from './input.class'
 import {
-  inputBaseVariants,
+  inputInputVariants,
   inputEndPaddingNoSlotVariants,
   inputEndPaddingWithSlotVariants,
   inputLeadingVariants,
@@ -289,8 +289,8 @@ export function Input(props: InputProps): JSX.Element {
         readOnly={formProps.readOnly}
         autocomplete={baseProps.autocomplete}
         maxLength={baseProps.maxLength}
-        data-slot="base"
-        class={inputBaseVariants(
+        data-slot="input"
+        class={inputInputVariants(
           {
             type: baseProps.type === 'file' ? 'file' : undefined,
           },

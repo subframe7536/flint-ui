@@ -20,7 +20,6 @@ import {
   textareaBaseVariants,
   textareaFooterVariants,
   textareaHeaderVariants,
-  textareaPaddingVariants,
   textareaRootVariants,
 } from './textarea.class'
 
@@ -295,9 +294,6 @@ export function Textarea(props: TextareaProps): JSX.Element {
             size: field.size(),
             autoresize: layoutProps.autoresize,
           },
-          textareaPaddingVariants({
-            size: field.size(),
-          }),
           styleProps.classes?.base,
         )}
         onInput={onInput}

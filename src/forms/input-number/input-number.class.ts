@@ -3,128 +3,113 @@ import { cva } from 'cls-variant/cva'
 
 import { SURFACE_HIGHLIGHT_VARIANT, SURFACE_VARIANT_CLASSES } from '../../shared/cva-common.class'
 
-export const inputNumberBaseVariants = cva(
-  'w-full rounded-md border border-input bg-transparent text-foreground outline-none transition-[color,box-shadow] dark:bg-input/30 placeholder:text-muted-foreground focus-visible:effect-fv-border aria-invalid:effect-invalid disabled:effect-dis',
+export const inputNumberRootVariants = cva(
+  'inline-flex w-full items-stretch overflow-hidden rounded-md border border-input bg-transparent transition-[color,box-shadow] dark:bg-input/30 focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
       variant: 'outline',
-      orientation: 'horizontal',
     },
     variants: {
       size: {
-        xs: 'h-7 px-2 text-xs',
-        sm: 'h-8 px-2.5 text-xs',
-        md: 'h-9 px-2.5 text-sm',
-        lg: 'h-10 px-3 text-sm',
-        xl: 'h-11 px-3 text-base',
+        xs: 'h-7',
+        sm: 'h-8',
+        md: 'h-9',
+        lg: 'h-10',
+        xl: 'h-11',
       },
       variant: SURFACE_VARIANT_CLASSES,
-      orientation: {
-        horizontal: 'text-center',
-        vertical: 'text-center',
-      },
       highlight: SURFACE_HIGHLIGHT_VARIANT,
+      disabled: {
+        true: 'effect-dis',
+      },
     },
   },
 )
 
-export const inputNumberPaddingVariants = cva('', {
-  defaultVariants: {
-    size: 'md',
-    orientation: 'horizontal',
-    increment: false,
-    decrement: false,
-  },
-  variants: {
-    size: {
-      xs: '',
-      sm: '',
-      md: '',
-      lg: '',
-      xl: '',
+export const inputNumberBaseVariants = cva(
+  'min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none disabled:bg-transparent',
+  {
+    defaultVariants: {
+      size: 'md',
+      align: 'center',
     },
-    orientation: {
-      horizontal: '',
-      vertical: '',
-    },
-    increment: {
-      true: '',
-      false: '',
-    },
-    decrement: {
-      true: '',
-      false: '',
+    variants: {
+      size: {
+        xs: 'px-2 text-xs',
+        sm: 'px-2.5 text-xs',
+        md: 'px-2.5 text-sm',
+        lg: 'px-3 text-sm',
+        xl: 'px-3 text-base',
+      },
+      align: {
+        center: 'text-center',
+        start: 'text-start',
+      },
     },
   },
-  compoundVariants: [
-    { orientation: 'horizontal', increment: true, size: 'xs', class: 'pe-7' },
-    { orientation: 'horizontal', increment: true, size: 'sm', class: 'pe-8' },
-    { orientation: 'horizontal', increment: true, size: 'md', class: 'pe-9' },
-    { orientation: 'horizontal', increment: true, size: 'lg', class: 'pe-10' },
-    { orientation: 'horizontal', increment: true, size: 'xl', class: 'pe-11' },
-    { orientation: 'horizontal', decrement: true, size: 'xs', class: 'ps-7' },
-    { orientation: 'horizontal', decrement: true, size: 'sm', class: 'ps-8' },
-    { orientation: 'horizontal', decrement: true, size: 'md', class: 'ps-9' },
-    { orientation: 'horizontal', decrement: true, size: 'lg', class: 'ps-10' },
-    { orientation: 'horizontal', decrement: true, size: 'xl', class: 'ps-11' },
-    { orientation: 'vertical', increment: true, size: 'xs', class: 'pe-7' },
-    { orientation: 'vertical', increment: true, size: 'sm', class: 'pe-8' },
-    { orientation: 'vertical', increment: true, size: 'md', class: 'pe-9' },
-    { orientation: 'vertical', increment: true, size: 'lg', class: 'pe-10' },
-    { orientation: 'vertical', increment: true, size: 'xl', class: 'pe-11' },
-    { orientation: 'vertical', decrement: true, size: 'xs', class: 'pe-7' },
-    { orientation: 'vertical', decrement: true, size: 'sm', class: 'pe-8' },
-    { orientation: 'vertical', decrement: true, size: 'md', class: 'pe-9' },
-    { orientation: 'vertical', decrement: true, size: 'lg', class: 'pe-10' },
-    { orientation: 'vertical', decrement: true, size: 'xl', class: 'pe-11' },
-  ],
-})
+)
+
+export type InputNumberOrientation = 'horizontal' | 'vertical'
+
+export function resolveInputNumberAlign(
+  orientation: InputNumberOrientation,
+  decrement: boolean,
+): 'center' | 'start' {
+  return orientation === 'horizontal' && !decrement ? 'start' : 'center'
+}
 
 export const inputNumberControlButtonVariants = cva('', {
   defaultVariants: {
+    control: 'increment',
+    divided: false,
     orientation: 'horizontal',
   },
   variants: {
+    control: {
+      increment: '',
+      decrement: '',
+    },
+    divided: {
+      true: 'border-t border-input',
+    },
     orientation: {
-      horizontal: '',
-      vertical: 'h-full min-h-0 w-full rounded-none px-0',
+      horizontal: 'h-full shrink-0 rounded-none border-0 shadow-none',
+      vertical: 'min-h-0 h-full w-full flex-1 rounded-none border-0 shadow-none px-0',
     },
   },
+  compoundVariants: [
+    {
+      control: 'increment',
+      orientation: 'horizontal',
+      class: 'border-s border-input',
+    },
+    {
+      control: 'decrement',
+      orientation: 'horizontal',
+      class: 'border-e border-input',
+    },
+  ],
 })
 
-export const inputNumberIncrementVariants = cva('absolute flex items-center justify-center', {
-  defaultVariants: {
-    orientation: 'horizontal',
-    disabled: false,
-  },
-  variants: {
-    orientation: {
-      horizontal: 'inset-y-0 end-0 pe-1',
-      vertical: 'top-0 end-0 h-1/2',
+export const inputNumberControlColumnVariants = cva(
+  'flex h-full shrink-0 flex-col border-s border-input',
+  {
+    defaultVariants: {
+      size: 'md',
     },
-    disabled: {
-      true: 'effect-dis',
+    variants: {
+      size: {
+        xs: 'w-7',
+        sm: 'w-8',
+        md: 'w-9',
+        lg: 'w-10',
+        xl: 'w-11',
+      },
     },
   },
-})
+)
 
-export const inputNumberDecrementVariants = cva('absolute flex items-center justify-center', {
-  defaultVariants: {
-    orientation: 'horizontal',
-    disabled: false,
-  },
-  variants: {
-    orientation: {
-      horizontal: 'inset-y-0 start-0 ps-1',
-      vertical: 'bottom-0 end-0 h-1/2',
-    },
-    disabled: {
-      true: 'effect-dis',
-    },
-  },
-})
-
-export type InputNumberVariantProps = VariantProps<typeof inputNumberBaseVariants> &
-  VariantProps<typeof inputNumberIncrementVariants> &
-  VariantProps<typeof inputNumberDecrementVariants>
+export type InputNumberVariantProps = VariantProps<typeof inputNumberRootVariants> &
+  VariantProps<typeof inputNumberBaseVariants> &
+  VariantProps<typeof inputNumberControlButtonVariants>

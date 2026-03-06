@@ -1,39 +1,46 @@
 import * as KobalteNumberField from '@kobalte/core/number-field'
 import type { JSX } from 'solid-js'
-import { createMemo, mergeProps, onMount, Show, splitProps } from 'solid-js'
+import { createMemo, mergeProps, onCleanup, onMount, Show, splitProps } from 'solid-js'
 
 import { Button } from '../../elements/button'
 import type { ButtonProps } from '../../elements/button/button'
 import type { IconName } from '../../elements/icon'
 import { Icon } from '../../elements/icon'
 import type { SlotClasses } from '../../shared/slot-class'
-import { callHandler, cn, useId } from '../../shared/utils'
+import { callHandler, useId } from '../../shared/utils'
 import { useFormField } from '../form-field/form-field-context'
 import type { FormDisableOption, FormIdentityOptions } from '../form-field/form-options'
 import { FORM_ID_NAME_DISABLED_KEYS, FORM_INPUT_INTERACTION_KEYS } from '../form-field/form-options'
 
-import type { InputNumberVariantProps } from './input-number.class'
+import type { InputNumberOrientation, InputNumberVariantProps } from './input-number.class'
 import {
   inputNumberBaseVariants,
   inputNumberControlButtonVariants,
-  inputNumberDecrementVariants,
-  inputNumberIncrementVariants,
-  inputNumberPaddingVariants,
+  inputNumberControlColumnVariants,
+  inputNumberRootVariants,
+  resolveInputNumberAlign,
 } from './input-number.class'
 
 type InputNumberControlButtonProps = Partial<
   Omit<ButtonProps<'button'>, 'children' | 'label' | 'onClick' | 'type'>
->
+> & {
+  'data-slot'?: 'increment' | 'decrement'
+  onClickCapture?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>
+}
 
 type InputNumberSlots = 'root' | 'base' | 'increment' | 'decrement'
+
+const INPUT_NUMBER_HOLD_REPEAT_DELAY = 400
+const INPUT_NUMBER_HOLD_REPEAT_INTERVAL = 60
 
 export type InputNumberClasses = SlotClasses<InputNumberSlots>
 
 export interface InputNumberBaseProps
   extends
-    Pick<InputNumberVariantProps, 'size' | 'variant' | 'highlight' | 'orientation'>,
+    Pick<InputNumberVariantProps, 'size' | 'variant' | 'highlight'>,
     FormIdentityOptions,
     FormDisableOption {
+  orientation?: InputNumberOrientation
   placeholder?: string
   increment?: boolean | InputNumberControlButtonProps
   incrementIcon?: IconName
@@ -98,17 +105,27 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
   )
 
   let inputEl: HTMLInputElement | undefined
+  let activeRepeatButton: HTMLButtonElement | undefined
+  let holdRepeatTimeoutId: ReturnType<typeof setTimeout> | undefined
+  let holdRepeatIntervalId: ReturnType<typeof setInterval> | undefined
+  let clearSuppressTrustedClickTimeoutId: ReturnType<typeof setTimeout> | undefined
+  let suppressTrustedClick = false
+  let repeatedDuringPress = false
 
   const resolvedIncrement = createMemo(() => Boolean(controlProps.increment))
 
   const resolvedDecrement = createMemo(() => Boolean(controlProps.decrement))
+
+  const resolvedOrientation = createMemo<InputNumberOrientation>(
+    () => controlProps.orientation ?? 'horizontal',
+  )
 
   const incrementIcon = createMemo<IconName>(() => {
     if (controlProps.incrementIcon) {
       return controlProps.incrementIcon
     }
 
-    return controlProps.orientation === 'vertical' ? 'icon-chevron-up' : 'icon-plus'
+    return resolvedOrientation() === 'vertical' ? 'icon-chevron-up' : 'icon-plus'
   })
 
   const decrementIcon = createMemo<IconName>(() => {
@@ -116,16 +133,182 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       return controlProps.decrementIcon
     }
 
-    return controlProps.orientation === 'vertical' ? 'icon-chevron-down' : 'icon-minus'
+    return resolvedOrientation() === 'vertical' ? 'icon-chevron-down' : 'icon-minus'
   })
 
-  const incrementProps = createMemo<InputNumberControlButtonProps | undefined>(() => {
-    return typeof controlProps.increment === 'object' ? controlProps.increment : undefined
+  const isVertical = createMemo(() => resolvedOrientation() === 'vertical')
+
+  function clearHoldRepeatTimers(): void {
+    if (holdRepeatTimeoutId) {
+      clearTimeout(holdRepeatTimeoutId)
+      holdRepeatTimeoutId = undefined
+    }
+
+    if (holdRepeatIntervalId) {
+      clearInterval(holdRepeatIntervalId)
+      holdRepeatIntervalId = undefined
+    }
+  }
+
+  function clearSuppressTrustedClickTimeout(): void {
+    if (clearSuppressTrustedClickTimeoutId) {
+      clearTimeout(clearSuppressTrustedClickTimeoutId)
+      clearSuppressTrustedClickTimeoutId = undefined
+    }
+  }
+
+  function clickActiveRepeatButton(): void {
+    if (!activeRepeatButton || activeRepeatButton.disabled || !activeRepeatButton.isConnected) {
+      stopHoldRepeat()
+      return
+    }
+
+    repeatedDuringPress = true
+    activeRepeatButton.click()
+  }
+
+  function startHoldRepeat(button: HTMLButtonElement): void {
+    if (button.disabled) {
+      return
+    }
+
+    clearSuppressTrustedClickTimeout()
+    suppressTrustedClick = false
+    stopHoldRepeat()
+
+    activeRepeatButton = button
+    repeatedDuringPress = false
+    holdRepeatTimeoutId = setTimeout(() => {
+      clickActiveRepeatButton()
+      holdRepeatIntervalId = setInterval(clickActiveRepeatButton, INPUT_NUMBER_HOLD_REPEAT_INTERVAL)
+    }, INPUT_NUMBER_HOLD_REPEAT_DELAY)
+  }
+
+  function stopHoldRepeat(): void {
+    const shouldSuppressTrustedClick = repeatedDuringPress
+
+    clearHoldRepeatTimers()
+    activeRepeatButton = undefined
+    repeatedDuringPress = false
+
+    if (!shouldSuppressTrustedClick) {
+      return
+    }
+
+    suppressTrustedClick = true
+    clearSuppressTrustedClickTimeout()
+    clearSuppressTrustedClickTimeoutId = setTimeout(() => {
+      suppressTrustedClick = false
+      clearSuppressTrustedClickTimeoutId = undefined
+    }, 0)
+  }
+
+  function onControlPointerDown(
+    event: PointerEvent,
+    handler: JSX.EventHandlerUnion<HTMLButtonElement, PointerEvent> | undefined,
+  ): void {
+    const { defaultPrevented } = callHandler(event, handler)
+
+    if (defaultPrevented || (event.pointerType === 'mouse' && event.button !== 0)) {
+      return
+    }
+
+    startHoldRepeat(event.currentTarget as HTMLButtonElement)
+  }
+
+  function onControlPointerStop(
+    event: PointerEvent,
+    handler: JSX.EventHandlerUnion<HTMLButtonElement, PointerEvent> | undefined,
+  ): void {
+    callHandler(event, handler)
+    stopHoldRepeat()
+  }
+
+  function onControlClickCapture(
+    event: MouseEvent,
+    handler: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> | undefined,
+  ): void {
+    callHandler(event, handler)
+
+    if (!suppressTrustedClick || !event.isTrusted) {
+      return
+    }
+
+    suppressTrustedClick = false
+    clearSuppressTrustedClickTimeout()
+    event.preventDefault()
+    event.stopPropagation()
+    event.stopImmediatePropagation()
+  }
+
+  onCleanup(() => {
+    clearHoldRepeatTimers()
+    clearSuppressTrustedClickTimeout()
   })
 
-  const decrementProps = createMemo<InputNumberControlButtonProps | undefined>(() => {
-    return typeof controlProps.decrement === 'object' ? controlProps.decrement : undefined
-  })
+  function resolveControlProps(
+    isIncrement: boolean,
+    userProps: InputNumberControlButtonProps | undefined,
+  ): InputNumberControlButtonProps {
+    const resolvedClasses = userProps?.classes
+    const slot = isIncrement ? 'increment' : 'decrement'
+
+    return {
+      'data-slot': slot,
+      disabled:
+        field.disabled() ||
+        (isIncrement ? controlProps.incrementDisabled : controlProps.decrementDisabled),
+      variant: 'ghost',
+      size: `icon-${field.size()}`,
+      'aria-label': isIncrement ? 'Increment' : 'Decrement',
+      leading: <Icon name={isIncrement ? incrementIcon() : decrementIcon()} />,
+      ...userProps,
+      onPointerDown: (event: PointerEvent) => onControlPointerDown(event, userProps?.onPointerDown),
+      onPointerUp: (event: PointerEvent) => onControlPointerStop(event, userProps?.onPointerUp),
+      onPointerLeave: (event: PointerEvent) =>
+        onControlPointerStop(event, userProps?.onPointerLeave),
+      onPointerCancel: (event: PointerEvent) =>
+        onControlPointerStop(event, userProps?.onPointerCancel),
+      onClickCapture: (event: MouseEvent) =>
+        onControlClickCapture(event, userProps?.onClickCapture),
+      classes: {
+        ...resolvedClasses,
+        base: inputNumberControlButtonVariants(
+          {
+            control: slot,
+            divided: !isIncrement && isVertical() && resolvedIncrement(),
+            orientation: resolvedOrientation(),
+          },
+          isIncrement ? styleProps.classes?.increment : styleProps.classes?.decrement,
+          resolvedClasses?.base,
+        ),
+      },
+    }
+  }
+
+  function IncrementControl(): JSX.Element {
+    return (
+      <KobalteNumberField.IncrementTrigger
+        as={Button}
+        {...resolveControlProps(
+          true,
+          typeof controlProps.increment === 'object' ? controlProps.increment : undefined,
+        )}
+      />
+    )
+  }
+
+  function DecrementControl(): JSX.Element {
+    return (
+      <KobalteNumberField.DecrementTrigger
+        as={Button}
+        {...resolveControlProps(
+          false,
+          typeof controlProps.decrement === 'object' ? controlProps.decrement : undefined,
+        )}
+      />
+    )
+  }
 
   function onRawValueChange(value: number): void {
     field.setFormValue(value)
@@ -161,9 +344,22 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       disabled={field.disabled()}
       onRawValueChange={onRawValueChange}
       data-slot="root"
-      class={cn('relative inline-flex w-full items-center', styleProps.classes?.root)}
+      data-invalid={field.invalid() ? '' : undefined}
+      class={inputNumberRootVariants(
+        {
+          size: field.size(),
+          variant: styleProps.variant,
+          highlight: field.highlight(),
+          disabled: field.disabled(),
+        },
+        styleProps.classes?.root,
+      )}
       {...restProps}
     >
+      <Show when={!isVertical() && resolvedDecrement()}>
+        <DecrementControl />
+      </Show>
+
       <KobalteNumberField.Input
         id={field.id()}
         ref={(e) => (inputEl = e)}
@@ -172,17 +368,8 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
         class={inputNumberBaseVariants(
           {
             size: field.size(),
-            variant: styleProps.variant,
-            highlight: field.highlight(),
-            orientation: controlProps.orientation,
+            align: resolveInputNumberAlign(resolvedOrientation(), resolvedDecrement()),
           },
-          inputNumberPaddingVariants({
-            size: field.size(),
-            orientation: controlProps.orientation,
-            increment: resolvedIncrement(),
-            decrement: resolvedDecrement(),
-          }),
-          controlProps.orientation === 'horizontal' && !resolvedDecrement() && 'text-start',
           styleProps.classes?.base,
         )}
         onBlur={onBlur}
@@ -192,64 +379,19 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
 
       <KobalteNumberField.HiddenInput />
 
-      <Show when={resolvedIncrement()}>
-        <div
-          data-slot="increment"
-          class={inputNumberIncrementVariants(
-            {
-              orientation: controlProps.orientation,
-              disabled: field.disabled() || controlProps.incrementDisabled,
-            },
-            styleProps.classes?.increment,
-          )}
-        >
-          <KobalteNumberField.IncrementTrigger
-            as={Button}
-            disabled={field.disabled() || controlProps.incrementDisabled}
-            variant="ghost"
-            size={`icon-${field.size()}`}
-            aria-label="Increment"
-            leading={<Icon name={incrementIcon()} />}
-            {...incrementProps()}
-            classes={{
-              ...incrementProps()?.classes,
-              base: cn(
-                incrementProps()?.classes?.base,
-                inputNumberControlButtonVariants({ orientation: controlProps.orientation }),
-              ),
-            }}
-          />
+      <Show when={isVertical() && (resolvedIncrement() || resolvedDecrement())}>
+        <div data-slot="controls" class={inputNumberControlColumnVariants({ size: field.size() })}>
+          <Show when={resolvedIncrement()}>
+            <IncrementControl />
+          </Show>
+          <Show when={resolvedDecrement()}>
+            <DecrementControl />
+          </Show>
         </div>
       </Show>
 
-      <Show when={resolvedDecrement()}>
-        <div
-          data-slot="decrement"
-          class={inputNumberDecrementVariants(
-            {
-              orientation: controlProps.orientation,
-              disabled: field.disabled() || controlProps.decrementDisabled,
-            },
-            styleProps.classes?.decrement,
-          )}
-        >
-          <KobalteNumberField.DecrementTrigger
-            as={Button}
-            disabled={field.disabled() || controlProps.decrementDisabled}
-            variant="ghost"
-            size={`icon-${field.size()}`}
-            aria-label="Decrement"
-            leading={<Icon name={decrementIcon()} />}
-            {...decrementProps()}
-            classes={{
-              ...decrementProps()?.classes,
-              base: cn(
-                decrementProps()?.classes?.base,
-                inputNumberControlButtonVariants({ orientation: controlProps.orientation }),
-              ),
-            }}
-          />
-        </div>
+      <Show when={!isVertical() && resolvedIncrement()}>
+        <IncrementControl />
       </Show>
     </KobalteNumberField.Root>
   )

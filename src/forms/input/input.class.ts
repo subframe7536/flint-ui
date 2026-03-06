@@ -4,7 +4,7 @@ import { cva } from 'cls-variant/cva'
 import { SURFACE_HIGHLIGHT_VARIANT, SURFACE_VARIANT_CLASSES } from '../../shared/cva-common.class'
 
 export const inputRootVariants = cva(
-  'inline-flex w-full items-center overflow-hidden rounded-md border border-input bg-transparent transition dark:bg-input/30 focus-within:effect-fv-border data-invalid:effect-invalid',
+  'inline-flex w-full items-center overflow-hidden rounded-md border border-input bg-transparent transition-[color,box-shadow] dark:bg-input/30 focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -27,7 +27,7 @@ export const inputRootVariants = cva(
   },
 )
 
-export const inputBaseVariants = cva(
+export const inputInputVariants = cva(
   'flex-1 min-w-0 h-full bg-transparent text-foreground outline-none placeholder:text-muted-foreground disabled:effect-dis',
   {
     variants: {
@@ -38,7 +38,7 @@ export const inputBaseVariants = cva(
   },
 )
 
-export const inputStartPaddingNoSlotVariants = cva('ps-3.5', {
+export const inputStartPaddingNoSlotVariants = cva('', {
   defaultVariants: {
     size: 'md',
   },
@@ -53,7 +53,7 @@ export const inputStartPaddingNoSlotVariants = cva('ps-3.5', {
   },
 })
 
-export const inputStartPaddingWithSlotVariants = cva('ps-2', {
+export const inputStartPaddingWithSlotVariants = cva('', {
   defaultVariants: {
     size: 'md',
   },
@@ -68,7 +68,7 @@ export const inputStartPaddingWithSlotVariants = cva('ps-2', {
   },
 })
 
-export const inputEndPaddingNoSlotVariants = cva('pe-3.5', {
+export const inputEndPaddingNoSlotVariants = cva('', {
   defaultVariants: {
     size: 'md',
   },
@@ -83,7 +83,7 @@ export const inputEndPaddingNoSlotVariants = cva('pe-3.5', {
   },
 })
 
-export const inputEndPaddingWithSlotVariants = cva('pe-2', {
+export const inputEndPaddingWithSlotVariants = cva('', {
   defaultVariants: {
     size: 'md',
   },
@@ -129,7 +129,7 @@ export const inputTrailingVariants = cva('flex items-center shrink-0 text-muted-
 })
 
 export type InputVariantProps = VariantProps<typeof inputRootVariants> &
-  VariantProps<typeof inputBaseVariants> &
+  VariantProps<typeof inputInputVariants> &
   VariantProps<typeof inputStartPaddingNoSlotVariants> &
   VariantProps<typeof inputStartPaddingWithSlotVariants> &
   VariantProps<typeof inputEndPaddingNoSlotVariants> &

@@ -8,7 +8,7 @@ import {
 } from '../../shared/cva-common.class'
 
 export const textareaRootVariants = cva(
-  'inline-flex w-full flex-col overflow-hidden rounded-md border border-input bg-transparent transition-[color,box-shadow] dark:bg-input/30 focus-within:effect-fv-border data-invalid:effect-invalid',
+  'inline-flex w-full flex-col overflow-hidden rounded-md border border-input bg-transparent transition-[color,box-shadow] dark:bg-input/30 focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -34,11 +34,11 @@ export const textareaBaseVariants = cva(
     },
     variants: {
       size: {
-        xs: 'min-h-17 py-1',
-        sm: 'min-h-18 py-1.5',
-        md: 'min-h-20 py-1.5',
-        lg: 'min-h-22 py-2',
-        xl: 'min-h-24 py-2',
+        xs: 'min-h-17 py-1 px-2',
+        sm: 'min-h-18 py-1.5 px-2.5',
+        md: 'min-h-20 py-1.5 px-2.5',
+        lg: 'min-h-22 py-2 px-3',
+        xl: 'min-h-24 py-2 px-3',
       },
       autoresize: {
         true: 'resize-none',
@@ -47,21 +47,6 @@ export const textareaBaseVariants = cva(
     },
   },
 )
-
-export const textareaPaddingVariants = cva('ps-2.5 pe-2.5', {
-  defaultVariants: {
-    size: 'md',
-  },
-  variants: {
-    size: {
-      xs: 'ps-2 pe-2',
-      sm: 'ps-2.5 pe-2.5',
-      md: 'ps-2.5 pe-2.5',
-      lg: 'ps-3 pe-3',
-      xl: 'ps-3 pe-3',
-    },
-  },
-})
 
 export const textareaHeaderVariants = cva(
   'flex w-full items-center gap-2 text-muted-foreground font-medium',
@@ -101,6 +86,5 @@ export const textareaFooterVariants = cva(
 
 export type TextareaVariantProps = VariantProps<typeof textareaRootVariants> &
   VariantProps<typeof textareaBaseVariants> &
-  VariantProps<typeof textareaPaddingVariants> &
   VariantProps<typeof textareaHeaderVariants> &
   VariantProps<typeof textareaFooterVariants>

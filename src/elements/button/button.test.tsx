@@ -66,7 +66,7 @@ describe('Button', () => {
 
     const button = screen.getByRole('button', { name: 'Delete' })
     expect(button.className).toContain('bg-destructive')
-    expect(button.className).toContain('h-8')
+    expect(button.className).toContain('h-7')
   })
 
   test('renders leading and trailing icon slots for xs size', () => {
