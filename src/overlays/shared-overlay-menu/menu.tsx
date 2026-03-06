@@ -182,7 +182,7 @@ export function OverlayMenuBaseContent<
               <GroupLabel
                 data-slot="label"
                 class={cn(
-                  'px-1.5 py-1 font-medium text-muted-foreground text-xs',
+                  'inline-flex px-1.5 py-1 font-medium text-muted-foreground text-xs',
                   props.classes?.label,
                 )}
               >

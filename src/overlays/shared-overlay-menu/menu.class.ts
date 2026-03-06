@@ -25,17 +25,19 @@ export const overlayMenuItemVariants = cva(
 export type OverlayMenuItemVariantProps = VariantProps<typeof overlayMenuItemVariants>
 
 export const overlayMenuContentVariants = cva(
-  'z-50 origin-$kb-popper-content-transform-origin bg-popover text-popover-foreground outline-none flex flex-col min-w-32 rounded-lg p-1 shadow-lg ring-1 ring-foreground/10 data-expanded:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) duration-150',
+  'z-50 origin-$kb-popper-content-transform-origin bg-popover text-popover-foreground outline-none flex flex-col min-w-32 rounded-lg p-1 shadow-lg ring-1 ring-foreground/10 data-expanded:(animate-in fade-in-0 zoom-in-90) data-closed:(animate-out fade-out-0 zoom-out-90)',
   {
     defaultVariants: {
       side: 'right',
     },
     variants: {
       side: {
-        top: 'mb-$kb-popper-content-overflow-padding data-expanded:slide-in-from-b-2',
-        right: 'ml-$kb-popper-content-overflow-padding data-expanded:slide-in-from-l-2',
-        bottom: 'mt-$kb-popper-content-overflow-padding data-expanded:slide-in-from-t-2',
-        left: 'mr-$kb-popper-content-overflow-padding data-expanded:slide-in-from-r-2',
+        top: 'mb-$kb-popper-content-overflow-padding data-expanded:slide-in-from-bottom-2 data-closed:slide-out-to-bottom-2',
+        right:
+          'ml-$kb-popper-content-overflow-padding data-expanded:slide-in-from-left-2 data-closed:slide-out-to-left-2',
+        bottom:
+          'mt-$kb-popper-content-overflow-padding data-expanded:slide-in-from-top-2 data-closed:slide-out-to-top-2',
+        left: 'mr-$kb-popper-content-overflow-padding data-expanded:slide-in-from-right-2 data-closed:slide-out-to-right-2',
       },
     },
   },

@@ -50,7 +50,7 @@ describe('DropdownMenu', () => {
     expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
   })
 
-  test('uses downward animation classes for default bottom placement', async () => {
+  test('uses shared bottom-side transition classes for default placement', async () => {
     render(() => (
       <DropdownMenu defaultOpen items={[{ label: 'Default animation item' }]}>
         <button type="button">Actions</button>
@@ -64,8 +64,10 @@ describe('DropdownMenu', () => {
     const rootContent = document.body.querySelector('[data-slot="content"]') as HTMLElement
 
     expect(rootContent.className).toContain('mt-$kb-popper-content-overflow-padding')
-    expect(rootContent.className).toContain('data-expanded:slide-in-from-t-2')
-    expect(rootContent.className).not.toContain('data-expanded:slide-in-from-b-2')
+    expect(rootContent.className).toContain('data-expanded:slide-in-from-top-2')
+    expect(rootContent.className).toContain('data-closed:slide-out-to-top-2')
+    expect(rootContent.className).not.toContain('data-expanded:slide-in-from-bottom-2')
+    expect(rootContent.className).not.toContain('data-closed:slide-out-to-bottom-2')
   })
 
   test('renders item matrix, nested submenu, and content slots', async () => {
@@ -137,7 +139,8 @@ describe('DropdownMenu', () => {
 
     expect(rootContent?.className).toContain('mr-$kb-popper-content-overflow-padding')
     expect(rootContent?.className).toContain('ring-foreground/10')
-    expect(rootContent?.className).toContain('data-expanded:slide-in-from-r-2')
+    expect(rootContent?.className).toContain('data-expanded:slide-in-from-right-2')
+    expect(rootContent?.className).toContain('data-closed:slide-out-to-right-2')
     expect(rootContent?.className).toContain('content-class')
 
     expect(document.body.querySelector('[data-testid="content-top-root"]')).not.toBeNull()

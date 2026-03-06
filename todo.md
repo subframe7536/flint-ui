@@ -25,7 +25,7 @@
 - [x] bug: form field standard schema demo, email input cannot cleanup when press backspace, text `a` - press backspace -> `undefined`
 - [x] tooltip variant
 - [x] optimize context menu trigger timing, or implement context by dropdown menu
-- [ ] adjust dropmenu / context menu show up transition
+- [x] adjust dropmenu / context menu show up transition
 - [ ] polish and cleanup select control / input / input number variants
 
 # Future
@@ -36,4 +36,6 @@
 - [ ] polish theme, like ring color etc.
 - [ ] transform to tailwind class syntax, optional unocss transform to simplify
 - [ ] inline and drop kobalte
+  - [ ] bug: When the pointer moves from that parent item toward the submenu, the submenu closes too early before the pointer can reach it, because a different sibling menu item becomes highlighted/triggered during the pointer movement.
+  - [ ] animated collapsible component
 - [ ] refine demo into doc?

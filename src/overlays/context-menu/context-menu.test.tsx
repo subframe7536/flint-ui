@@ -122,6 +122,12 @@ describe('ContextMenu', () => {
       expect(document.body.querySelector('[data-slot="content"]')).not.toBeNull()
       expect(document.body.textContent).toContain('Default open item')
     })
+
+    const content = document.body.querySelector('[data-slot="content"]') as HTMLElement
+
+    expect(content.className).toContain('ml-$kb-popper-content-overflow-padding')
+    expect(content.className).toContain('data-expanded:slide-in-from-left-2')
+    expect(content.className).toContain('data-closed:slide-out-to-left-2')
   })
 
   test('opens after 700ms touch long press', async () => {
@@ -283,7 +289,8 @@ describe('ContextMenu', () => {
 
     expect(rootContent?.className).toContain('mt-$kb-popper-content-overflow-padding')
     expect(rootContent?.className).toContain('ring-foreground/10')
-    expect(rootContent?.className).toContain('data-expanded:slide-in-from-t-2')
+    expect(rootContent?.className).toContain('data-expanded:slide-in-from-top-2')
+    expect(rootContent?.className).toContain('data-closed:slide-out-to-top-2')
     expect(rootContent?.className).toContain('content-class')
 
     expect(document.body.querySelector('[data-testid="content-top-root"]')).not.toBeNull()
