@@ -119,8 +119,6 @@ export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
                     rel={item.rel}
                     aria-current={isCurrent() ? 'page' : undefined}
                     data-current={isCurrent() ? '' : undefined}
-                    aria-disabled={isDisabled() ? true : undefined}
-                    data-disabled={isDisabled() ? '' : undefined}
                     disabled={isDisabled()}
                     onClick={item.onClick}
                     leading={item.icon}

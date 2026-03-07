@@ -120,7 +120,7 @@ export function Accordion(props: AccordionProps): JSX.Element {
                 <div
                   data-slot="content"
                   class={cn(
-                    'h-$kb-collapsible-content-height pb-2.5 [&_a]:(underline underline-offset-3 hover:text-foreground) [&_p:not(:last-child)]:mb-4',
+                    'h-$kb-collapsible-content-height pb-2.5 style-accordion-content',
                     renderProps.classes?.content,
                   )}
                 >

@@ -362,13 +362,17 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
       ['effect-fv', 'outline-none ring-3px ring-ring/30'],
       ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/30'],
       ['style-placeholder', 'placeholder:(text-muted-foreground select-none)'],
+      [
+        'style-accordion-content',
+        '[&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
+      ],
       ['surface-highlight', 'ring-1 ring-border/50'],
       ['hidden-hitless', 'opacity-0 pointer-events-none'],
       [
         'effect-invalid',
         'border-destructive ring-3 ring-destructive/20 dark:(border-destructive/50 ring-destructive/40)',
       ],
-      ['effect-dis', 'pointer-events-none opacity-64 cursor-not-allowed'],
+      ['effect-dis', 'opacity-64 pointer-events-none'],
       ['border', 'b-1 b-border'],
       ...createIconShortcuts(appConfig.icons),
     ],
@@ -408,7 +412,7 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 2px);
   --ui-radius: var(--radius);
   --ui-container: 80rem;
 }

@@ -884,24 +884,24 @@ export function Select(props: SelectProps): JSX.Element {
     )
   }
 
-  const SelectSectionComponent: Component<ComboboxRootSectionComponentProps<NormalizedGroup>> = (
-    sectionProps,
-  ) => (
-    <Combobox.Section
-      data-slot="group"
-      class={cn('[&:not(:first-child)]:mt-1.5', styleProps.classes?.group)}
-    >
-      <span
-        data-slot="label"
-        class={cn(
-          'block px-2 py-1.5 font-medium text-muted-foreground text-xs',
-          styleProps.classes?.label,
-        )}
+  function SelectSectionComponent(props: ComboboxRootSectionComponentProps<NormalizedGroup>) {
+    return (
+      <Combobox.Section
+        data-slot="group"
+        class={cn('[&:not(:first-child)]:mt-1.5', styleProps.classes?.group)}
       >
-        {sectionProps.section.rawValue.label}
-      </span>
-    </Combobox.Section>
-  )
+        <span
+          data-slot="label"
+          class={cn(
+            'block px-2 py-1.5 font-medium text-muted-foreground text-xs',
+            styleProps.classes?.label,
+          )}
+        >
+          {props.section.rawValue.label}
+        </span>
+      </Combobox.Section>
+    )
+  }
 
   function SelectTriggerIcon(props: Record<string, unknown>): JSX.Element {
     return (
@@ -1195,7 +1195,7 @@ export function Select(props: SelectProps): JSX.Element {
   }
 
   // ---- Dropdown content ----
-  function renderContent(): JSX.Element {
+  function Content(): JSX.Element {
     return (
       <Combobox.Portal>
         <Combobox.Content
@@ -1322,7 +1322,7 @@ export function Select(props: SelectProps): JSX.Element {
         {(state) => <SelectTriggerContent {...state} />}
       </Combobox.Control>
 
-      {renderContent()}
+      <Content />
       <Combobox.HiddenSelect />
     </Combobox>
   )

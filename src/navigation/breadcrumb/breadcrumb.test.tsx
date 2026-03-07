@@ -123,7 +123,7 @@ describe('Breadcrumb', () => {
     expect(explicit?.getAttribute('href')).toBeNull()
   })
 
-  test('renders icon and label slots via button composition', () => {
+  test('renders icon slot and direct label text via button composition', () => {
     const screen = render(() => (
       <Breadcrumb
         items={[
@@ -135,12 +135,11 @@ describe('Breadcrumb', () => {
 
     const homeLink = screen.getByText('Home').closest('[data-slot="link"]')
     const leading = homeLink?.querySelector('[data-slot="leading"]')
-    const label = homeLink?.querySelector('[data-slot="label"]')
 
     expect(leading).not.toBeNull()
     expect(leading?.className).toContain('i-lucide-house')
-    expect(label).not.toBeNull()
-    expect(label?.textContent).toBe('Home')
+    expect(homeLink?.textContent).toContain('Home')
+    expect(homeLink?.querySelector('[data-slot="label"]')).toBeNull()
   })
 
   test('applies disabled state and classes overrides', () => {
@@ -150,7 +149,6 @@ describe('Breadcrumb', () => {
           root: 'root-override',
           link: 'link-override',
           leading: 'leading-override',
-          label: 'label-override',
           separator: 'separator-override',
         }}
         items={[
@@ -163,13 +161,11 @@ describe('Breadcrumb', () => {
     const root = screen.container.querySelector('[data-slot="root"]')
     const home = screen.getByText('Home').closest('[data-slot="link"]')
     const homeLeading = home?.querySelector('[data-slot="leading"]')
-    const homeLabel = home?.querySelector('[data-slot="label"]')
     const disabled = screen.getByText('Disabled').closest('[data-slot="link"]')
     const separator = screen.container.querySelector('[data-slot="separator"]')
 
     expect(root?.className).toContain('root-override')
     expect(homeLeading?.className).toContain('leading-override')
-    expect(homeLabel?.className).toContain('label-override')
     expect(disabled?.className).toContain('link-override')
     expect(disabled?.getAttribute('aria-disabled')).toBe('true')
     expect(disabled?.getAttribute('href')).toBeNull()

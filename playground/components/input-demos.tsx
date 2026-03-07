@@ -55,11 +55,12 @@ export const InputDemos = () => {
         </div>
       </DemoSection>
 
-      <DemoSection title="Input States" description="Loading, disabled, and file type.">
+      <DemoSection title="Input States" description="Loading, disabled, and type.">
         <div class="gap-3 grid sm:grid-cols-2">
           <Input loading placeholder="Loading..." />
           <Input disabled placeholder="Disabled" value="Cannot edit" />
           <Input type="file" />
+          <Input type="datetime-local" />
         </div>
       </DemoSection>
 
