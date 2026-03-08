@@ -26,6 +26,7 @@ import { PaginationDemos } from './components/pagination-demos'
 import { PopoverDemos } from './components/popover-demos'
 import { PopupDemos } from './components/popup-demos'
 import { ProgressDemos } from './components/progress-demos'
+import { ResizableDemos } from './components/resizable-demos'
 import { SelectDemos } from './components/select-demos'
 import { SeparatorDemos } from './components/separator-demos'
 import { SheetDemos } from './components/sheet-demos'
@@ -42,6 +43,7 @@ const PAGES = [
   { key: 'kbd', label: 'Kbd', group: 'General' },
   { key: 'separator', label: 'Separator', group: 'General' },
   { key: 'card', label: 'Card', group: 'Layout' },
+  { key: 'resizable', label: 'Resizable', group: 'Layout' },
   { key: 'breadcrumb', label: 'Breadcrumb', group: 'Navigation' },
   { key: 'pagination', label: 'Pagination', group: 'Navigation' },
   { key: 'stepper', label: 'Stepper', group: 'Navigation' },
@@ -144,6 +146,9 @@ function App() {
           </Match>
           <Match when={page() === 'progress'}>
             <ProgressDemos />
+          </Match>
+          <Match when={page() === 'resizable'}>
+            <ResizableDemos />
           </Match>
           <Match when={page() === 'separator'}>
             <SeparatorDemos />

@@ -29,7 +29,7 @@ const createCheckoutSteps = () => [
   },
 ]
 
-const RELEASE_STEPS = [
+const RELEASE_STEPS = () => [
   {
     title: 'Draft',
     value: 'draft',
@@ -47,7 +47,7 @@ const RELEASE_STEPS = [
   },
 ]
 
-const PIPELINE_STEPS = [
+const PIPELINE_STEPS = () => [
   {
     title: 'Queued',
     description: 'Waiting for worker capacity.',
@@ -141,7 +141,7 @@ export const StepperDemos = () => {
       >
         <div class="space-y-4">
           <Stepper
-            items={RELEASE_STEPS}
+            items={RELEASE_STEPS()}
             value={releaseStep()}
             onChange={setReleaseStep}
             linear={false}
@@ -166,7 +166,7 @@ export const StepperDemos = () => {
         description="Render the stepper vertically as a read-only progress indicator."
       >
         <div class="max-w-3xl">
-          <Stepper items={PIPELINE_STEPS} orientation="vertical" defaultValue="building" />
+          <Stepper items={PIPELINE_STEPS()} orientation="vertical" defaultValue="building" />
         </div>
       </DemoSection>
     </DemoPage>

@@ -5,8 +5,8 @@
     "": {
       "name": "rock-ui",
       "dependencies": {
-        "@corvu/utils": "^0.4.2",
-        "@kobalte/core": "^0.13.11",
+        "@kobalte/core": "~0.13.11",
+        "@kobalte/utils": "*",
         "cls-variant": "^1.1.1",
       },
       "devDependencies": {

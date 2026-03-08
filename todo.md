@@ -2,7 +2,7 @@
 
 - [x] New Badge: leading, trailing, onTrailingClick, size, variant (default / outline / solid); reuse in select
 - [x] New Stepper: reference from nuxt-ui/
-- [ ] New Resizable: https://corvu.dev/docs/primitives/resizable , `panels: ParentProps<ResizePanelProps>[]`, auto insert handle
+- [x] New Resizable: only reference from `zaidan/src/registry/kobalte/ui/resizable.tsx` , use `panels` as `Array` to setuo panels, auto insert handle between panels
 
 # Beta
 
