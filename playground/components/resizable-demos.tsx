@@ -9,10 +9,6 @@ function formatPixelSizes(sizes: number[]): string {
   return sizes.map((size) => `${Math.round(size)}px`).join(' / ')
 }
 
-function formatPercentValue(value: number): `${number}%` {
-  return `${Number.parseFloat((value * 100).toFixed(2))}%`
-}
-
 function createPanel(title: string, description: string, tone: string) {
   return (
     <div class={`p-4 h-full ${tone}`}>
@@ -26,7 +22,7 @@ export const ResizableDemos = () => {
   const [controlledPanels, setControlledPanels] = createStore([
     {
       size: 360,
-      minSize: '20%' as const,
+      min: '20%' as const,
       content: createPanel(
         'Logs',
         'Drag or use arrow keys to rebalance with px callbacks.',
@@ -35,7 +31,7 @@ export const ResizableDemos = () => {
     },
     {
       size: 640,
-      minSize: '25%' as const,
+      min: '25%' as const,
       content: createPanel(
         'Preview',
         'The external store writes callback px values back into panel.size.',
@@ -47,9 +43,9 @@ export const ResizableDemos = () => {
     controlledPanels.map((panel) => (typeof panel.size === 'number' ? panel.size : 0)),
   )
   const [handleIcon, setHandleIcon] = createSignal<'grip' | 'dots'>('grip')
-  const [collapseThreshold, setCollapseThreshold] = createSignal(0.08)
-  const [collapsedSize, setCollapsedSize] = createSignal(0.06)
+  const [externalSizes, setExternalSizes] = createSignal<[number, number]>([320, 680])
   const [isSidebarCollapsed, setIsSidebarCollapsed] = createSignal(false)
+  const [lastExpandedSize, setLastExpandedSize] = createSignal(320)
 
   const handleIconClass = createMemo(() =>
     handleIcon() === 'grip' ? 'i-lucide-grip-vertical' : 'i-lucide-grip',
@@ -61,6 +57,33 @@ export const ResizableDemos = () => {
         setControlledPanels(index, 'size', nextSize)
       }
     })
+  }
+
+  function handleExternalResize(nextSizes: number[]): void {
+    const sidebarSize = nextSizes[0]
+    const contentSize = nextSizes[1]
+    if (!Number.isFinite(sidebarSize) || !Number.isFinite(contentSize)) {
+      return
+    }
+
+    setExternalSizes([sidebarSize, contentSize])
+    if (sidebarSize > 0) {
+      setLastExpandedSize(sidebarSize)
+    }
+  }
+
+  function toggleExternalSidebar(): void {
+    const [sidebarSize, contentSize] = externalSizes()
+    const totalSize = sidebarSize + contentSize > 0 ? sidebarSize + contentSize : 1000
+
+    if (sidebarSize <= 0) {
+      const restoredSize = Math.min(Math.max(lastExpandedSize(), totalSize * 0.16), totalSize)
+      setExternalSizes([restoredSize, Math.max(totalSize - restoredSize, 0)])
+      return
+    }
+
+    setLastExpandedSize(sidebarSize)
+    setExternalSizes([0, totalSize])
   }
 
   return (
@@ -78,13 +101,13 @@ export const ResizableDemos = () => {
             renderHandle
             panels={[
               {
-                initialSize: '40%',
-                minSize: '20%',
+                defaultSize: '40%',
+                min: '20%',
                 content: createPanel('Navigation', 'Left panel can shrink to 20%.', 'bg-zinc-100'),
               },
               {
-                initialSize: '60%',
-                minSize: '30%',
+                defaultSize: '60%',
+                min: '30%',
                 content: createPanel(
                   'Content',
                   'Right panel keeps enough width for details.',
@@ -124,7 +147,7 @@ export const ResizableDemos = () => {
                 classes={{ divider: 'bg-zinc-300/80' }}
                 panels={[
                   {
-                    initialSize: '33%',
+                    defaultSize: '33%',
                     content: createPanel(
                       'Top',
                       'Interactive vertical divider between top and middle.',
@@ -132,7 +155,8 @@ export const ResizableDemos = () => {
                     ),
                   },
                   {
-                    initialSize: '34%',
+                    defaultSize: '34%',
+                    min: '30%',
                     content: createPanel(
                       'Middle',
                       'All dividers remain present because handle settings live on the root now.',
@@ -140,7 +164,7 @@ export const ResizableDemos = () => {
                     ),
                   },
                   {
-                    initialSize: '33%',
+                    defaultSize: '33%',
                     content: createPanel(
                       'Bottom',
                       'Last panel in the vertical stack.',
@@ -164,7 +188,7 @@ export const ResizableDemos = () => {
                 classes={{ divider: 'bg-zinc-300/80 opacity-80' }}
                 panels={[
                   {
-                    initialSize: '33%',
+                    defaultSize: '33%',
                     content: createPanel(
                       'Top',
                       'Divider stays visible but is not interactive.',
@@ -172,7 +196,7 @@ export const ResizableDemos = () => {
                     ),
                   },
                   {
-                    initialSize: '34%',
+                    defaultSize: '34%',
                     content: createPanel(
                       'Middle',
                       'Keyboard and pointer resizing are both disabled.',
@@ -180,7 +204,7 @@ export const ResizableDemos = () => {
                     ),
                   },
                   {
-                    initialSize: '33%',
+                    defaultSize: '33%',
                     content: createPanel('Bottom', 'Useful for read-only layouts.', 'bg-zinc-50'),
                   },
                 ]}
@@ -205,8 +229,8 @@ export const ResizableDemos = () => {
                 intersection
                 panels={[
                   {
-                    initialSize: '32%',
-                    minSize: '20%',
+                    defaultSize: '32%',
+                    min: '20%',
                     content: createPanel(
                       'Sidebar',
                       'Outer divider can intersect with the nested group.',
@@ -214,8 +238,8 @@ export const ResizableDemos = () => {
                     ),
                   },
                   {
-                    initialSize: '68%',
-                    minSize: '35%',
+                    defaultSize: '68%',
+                    min: '35%',
                     content: (
                       <Resizable
                         orientation="vertical"
@@ -223,13 +247,13 @@ export const ResizableDemos = () => {
                         intersection
                         panels={[
                           {
-                            initialSize: '50%',
-                            minSize: '25%',
+                            defaultSize: '50%',
+                            min: '25%',
                             content: createPanel('Editor', 'Nested top panel.', 'bg-white'),
                           },
                           {
-                            initialSize: '50%',
-                            minSize: '20%',
+                            defaultSize: '50%',
+                            min: '20%',
                             content: createPanel(
                               'Console',
                               'Nested bottom panel with cross drag enabled.',
@@ -238,6 +262,15 @@ export const ResizableDemos = () => {
                           },
                         ]}
                       />
+                    ),
+                  },
+                  {
+                    defaultSize: '32%',
+                    min: '20%',
+                    content: createPanel(
+                      'Sidebar',
+                      'Outer divider can intersect with the nested group.',
+                      'bg-zinc-50',
                     ),
                   },
                 ]}
@@ -255,8 +288,8 @@ export const ResizableDemos = () => {
                 intersection={false}
                 panels={[
                   {
-                    initialSize: '68%',
-                    minSize: '35%',
+                    defaultSize: '68%',
+                    min: '35%',
                     content: (
                       <Resizable
                         orientation="vertical"
@@ -264,13 +297,13 @@ export const ResizableDemos = () => {
                         intersection={false}
                         panels={[
                           {
-                            initialSize: '50%',
-                            minSize: '25%',
+                            defaultSize: '50%',
+                            min: '25%',
                             content: createPanel('Editor', 'Nested top panel.', 'bg-white'),
                           },
                           {
-                            initialSize: '50%',
-                            minSize: '20%',
+                            defaultSize: '50%',
+                            min: '20%',
                             content: createPanel(
                               'Console',
                               'Nested bottom panel with cross drag disabled.',
@@ -282,8 +315,8 @@ export const ResizableDemos = () => {
                     ),
                   },
                   {
-                    initialSize: '32%',
-                    minSize: '20%',
+                    defaultSize: '32%',
+                    min: '20%',
                     content: createPanel(
                       'Inspector',
                       'Comparison panel for nested intersection behavior.',
@@ -298,8 +331,8 @@ export const ResizableDemos = () => {
       </DemoSection>
 
       <DemoSection
-        title="Custom Handle + Configurable Collapse"
-        description="Customize the root handle, animate divider states, and tune collapse thresholds live."
+        title="Custom Handle + External Collapse Button"
+        description="Collapse is controlled by an external button and signal; no built-in collapse icon is rendered."
       >
         <div class="space-y-4">
           <div class="flex flex-wrap gap-3 items-end">
@@ -317,37 +350,13 @@ export const ResizableDemos = () => {
               </select>
             </label>
 
-            <label class="space-y-1">
-              <p class="text-xs text-zinc-600">
-                collapsedSize: {Math.round(collapsedSize() * 100)}%
-              </p>
-              <input
-                class="accent-sky-600 w-40"
-                type="range"
-                min="0"
-                max="0.2"
-                step="0.01"
-                value={collapsedSize()}
-                onInput={(event) => setCollapsedSize(Number.parseFloat(event.currentTarget.value))}
-              />
-            </label>
-
-            <label class="space-y-1">
-              <p class="text-xs text-zinc-600">
-                collapseThreshold: {Math.round(collapseThreshold() * 100)}%
-              </p>
-              <input
-                class="accent-sky-600 w-40"
-                type="range"
-                min="0.01"
-                max="0.3"
-                step="0.01"
-                value={collapseThreshold()}
-                onInput={(event) =>
-                  setCollapseThreshold(Number.parseFloat(event.currentTarget.value))
-                }
-              />
-            </label>
+            <button
+              type="button"
+              class="text-xs text-zinc-700 px-3 border border-zinc-300 rounded-md bg-white h-8 hover:bg-zinc-50"
+              onClick={toggleExternalSidebar}
+            >
+              {isSidebarCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'}
+            </button>
           </div>
 
           <div class="border border-zinc-200 rounded-xl h-56 overflow-hidden">
@@ -355,41 +364,31 @@ export const ResizableDemos = () => {
               renderHandle={
                 <div class={`text-zinc-600 h-3.5 w-3.5 pointer-events-none ${handleIconClass()}`} />
               }
+              onResize={handleExternalResize}
               classes={{
                 divider:
                   'w-[6px] rounded-full bg-zinc-300/45 transition-colors duration-200 hover:bg-sky-300/45 data-dragging:bg-sky-500/70',
               }}
               panels={[
                 {
-                  initialSize: '30%',
-                  minSize: '16%',
+                  size: externalSizes()[0],
+                  min: '16%',
                   collapsible: true,
-                  collapsedSize: formatPercentValue(collapsedSize()),
-                  collapseThreshold: formatPercentValue(collapseThreshold()),
                   onCollapse: () => setIsSidebarCollapsed(true),
                   onExpand: () => setIsSidebarCollapsed(false),
                   content: createPanel(
                     'Sidebar',
-                    'Press Enter on the divider or drag past the threshold to collapse and expand.',
+                    'Use the external button to collapse to 0 and restore the last expanded size.',
                     'bg-zinc-50',
                   ),
                 },
                 {
-                  initialSize: '46%',
-                  minSize: '24%',
+                  size: externalSizes()[1],
+                  min: '24%',
                   content: createPanel(
                     'Editor',
-                    'All dividers use the same custom root handle icon in the new API.',
+                    'Divider dragging still works and updates external controlled sizes.',
                     'bg-white',
-                  ),
-                },
-                {
-                  initialSize: '24%',
-                  minSize: '16%',
-                  content: createPanel(
-                    'Preview',
-                    'Hover dividers to see transitions and focus them for keyboard resizing.',
-                    'bg-zinc-100',
                   ),
                 },
               ]}
@@ -397,9 +396,8 @@ export const ResizableDemos = () => {
           </div>
 
           <p class="text-xs text-zinc-600">
-            Sidebar state: {isSidebarCollapsed() ? 'collapsed' : 'expanded'} · Tip: focus a divider,
-            then press <kbd class="px-1 py-0.5 border border-zinc-300 rounded">Enter</kbd> to toggle
-            collapse.
+            Sidebar state: {isSidebarCollapsed() ? 'collapsed' : 'expanded'} · Last expanded:{' '}
+            {Math.round(lastExpandedSize())}px
           </p>
         </div>
       </DemoSection>

@@ -24,6 +24,28 @@ export const RESIZE_FLAG_BOTH = 3
 type ResizeStrategy = 1 | 2 | 3
 type ResizeSide = 1 | 2
 
+function withCollapsedPanelMinOverride(
+  panels: ResizableResolvedPanel[],
+  initialSizes: number[],
+): ResizableResolvedPanel[] {
+  let changed = false
+  const nextPanels = panels.map((panel, index) => {
+    const size = initialSizes[index] ?? 0
+
+    if (!panel.collapsible || panel.min <= 0 || !nearlyEqual(size, 0)) {
+      return panel
+    }
+
+    changed = true
+    return {
+      ...panel,
+      min: 0,
+    }
+  })
+
+  return changed ? nextPanels : panels
+}
+
 function getResizeDirection(side: ResizeSide, desiredPercentage: number): ResizeDirection {
   let direction = 0
 
@@ -47,66 +69,23 @@ function isIncreasingDirection(direction: ResizeDirection): boolean {
   return (direction & RESIZE_DIRECTION_INCREASING) !== 0
 }
 
-function applyDistributedSizeChange(input: {
-  resizeDirection: ResizeDirection
-  distributedPercentage: number
-  panelSize: number
-  previousSize: number
-  nextSize: number
-}): number {
-  const previousDelta = input.previousSize - input.panelSize
-  const nextDelta = input.nextSize - input.panelSize
-
-  if (isPrecedingDirection(input.resizeDirection)) {
-    return input.distributedPercentage + (nextDelta - previousDelta)
-  }
-
-  return input.distributedPercentage - (nextDelta - previousDelta)
-}
-
-function resolveExpandedSize(input: {
-  resizeDirection: ResizeDirection
-  panel: ResizableResolvedPanel
-  panelSize: number
-  availablePercentage: number
-}): { nextSize: number; collapsed: boolean } {
-  let nextSize = input.panel.minSize
-  let collapsed = false
-
-  if (Math.abs(input.availablePercentage) >= input.panel.minSize - input.panel.collapsedSize) {
-    if (isPrecedingDirection(input.resizeDirection)) {
-      nextSize = Math.min(input.panel.maxSize, input.panelSize + input.availablePercentage)
-    } else {
-      nextSize = Math.min(input.panel.maxSize, input.panelSize - input.availablePercentage)
-    }
-  } else {
-    collapsed = true
-  }
-
-  return { nextSize, collapsed }
-}
-
 function distributePercentage(input: {
   desiredPercentage: number
   side: ResizeSide
   range: IndexSpan
   sizes: number[]
   panels: ResizableResolvedPanel[]
-  collapsible: boolean
-}): [number, boolean] {
+}): number {
   const desiredPercentage = fixToPrecision(input.desiredPercentage)
   const { start, end } = input.range
 
   if (end < start) {
-    return [0, false]
+    return 0
   }
 
   const resizeDirection = getResizeDirection(input.side, desiredPercentage)
   const precedingDirection = isPrecedingDirection(resizeDirection)
   const increasingDirection = isIncreasingDirection(resizeDirection)
-
-  const targetIndex = precedingDirection ? end : start
-  const originalTargetSize = input.sizes[targetIndex] ?? 0
 
   let distributedPercentage = 0
 
@@ -122,17 +101,13 @@ function distributePercentage(input: {
       continue
     }
 
-    if (panel.collapsible && nearlyEqual(panelSize, panel.collapsedSize)) {
-      continue
-    }
-
     const availablePercentage = fixToPrecision(desiredPercentage - distributedPercentage)
 
     if (nearlyEqual(availablePercentage, 0)) {
       break
     }
 
-    const boundarySize = increasingDirection ? panel.maxSize : panel.minSize
+    const boundarySize = increasingDirection ? panel.max : panel.min
     const signedAvailable = precedingDirection ? availablePercentage : -availablePercentage
     const nextSize = increasingDirection
       ? Math.min(boundarySize, panelSize + signedAvailable)
@@ -144,77 +119,13 @@ function distributePercentage(input: {
   }
 
   distributedPercentage = fixToPrecision(distributedPercentage)
-
-  if (!input.collapsible || nearlyEqual(distributedPercentage, desiredPercentage)) {
-    return [distributedPercentage, false]
-  }
-
-  const panel = input.panels[targetIndex]
-
-  if (!panel || !panel.collapsible) {
-    return [distributedPercentage, false]
-  }
-
-  const availablePercentage = fixToPrecision(desiredPercentage - distributedPercentage)
-  const panelSize = originalTargetSize
-  const collapsedSize = panel.collapsedSize
-  const minSize = panel.minSize
-  const collapseThreshold = Math.min(panel.collapseThreshold, Math.max(0, minSize - collapsedSize))
-  const isCollapsed = nearlyEqual(panelSize, collapsedSize)
-
-  if (Math.abs(availablePercentage) < collapseThreshold) {
-    return [fixToPrecision(distributedPercentage), false]
-  }
-
-  if (!increasingDirection && !isCollapsed) {
-    const previousSize = input.sizes[targetIndex] ?? panelSize
-    input.sizes[targetIndex] = collapsedSize
-    return [
-      fixToPrecision(
-        applyDistributedSizeChange({
-          resizeDirection,
-          distributedPercentage,
-          panelSize,
-          previousSize,
-          nextSize: collapsedSize,
-        }),
-      ),
-      true,
-    ]
-  }
-
-  if (increasingDirection && isCollapsed) {
-    const previousSize = input.sizes[targetIndex] ?? panelSize
-    const expanded = resolveExpandedSize({
-      resizeDirection,
-      panel,
-      panelSize,
-      availablePercentage,
-    })
-
-    input.sizes[targetIndex] = expanded.nextSize
-    return [
-      fixToPrecision(
-        applyDistributedSizeChange({
-          resizeDirection,
-          distributedPercentage,
-          panelSize,
-          previousSize,
-          nextSize: expanded.nextSize,
-        }),
-      ),
-      expanded.collapsed,
-    ]
-  }
-
-  return [fixToPrecision(distributedPercentage), false]
+  return fixToPrecision(distributedPercentage)
 }
 
 function getDistributablePercentage(input: {
   desiredPercentage: number
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
-  collapsible: boolean
   actions: ResizeAction[]
 }): number {
   if (input.actions.length === 0) {
@@ -228,35 +139,25 @@ function getDistributablePercentage(input: {
   for (const action of input.actions) {
     const desiredPercentage = action.negate ? -input.desiredPercentage : input.desiredPercentage
 
-    let [precedingPercentage, collapsedPreceding] = distributePercentage({
+    let precedingPercentage = distributePercentage({
       desiredPercentage,
       side: RESIZE_FLAG_PRECEDING,
       range: action.precedingRange,
       sizes: nextSizes,
       panels: input.panels,
-      collapsible: input.collapsible,
     })
 
-    let [followingPercentage, collapsedFollowing] = distributePercentage({
+    let followingPercentage = distributePercentage({
       desiredPercentage,
       side: RESIZE_FLAG_FOLLOWING,
       range: action.followingRange,
       sizes: nextSizes,
       panels: input.panels,
-      collapsible: input.collapsible,
     })
 
     if (action.negate) {
       precedingPercentage = -precedingPercentage
       followingPercentage = -followingPercentage
-    }
-
-    if (collapsedPreceding) {
-      followingPercentage = precedingPercentage
-    }
-
-    if (collapsedFollowing) {
-      precedingPercentage = followingPercentage
     }
 
     distributablePercentage =
@@ -276,7 +177,6 @@ function applyResize(input: {
   distributablePercentage: number
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
-  collapsible: boolean
   actions: ResizeAction[]
 }): number[] {
   const nextSizes = [...input.initialSizes]
@@ -292,7 +192,6 @@ function applyResize(input: {
       range: action.precedingRange,
       sizes: nextSizes,
       panels: input.panels,
-      collapsible: input.collapsible,
     })
 
     distributePercentage({
@@ -301,7 +200,6 @@ function applyResize(input: {
       range: action.followingRange,
       sizes: nextSizes,
       panels: input.panels,
-      collapsible: input.collapsible,
     })
   }
 
@@ -312,7 +210,6 @@ function computeResize(input: {
   desiredPercentage: number
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
-  collapsible: boolean
   actions: ResizeAction[]
 }): number[] {
   const distributablePercentage = getDistributablePercentage(input)
@@ -321,7 +218,6 @@ function computeResize(input: {
     distributablePercentage,
     initialSizes: input.initialSizes,
     panels: input.panels,
-    collapsible: input.collapsible,
     actions: input.actions,
   })
 }
@@ -333,7 +229,8 @@ export function resizeFromHandle(input: {
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
 }): number[] {
-  const panelCount = input.panels.length
+  const panels = withCollapsedPanelMinOverride(input.panels, input.initialSizes)
+  const panelCount = panels.length
 
   if (panelCount <= 1 || input.handleIndex < 0 || input.handleIndex >= panelCount - 1) {
     return normalizeSizeVector(input.initialSizes)
@@ -345,8 +242,7 @@ export function resizeFromHandle(input: {
       deltaPercentage: input.deltaPercentage,
       strategy: RESIZE_FLAG_FOLLOWING,
       initialSizes: input.initialSizes,
-      panels: input.panels,
-      collapsible: true,
+      panels,
     })
   }
 
@@ -360,17 +256,16 @@ export function resizeFromHandle(input: {
       deltaPercentage = -deltaPercentage
     }
 
-    const panel = input.panels[panelIndex]
+    const panel = panels[panelIndex]
     const panelSize = input.initialSizes[panelIndex] ?? 0
-    const minDelta = panel.minSize - panelSize
-    const maxDelta = panel.maxSize - panelSize
+    const minDelta = panel.min - panelSize
+    const maxDelta = panel.max - panelSize
     const cappedDelta = clamp(deltaPercentage * 2, minDelta, maxDelta) / 2
 
     return computeResize({
       desiredPercentage: cappedDelta,
       initialSizes: input.initialSizes,
-      panels: input.panels,
-      collapsible: false,
+      panels,
       actions: [
         {
           precedingRange: { start: 0, end: panelIndex },
@@ -388,8 +283,7 @@ export function resizeFromHandle(input: {
   return computeResize({
     desiredPercentage: input.deltaPercentage,
     initialSizes: input.initialSizes,
-    panels: input.panels,
-    collapsible: true,
+    panels,
     actions: [
       {
         precedingRange: { start: 0, end: input.handleIndex },
@@ -405,7 +299,6 @@ function resizePanelByDelta(input: {
   strategy: ResizeStrategy
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
-  collapsible: boolean
 }): number[] {
   const panelCount = input.panels.length
   const targetPanel = input.panels[input.panelIndex]
@@ -430,7 +323,6 @@ function resizePanelByDelta(input: {
       desiredPercentage: input.deltaPercentage / 2,
       initialSizes: input.initialSizes,
       panels: input.panels,
-      collapsible: input.collapsible,
       actions: [
         {
           precedingRange: { start: 0, end: input.panelIndex },
@@ -461,7 +353,6 @@ function resizePanelByDelta(input: {
     desiredPercentage,
     initialSizes: input.initialSizes,
     panels: input.panels,
-    collapsible: input.collapsible,
     actions: [{ precedingRange: adjustedPreceding, followingRange: adjustedFollowing }],
   })
 }
@@ -480,7 +371,7 @@ export function resizePanelToSize(input: {
   }
 
   const requestedSize = resolveSize(input.size, input.rootSize)
-  const allowedSize = clamp(requestedSize, panel.minSize, panel.maxSize)
+  const allowedSize = clamp(requestedSize, panel.min, panel.max)
   const deltaPercentage = allowedSize - (input.initialSizes[input.panelIndex] ?? 0)
 
   return resizePanelByDelta({
@@ -489,8 +380,15 @@ export function resizePanelToSize(input: {
     strategy: input.strategy,
     initialSizes: input.initialSizes,
     panels: input.panels,
-    collapsible: false,
   })
+}
+
+function withPanelMinOverride(
+  panels: ResizableResolvedPanel[],
+  panelIndex: number,
+  min: number,
+): ResizableResolvedPanel[] {
+  return panels.map((panel, index) => (index === panelIndex ? { ...panel, min } : panel))
 }
 
 export function collapsePanel(input: {
@@ -505,18 +403,40 @@ export function collapsePanel(input: {
   }
 
   const panelSize = input.initialSizes[input.panelIndex] ?? 0
-  if (!panel.collapsible || nearlyEqual(panelSize, panel.collapsedSize)) {
+  if (!panel.collapsible || nearlyEqual(panelSize, 0)) {
     return normalizeSizeVector(input.initialSizes)
   }
 
+  const collapsePanels = withPanelMinOverride(input.panels, input.panelIndex, 0)
+
   return resizePanelByDelta({
     panelIndex: input.panelIndex,
-    deltaPercentage: panel.collapsedSize - panelSize,
+    deltaPercentage: -panelSize,
     strategy: input.strategy,
     initialSizes: input.initialSizes,
-    panels: input.panels,
-    collapsible: true,
+    panels: collapsePanels,
   })
+}
+
+function resolveExpandedTargetSize(input: {
+  panelIndex: number
+  initialSizes: number[]
+  panels: ResizableResolvedPanel[]
+  expandedSize?: number
+}): number {
+  const panel = input.panels[input.panelIndex]
+  if (!panel) {
+    return 0
+  }
+
+  // Internal sizes are normalized ratios, so resolve defaultSize in a unit-sized root (1).
+  const fallbackDefaultSize = panel.defaultSize
+    ? resolveSize(panel.defaultSize, 1)
+    : (input.initialSizes[input.panelIndex] ?? 0)
+  const preferred = input.expandedSize ?? fallbackDefaultSize
+  const normalizedPreferred = Number.isFinite(preferred) ? preferred : panel.min
+
+  return clamp(normalizedPreferred, panel.min, panel.max)
 }
 
 export function expandPanel(input: {
@@ -524,6 +444,7 @@ export function expandPanel(input: {
   strategy: ResizeStrategy
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
+  expandedSize?: number
 }): number[] {
   const panel = input.panels[input.panelIndex]
   if (!panel) {
@@ -531,55 +452,77 @@ export function expandPanel(input: {
   }
 
   const panelSize = input.initialSizes[input.panelIndex] ?? 0
-  if (!panel.collapsible || !nearlyEqual(panelSize, panel.collapsedSize)) {
+  if (!panel.collapsible || !nearlyEqual(panelSize, 0)) {
     return normalizeSizeVector(input.initialSizes)
   }
 
+  const nextSize = resolveExpandedTargetSize(input)
+
   return resizePanelByDelta({
     panelIndex: input.panelIndex,
-    deltaPercentage: panel.minSize - panelSize,
+    deltaPercentage: nextSize - panelSize,
     strategy: input.strategy,
     initialSizes: input.initialSizes,
     panels: input.panels,
-    collapsible: true,
   })
+}
+
+function resolveCollapsiblePanelIndex(
+  panels: ResizableResolvedPanel[],
+  handleIndex: number,
+): number {
+  const precedingPanel = panels[handleIndex]
+  const followingPanel = panels[handleIndex + 1]
+
+  if (precedingPanel?.collapsible === true) {
+    return handleIndex
+  }
+
+  if (followingPanel?.collapsible === true) {
+    return handleIndex + 1
+  }
+
+  return -1
+}
+
+export function togglePanel(input: {
+  panelIndex: number
+  strategy: ResizeStrategy
+  initialSizes: number[]
+  panels: ResizableResolvedPanel[]
+  expandedSize?: number
+}): number[] {
+  const panel = input.panels[input.panelIndex]
+  if (!panel?.collapsible) {
+    return normalizeSizeVector(input.initialSizes)
+  }
+
+  const panelSize = input.initialSizes[input.panelIndex] ?? 0
+
+  if (nearlyEqual(panelSize, 0)) {
+    return expandPanel(input)
+  }
+
+  return collapsePanel(input)
 }
 
 export function toggleHandleNearestPanel(input: {
   handleIndex: number
   initialSizes: number[]
   panels: ResizableResolvedPanel[]
+  expandedSizes?: Array<number | undefined>
 }): number[] {
-  const precedingPanel = input.panels[input.handleIndex]
-  const followingPanel = input.panels[input.handleIndex + 1]
-
-  const panelIndex =
-    precedingPanel?.collapsible === true
-      ? input.handleIndex
-      : followingPanel?.collapsible === true
-        ? input.handleIndex + 1
-        : -1
+  const panelIndex = resolveCollapsiblePanelIndex(input.panels, input.handleIndex)
 
   if (panelIndex < 0) {
     return normalizeSizeVector(input.initialSizes)
   }
 
-  const panel = input.panels[panelIndex]!
-  const panelSize = input.initialSizes[panelIndex] ?? 0
-
-  if (nearlyEqual(panelSize, panel.collapsedSize)) {
-    return expandPanel({
-      panelIndex,
-      strategy: RESIZE_FLAG_FOLLOWING,
-      initialSizes: input.initialSizes,
-      panels: input.panels,
-    })
-  }
-
-  return collapsePanel({
+  return togglePanel({
     panelIndex,
     strategy: RESIZE_FLAG_FOLLOWING,
     initialSizes: input.initialSizes,
     panels: input.panels,
+    expandedSize: input.expandedSizes?.[panelIndex],
   })
 }

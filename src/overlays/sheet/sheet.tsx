@@ -138,26 +138,19 @@ export function Sheet(props: SheetProps): JSX.Element {
       contentProps.title || contentProps.description || contentProps.actions || behaviorProps.close,
     )
 
-  const computedContentClass = () => {
-    const transitionClass = behaviorProps.transition
-      ? ''
-      : 'transition-none data-expanded:animate-none data-closed:animate-none'
-
-    return sheetContentVariants(
-      {
-        side: behaviorProps.side,
-        inset: behaviorProps.inset,
-      },
-      transitionClass,
-      contentProps.classes?.content,
-    )
-  }
-
   const content = () => (
     <KobalteDialog.Content
       data-slot="content"
       data-side={behaviorProps.side}
-      class={computedContentClass()}
+      class={sheetContentVariants(
+        {
+          side: behaviorProps.side,
+          inset: behaviorProps.inset,
+        },
+        !behaviorProps.transition &&
+          'transition-none data-expanded:animate-none data-closed:animate-none',
+        contentProps.classes?.content,
+      )}
       onPointerDownOutside={onPointerDownOutside}
       onInteractOutside={onInteractOutside}
       onEscapeKeyDown={onEscapeKeyDown}

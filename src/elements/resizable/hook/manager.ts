@@ -87,10 +87,18 @@ interface HandleSnapshotsByOrientation {
   verticalByBottom: Map<number, HandleSnapshot[]>
 }
 
+/**
+ * Single-instance manager state for all registered resizable handles.
+ * This is intentionally module-scoped so intersection and drag coordination
+ * work across related roots in one global session.
+ *
+ * Tests should isolate this module state via module reset (e.g. `vi.resetModules()`).
+ */
 const registeredHandles = new Map<symbol, RegisteredHandleEntry>()
 let dragSession: DragSession | null = null
 let managerState = 0
 const crossHoverRefCount = new Map<symbol, number>()
+let documentUserSelectSnapshot: { userSelect: string; webkitUserSelect: string } | null = null
 
 function resolveOrientationFlag(orientation: ResizableOrientation): OrientationFlag {
   return orientation === 'horizontal' ? ORIENTATION_FLAG_HORIZONTAL : ORIENTATION_FLAG_VERTICAL
@@ -157,6 +165,43 @@ function setHandleCrossHovered(handle: ResizableHandleRegistration, hovered: boo
   handle.setCrossHovered(nextCount > 0)
 }
 
+function lockDocumentTextSelection(): void {
+  if (documentUserSelectSnapshot || typeof document === 'undefined') {
+    return
+  }
+
+  const body = document.body
+  if (!body) {
+    return
+  }
+
+  const style = body.style as CSSStyleDeclaration & { webkitUserSelect: string }
+  documentUserSelectSnapshot = {
+    userSelect: style.userSelect,
+    webkitUserSelect: style.webkitUserSelect,
+  }
+
+  style.userSelect = 'none'
+  style.webkitUserSelect = 'none'
+}
+
+function unlockDocumentTextSelection(): void {
+  if (!documentUserSelectSnapshot || typeof document === 'undefined') {
+    return
+  }
+
+  const body = document.body
+  if (!body) {
+    documentUserSelectSnapshot = null
+    return
+  }
+
+  const style = body.style as CSSStyleDeclaration & { webkitUserSelect: string }
+  style.userSelect = documentUserSelectSnapshot.userSelect
+  style.webkitUserSelect = documentUserSelectSnapshot.webkitUserSelect
+  documentUserSelectSnapshot = null
+}
+
 function runScheduledIntersectionsRefresh(): void {
   managerState &= ~MANAGER_STATE_INTERSECTION_REFRESH_SCHEDULED
   refreshResizableHandleIntersections()
@@ -168,13 +213,7 @@ export function scheduleResizableHandleIntersectionsRefresh(): void {
   }
 
   managerState |= MANAGER_STATE_INTERSECTION_REFRESH_SCHEDULED
-
-  if (typeof queueMicrotask === 'function') {
-    queueMicrotask(runScheduledIntersectionsRefresh)
-    return
-  }
-
-  Promise.resolve().then(runScheduledIntersectionsRefresh)
+  queueMicrotask(runScheduledIntersectionsRefresh)
 }
 
 function clearDragSession(event: PointerEvent | TouchEvent | MouseEvent): void {
@@ -184,6 +223,7 @@ function clearDragSession(event: PointerEvent | TouchEvent | MouseEvent): void {
 
   const current = dragSession
   dragSession = null
+  unlockDocumentTextSelection()
 
   for (const dragHandle of current.handles) {
     dragHandle.handle.setDragging(false)
@@ -201,6 +241,10 @@ function clearDragSession(event: PointerEvent | TouchEvent | MouseEvent): void {
 function onPointerMove(event: PointerEvent): void {
   if (!dragSession) {
     return
+  }
+
+  if (event.cancelable) {
+    event.preventDefault()
   }
 
   const deltaX = event.clientX - dragSession.startX
@@ -552,6 +596,10 @@ export function startResizableHandleDrag(
   event: PointerEvent,
   target: ResizableHandleIntersectionTarget,
 ): void {
+  if (event.cancelable) {
+    event.preventDefault()
+  }
+
   const handles = resolveDragHandles(handle, target, event)
   if (handles.some((dragHandle) => !dragHandle.getElement())) {
     return
@@ -568,6 +616,7 @@ export function startResizableHandleDrag(
     startX: event.clientX,
     startY: event.clientY,
   }
+  lockDocumentTextSelection()
 
   for (const dragHandle of dragHandles) {
     dragHandle.handle.setDragging(true)

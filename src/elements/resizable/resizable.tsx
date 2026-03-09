@@ -1,5 +1,13 @@
 import type { JSX } from 'solid-js'
-import { For, Show, createEffect, createMemo, createSignal, mergeProps, onCleanup } from 'solid-js'
+import {
+  Index,
+  Show,
+  createEffect,
+  createMemo,
+  createSignal,
+  mergeProps,
+  onCleanup,
+} from 'solid-js'
 
 import type { SlotClasses } from '../../shared/slot-class'
 import { cn, useId } from '../../shared/utils'
@@ -8,13 +16,15 @@ import {
   EPSILON,
   RESIZABLE_HANDLE_TARGET_END,
   RESIZABLE_HANDLE_TARGET_START,
+  RESIZE_FLAG_FOLLOWING,
+  RESIZE_FLAG_PRECEDING,
   getHandleAria,
   isPanelCollapsed,
   normalizePanelSizes,
   resolveKeyboardDelta,
   resolvePanels,
   resizeFromHandle,
-  toggleHandleNearestPanel,
+  resizePanelToSize,
   useResizableHandle,
 } from './hook'
 import type { ResizableOrientation, ResizablePanelItem, ResizableSize } from './hook'
@@ -35,6 +45,11 @@ export interface ResizableProps extends ResizableVariantProps {
   onResize?: (sizes: number[]) => void
   onResizeStart?: (sizes: number[]) => void
   onResizeEnd?: (sizes: number[]) => void
+  onHandleKeyDown?: (context: {
+    event: KeyboardEvent
+    handleIndex: number
+    sizes: number[]
+  }) => void
   disable?: boolean
   renderHandle?: boolean | JSX.Element
   intersection?: boolean
@@ -66,18 +81,19 @@ export function Resizable(props: ResizableProps): JSX.Element {
   const [rootElement, setRootElement] = createSignal<HTMLDivElement>()
   const [rootSize, setRootSize] = createSignal(1)
   const [uncontrolledSizes, setUncontrolledSizes] = createSignal<number[]>([])
+  const [interactionResizing, setInteractionResizing] = createSignal(false)
 
   const resolvedPanels = createMemo(() =>
     resolvePanels(localProps.panels ?? [], rootSize(), panelIdPrefix()),
   )
   const panelCount = createMemo(() => resolvedPanels().length)
-  const panelInitialSizes = createMemo(() => resolvedPanels().map((p) => p.initialSize))
+  const panelDefaultSizes = createMemo(() => resolvedPanels().map((p) => p.defaultSize))
 
   function normalizeWithCurrentState(controlledSizes?: Array<ResizableSize | undefined>) {
     return normalizePanelSizes({
       panelCount: panelCount(),
       rootSize: rootSize(),
-      panelInitialSizes: panelInitialSizes(),
+      panelInitialSizes: panelDefaultSizes(),
       controlledSizes,
     })
   }
@@ -173,6 +189,10 @@ export function Resizable(props: ResizableProps): JSX.Element {
     return nextSizes.map((size) => size * currentRootSize)
   }
 
+  function scheduleInteractionResizeRelease(): void {
+    queueMicrotask(() => setInteractionResizing(false))
+  }
+
   function normalizeSizes(nextSizes: number[]): number[] {
     const nextCount = panelCount()
     if (nextSizes.length !== nextCount) {
@@ -190,6 +210,46 @@ export function Resizable(props: ResizableProps): JSX.Element {
     return Math.abs(total - 1) > EPSILON * Math.max(1, nextCount)
       ? normalizeWithCurrentState(nextSizes)
       : nextSizes
+  }
+
+  function snapDragEndSizes(nextSizes: number[]): number[] {
+    const panels = resolvedPanels()
+    let snappedSizes = normalizeSizes(nextSizes)
+
+    for (let panelIndex = 0; panelIndex < panels.length; panelIndex += 1) {
+      const panel = panels[panelIndex]
+      const panelSize = snappedSizes[panelIndex] ?? 0
+
+      if (!panel?.collapsible || panelSize <= EPSILON || panelSize + EPSILON >= panel.min) {
+        continue
+      }
+
+      const strategy =
+        panelIndex === panels.length - 1 ? RESIZE_FLAG_PRECEDING : RESIZE_FLAG_FOLLOWING
+      snappedSizes = normalizeSizes(
+        resizePanelToSize({
+          panelIndex,
+          size: panel.min,
+          strategy,
+          initialSizes: snappedSizes,
+          panels,
+          rootSize: 1,
+        }),
+      )
+    }
+
+    return snappedSizes
+  }
+
+  function isHandleResizable(handleIndex: number): boolean {
+    const panels = resolvedPanels()
+    const precedingPanel = panels[handleIndex]
+    const followingPanel = panels[handleIndex + 1]
+    if (!precedingPanel || !followingPanel) {
+      return false
+    }
+
+    return precedingPanel.resizable !== false && followingPanel.resizable !== false
   }
 
   function beginResize(nextSizes: number[]): void {
@@ -250,6 +310,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
     }
 
     if (!drag.started) {
+      setInteractionResizing(true)
       beginResize(drag.initialSizes)
       drag.started = true
     }
@@ -260,34 +321,31 @@ export function Resizable(props: ResizableProps): JSX.Element {
 
   function stopHandleDrag(): void {
     if (drag?.started) {
+      const snappedSizes = snapDragEndSizes(drag.lastSizes)
+      if (hasSizeChange(drag.lastSizes, snappedSizes)) {
+        drag.lastSizes = snappedSizes
+        emitSizes(snappedSizes)
+      }
+
       endResize(drag.lastSizes)
     }
 
     drag = null
+    setInteractionResizing(false)
   }
 
   function onHandleKeyDown(handleIndex: number, event: KeyboardEvent, altKey: boolean): void {
-    if (localProps.disable) {
+    if (localProps.disable || !isHandleResizable(handleIndex)) {
       return
     }
 
-    if (event.key === 'Enter') {
-      const currentSizes = sizes()
-      const nextSizes = normalizeSizes(
-        toggleHandleNearestPanel({
-          handleIndex,
-          initialSizes: currentSizes,
-          panels: resolvedPanels(),
-        }),
-      )
+    localProps.onHandleKeyDown?.({
+      event,
+      handleIndex,
+      sizes: resolvePixelSizes(sizes()),
+    })
 
-      if (hasSizeChange(currentSizes, nextSizes)) {
-        beginResize(currentSizes)
-        emitSizes(nextSizes)
-        endResize(nextSizes)
-      }
-
-      event.preventDefault()
+    if (event.defaultPrevented) {
       return
     }
 
@@ -327,9 +385,11 @@ export function Resizable(props: ResizableProps): JSX.Element {
       return
     }
 
+    setInteractionResizing(true)
     beginResize(currentSizes)
     emitSizes(nextSizes)
     endResize(nextSizes)
+    scheduleInteractionResizeRelease()
     event.preventDefault()
   }
 
@@ -342,19 +402,23 @@ export function Resizable(props: ResizableProps): JSX.Element {
       data-orientation={orientation()}
       class={resizableRootVariants({ orientation: orientation() }, localProps.classes?.root)}
     >
-      <For each={resolvedPanels()}>
+      <Index each={resolvedPanels()}>
         {(panel, index) => {
-          const size = () => sizes()[index()] ?? 0
-          const collapsed = () => isPanelCollapsed(size(), panel)
+          const panelItem = createMemo(() => panel())
+          const size = () => sizes()[index] ?? 0
+          const collapsed = () => isPanelCollapsed(size(), panelItem())
+          const handleDisabled = createMemo(
+            () => localProps.disable === true || !isHandleResizable(index),
+          )
 
           const aria = createMemo(() =>
-            getHandleAria({ handleIndex: index(), sizes: sizes(), panels: resolvedPanels() }),
+            getHandleAria({ handleIndex: index, sizes: sizes(), panels: resolvedPanels() }),
           )
 
           const bindings = useResizableHandle({
-            handleIndex: index,
+            handleIndex: () => index,
             orientation,
-            disable: () => localProps.disable,
+            disable: handleDisabled,
             intersection: () => localProps.intersection,
             onDrag: resizeHandleByDelta,
             onDragEnd: stopHandleDrag,
@@ -364,18 +428,23 @@ export function Resizable(props: ResizableProps): JSX.Element {
           return (
             <>
               <div
-                id={panel.panelId}
+                id={panelItem().panelId}
                 data-slot="panel"
                 data-orientation={orientation()}
                 data-collapsed={collapsed() ? '' : undefined}
-                data-expanded={panel.collapsible && !collapsed() ? '' : undefined}
-                class={cn('min-h-0 min-w-0 overflow-auto', localProps.classes?.panel, panel.class)}
-                style={{ 'flex-basis': `${size() * 100}%`, ...panel.style }}
+                data-expanded={panelItem().collapsible && !collapsed() ? '' : undefined}
+                data-resizing={interactionResizing() ? '' : undefined}
+                class={cn(
+                  'min-h-0 min-w-0 overflow-auto transition-flex-basis duration-200 ease-out motion-reduce:transition-none data-resizing:duration-0',
+                  localProps.classes?.panel,
+                  panelItem().class,
+                )}
+                style={{ 'flex-basis': `${size() * 100}%`, ...panelItem().style }}
               >
-                {panel.content}
+                {panelItem().content}
               </div>
 
-              <Show when={index() < resolvedPanels().length - 1}>
+              <Show when={index < resolvedPanels().length - 1}>
                 <div
                   ref={bindings.setElement}
                   role="separator"
@@ -384,8 +453,8 @@ export function Resizable(props: ResizableProps): JSX.Element {
                   aria-valuemin={aria().valueMin}
                   aria-valuemax={aria().valueMax}
                   aria-valuenow={aria().valueNow}
-                  aria-disabled={localProps.disable ? 'true' : undefined}
-                  tabIndex={localProps.disable ? -1 : 0}
+                  aria-disabled={handleDisabled() ? 'true' : undefined}
+                  tabIndex={handleDisabled() ? -1 : 0}
                   data-slot="divider"
                   data-orientation={orientation()}
                   data-active={bindings.active() ? '' : undefined}
@@ -425,7 +494,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
                           <div
                             data-slot="handle"
                             class={cn(
-                              'z-10 pointer-events-none flex items-center justify-center',
+                              'z-10 flex items-center justify-center',
                               localProps.classes?.handle,
                             )}
                           >
@@ -436,7 +505,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
                         <div
                           data-slot="handle"
                           class={cn(
-                            'z-10 h-6 w-1 rounded-lg bg-border/90 pointer-events-none flex shrink-0',
+                            'z-10 h-6 w-1 rounded-lg bg-border/90 flex shrink-0',
                             orientation() === 'horizontal' ? 'mx-auto' : 'rotate-90',
                             localProps.classes?.handle,
                           )}
@@ -465,7 +534,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
             </>
           )
         }}
-      </For>
+      </Index>
     </div>
   )
 }

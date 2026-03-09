@@ -177,15 +177,23 @@ export function useResizableHandle(options: UseResizableHandleOptions): Resizabl
       return
     }
 
-    const target = event.target as HTMLElement | null
-    if (typeof target?.setPointerCapture === 'function') {
-      target.setPointerCapture(event.pointerId)
+    if (event.cancelable) {
+      event.preventDefault()
     }
 
+    const currentTarget = event.currentTarget as HTMLElement | null
+    if (typeof currentTarget?.setPointerCapture === 'function') {
+      currentTarget.setPointerCapture(event.pointerId)
+    }
+
+    const target = event.target as HTMLElement | null
+    const targetElement = target?.closest<HTMLElement>(
+      `[${HANDLE_START_TARGET_ATTR}], [${HANDLE_END_TARGET_ATTR}]`,
+    )
     let targetType: ResizableHandleIntersectionTarget = RESIZABLE_HANDLE_TARGET_HANDLE
-    if (target?.hasAttribute(HANDLE_START_TARGET_ATTR)) {
+    if (targetElement?.hasAttribute(HANDLE_START_TARGET_ATTR)) {
       targetType = RESIZABLE_HANDLE_TARGET_START
-    } else if (target?.hasAttribute(HANDLE_END_TARGET_ATTR)) {
+    } else if (targetElement?.hasAttribute(HANDLE_END_TARGET_ATTR)) {
       targetType = RESIZABLE_HANDLE_TARGET_END
     }
 

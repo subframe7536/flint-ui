@@ -361,6 +361,7 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
     shortcuts: [
       ['effect-fv', 'outline-none ring-3px ring-ring/30'],
       ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/30'],
+      ['transition-flex-basis', '[transition-property:flex-basis]'],
       ['style-placeholder', 'placeholder:(text-muted-foreground select-none)'],
       [
         'style-accordion-content',

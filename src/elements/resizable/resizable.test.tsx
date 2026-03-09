@@ -156,8 +156,8 @@ describe('Resizable', () => {
           }}
           onResizeEnd={(nextSizes) => events.push({ type: 'end', sizes: nextSizes })}
           panels={[
-            { content: 'Left', minSize: '20%', size: sizes()[0] },
-            { content: 'Right', minSize: '20%', size: sizes()[1] },
+            { content: 'Left', min: '20%', size: sizes()[0] },
+            { content: 'Right', min: '20%', size: sizes()[1] },
           ]}
         />
       )
@@ -189,8 +189,8 @@ describe('Resizable', () => {
         onResize={onResize}
         onResizeEnd={onResizeEnd}
         panels={[
-          { content: 'Left', minSize: '20%', size: 200 },
-          { content: 'Right', minSize: '20%', size: 800 },
+          { content: 'Left', min: '20%', size: 200 },
+          { content: 'Right', min: '20%', size: 800 },
         ]}
       />
     ))
@@ -218,8 +218,8 @@ describe('Resizable', () => {
           }}
           onResizeEnd={(nextSizes) => events.push({ type: 'end', sizes: nextSizes })}
           panels={[
-            { content: 'Left', minSize: '20%', size: sizes()[0] },
-            { content: 'Right', minSize: '20%', size: sizes()[1] },
+            { content: 'Left', min: '20%', size: sizes()[0] },
+            { content: 'Right', min: '20%', size: sizes()[1] },
           ]}
         />
       )
@@ -243,8 +243,8 @@ describe('Resizable', () => {
 
     const screen = render(() => {
       const [panels, setPanels] = createStore([
-        { content: 'Left', minSize: '20%' as const, size: 400 },
-        { content: 'Right', minSize: '20%' as const, size: 600 },
+        { content: 'Left', min: '20%' as const, size: 400 },
+        { content: 'Right', min: '20%' as const, size: 600 },
       ])
 
       return (
@@ -284,38 +284,208 @@ describe('Resizable', () => {
     expect(panels[2]?.style.flexBasis).toBe('50%')
   })
 
-  test('toggles the nearest collapsible panel with Enter and emits resize lifecycle', async () => {
-    const events: Array<{ type: 'start' | 'resize' | 'end'; sizes: number[] }> = []
+  test('does not toggle collapsible panels with Enter by default', async () => {
+    const onResize = vi.fn()
 
     const screen = render(() => (
       <Resizable
-        onResizeStart={(nextSizes) => events.push({ type: 'start', sizes: nextSizes })}
-        onResize={(nextSizes) => events.push({ type: 'resize', sizes: nextSizes })}
-        onResizeEnd={(nextSizes) => events.push({ type: 'end', sizes: nextSizes })}
+        onResize={onResize}
         panels={[
           {
             content: 'Sidebar',
-            initialSize: '30%',
-            minSize: '20%',
+            defaultSize: '30%',
+            min: '20%',
             collapsible: true,
-            collapsedSize: 0,
-            collapseThreshold: '5%',
           },
-          { content: 'Content', initialSize: '70%', minSize: '20%' },
+          { content: 'Content', defaultSize: '70%', min: '20%' },
         ]}
       />
     ))
 
     const handle = screen.container.querySelector('[data-slot="divider"]') as HTMLElement
+    const panels = screen.container.querySelectorAll('[data-slot="panel"]') as NodeListOf<HTMLDivElement>
+
     await fireEvent.keyDown(handle, { key: 'Enter' })
 
-    expect(events.map((event) => event.type)).toEqual(['start', 'resize', 'end'])
-    expect(events[0]?.sizes).toEqual([300, 700])
-    expect(events[1]?.sizes[0]).toBeCloseTo(0, 3)
-    expect(events[1]?.sizes[1]).toBeCloseTo(1000, 3)
+    expect(onResize).not.toHaveBeenCalled()
+    expect(panels[0]?.style.flexBasis).toBe('30%')
+    expect(panels[0]?.getAttribute('data-collapsed')).toBeNull()
+  })
 
-    const panels = screen.container.querySelectorAll('[data-slot="panel"]')
-    expect(panels[0]?.getAttribute('data-collapsed')).toBe('')
+  test('calls onHandleKeyDown with handle context and keeps keyboard resize behavior', async () => {
+    const onHandleKeyDown = vi.fn()
+
+    const screen = render(() => (
+      <Resizable
+        onHandleKeyDown={onHandleKeyDown}
+        panels={[
+          { content: 'Left', min: '20%', defaultSize: '50%' },
+          { content: 'Right', min: '20%', defaultSize: '50%' },
+        ]}
+      />
+    ))
+
+    const handle = screen.container.querySelector('[data-slot="divider"]') as HTMLElement
+    const panels = screen.container.querySelectorAll(
+      '[data-slot="panel"]',
+    ) as NodeListOf<HTMLDivElement>
+
+    await fireEvent.keyDown(handle, { key: 'ArrowRight' })
+
+    expect(onHandleKeyDown).toHaveBeenCalledTimes(1)
+    const context = onHandleKeyDown.mock.calls[0]?.[0] as {
+      event: KeyboardEvent
+      handleIndex: number
+      sizes: number[]
+    }
+    expect(context.handleIndex).toBe(0)
+    expect(context.sizes[0]).toBeCloseTo(500, 3)
+    expect(context.sizes[1]).toBeCloseTo(500, 3)
+    expect(context.event.key).toBe('ArrowRight')
+    expect(panels[0]?.style.flexBasis).toBe('60%')
+    expect(panels[1]?.style.flexBasis).toBe('40%')
+  })
+
+  test('skips internal keyboard resize when onHandleKeyDown prevents default', async () => {
+    const screen = render(() => (
+      <Resizable
+        onHandleKeyDown={({ event }) => {
+          if (event.key === 'ArrowRight') {
+            event.preventDefault()
+          }
+        }}
+        panels={[
+          { content: 'Left', min: '20%', size: 500 },
+          { content: 'Right', min: '20%', size: 500 },
+        ]}
+      />
+    ))
+
+    const handle = screen.container.querySelector('[data-slot="divider"]') as HTMLElement
+    const panels = screen.container.querySelectorAll(
+      '[data-slot="panel"]',
+    ) as NodeListOf<HTMLDivElement>
+
+    await fireEvent.keyDown(handle, { key: 'ArrowRight' })
+
+    expect(panels[0]?.style.flexBasis).toBe('50%')
+    expect(panels[1]?.style.flexBasis).toBe('50%')
+  })
+
+  test('supports dragging when pointer down starts on handle visual area', async () => {
+    const screen = render(() => (
+      <Resizable renderHandle panels={[{ content: 'Left' }, { content: 'Right' }]} />
+    ))
+
+    const handleVisual = screen.container.querySelector('[data-slot="handle"]') as HTMLElement
+    const panels = screen.container.querySelectorAll(
+      '[data-slot="panel"]',
+    ) as NodeListOf<HTMLDivElement>
+
+    await fireEvent.pointerDown(handleVisual, { pointerId: 1, clientX: 0, clientY: 0 })
+    await fireEvent.pointerMove(window, { pointerId: 1, clientX: 100, clientY: 0 })
+    await fireEvent.pointerUp(window, { pointerId: 1, clientX: 100, clientY: 0 })
+
+    expect(panels[0]?.style.flexBasis).toBe('60%')
+    expect(panels[1]?.style.flexBasis).toBe('40%')
+  })
+
+  test('snaps expanded size to min when releasing a drag from collapsed state', async () => {
+    const screen = render(() => {
+      const [sizes, setSizes] = createSignal([0, 1000])
+
+      return (
+        <Resizable
+          onResize={(nextSizes) => setSizes(nextSizes)}
+          panels={[
+            { content: 'Left', size: sizes()[0], min: '20%', collapsible: true },
+            { content: 'Right', size: sizes()[1], min: '20%' },
+          ]}
+        />
+      )
+    })
+
+    const handle = screen.container.querySelector('[data-slot="divider"]') as HTMLElement
+    const panels = screen.container.querySelectorAll(
+      '[data-slot="panel"]',
+    ) as NodeListOf<HTMLDivElement>
+
+    await fireEvent.pointerDown(handle, { pointerId: 1, clientX: 0, clientY: 0 })
+    await fireEvent.pointerMove(window, { pointerId: 1, clientX: 100, clientY: 0 })
+    expect(panels[0]?.style.flexBasis).toBe('10%')
+
+    await fireEvent.pointerUp(window, { pointerId: 1, clientX: 100, clientY: 0 })
+    expect(panels[0]?.style.flexBasis).toBe('20%')
+  })
+
+  test('does not render built-in collapsible buttons', () => {
+    const screen = render(() => (
+      <Resizable
+        panels={[
+          { content: 'Left', collapsible: true },
+          { content: 'Center', collapsible: true },
+          { content: 'Right' },
+        ]}
+      />
+    ))
+
+    expect(screen.container.querySelectorAll('[data-slot="collapsible"]')).toHaveLength(0)
+  })
+
+  test('applies flex-basis transition only during collapse state changes', async () => {
+    const screen = render(() => {
+      const [sizes, setSizes] = createSignal<[number, number]>([350, 650])
+      const [lastExpandedSize, setLastExpandedSize] = createSignal(350)
+
+      function toggleSidebar(): void {
+        const currentSizes = sizes()
+        const sidebarSize = currentSizes[0] ?? 0
+        const contentSize = currentSizes[1] ?? 0
+        const total = sidebarSize + contentSize > 0 ? sidebarSize + contentSize : 1000
+
+        if (sidebarSize <= 0) {
+          const restoredSize = Math.min(Math.max(lastExpandedSize(), 1), total)
+          setSizes([restoredSize, Math.max(total - restoredSize, 0)])
+          return
+        }
+
+        setLastExpandedSize(sidebarSize)
+        setSizes([0, total])
+      }
+
+      return (
+        <div>
+          <button type="button" data-slot="toggle" onClick={toggleSidebar}>
+            Toggle
+          </button>
+          <Resizable
+            panels={[
+              { content: 'Left', size: sizes()[0], collapsible: true },
+              { content: 'Right', size: sizes()[1] },
+            ]}
+          />
+        </div>
+      )
+    })
+
+    const toggle = screen.container.querySelector('[data-slot="toggle"]') as HTMLButtonElement
+    const getSidebar = () =>
+      screen.container.querySelectorAll('[data-slot="panel"]')[0] as HTMLDivElement
+    const sidebarBefore = getSidebar()
+
+    expect(getSidebar().className).toContain('transition-flex-basis')
+    expect(getSidebar().className).toContain('data-resizing:duration-0')
+    expect(getSidebar().getAttribute('data-resizing')).toBeNull()
+
+    await fireEvent.click(toggle)
+    expect(getSidebar()).toBe(sidebarBefore)
+    expect(getSidebar().style.flexBasis).toBe('0%')
+    expect(getSidebar().getAttribute('data-resizing')).toBeNull()
+
+    await fireEvent.click(toggle)
+    expect(getSidebar()).toBe(sidebarBefore)
+    expect(getSidebar().style.flexBasis).toBe('35%')
+    expect(getSidebar().getAttribute('data-resizing')).toBeNull()
   })
 
   test('supports nested resizable panels and root-level intersection config', async () => {
@@ -444,9 +614,9 @@ describe('Resizable', () => {
 
     const screen = render(() => {
       const [panelMetas, setPanelMetas] = createSignal([
-        { content: 'One', minSize: '20%' as const },
-        { content: 'Two', minSize: '20%' as const },
-        { content: 'Three', minSize: '20%' as const },
+        { content: 'One', min: '20%' as const },
+        { content: 'Two', min: '20%' as const },
+        { content: 'Three', min: '20%' as const },
       ])
       const [sizes, setSizes] = createSignal([340, 330, 330])
       const panels = () =>
@@ -499,9 +669,11 @@ describe('Resizable', () => {
     const screen = render(() => <Resizable panels={[{ content: 'Left' }, { content: 'Right' }]} />)
 
     const handle = screen.container.querySelector('[data-slot="divider"]') as HTMLElement
+    const panel = screen.container.querySelector('[data-slot="panel"]') as HTMLDivElement
 
     expect(handle.getAttribute('data-active')).toBeNull()
     expect(handle.getAttribute('data-dragging')).toBeNull()
+    expect(panel.getAttribute('data-resizing')).toBeNull()
 
     await fireEvent.mouseEnter(handle)
     expect(handle.getAttribute('data-active')).toBe('')
@@ -512,8 +684,51 @@ describe('Resizable', () => {
     await fireEvent.pointerDown(handle, { pointerId: 1, clientX: 0, clientY: 0 })
     expect(handle.getAttribute('data-active')).toBe('')
     expect(handle.getAttribute('data-dragging')).toBe('')
+    await fireEvent.pointerMove(window, { pointerId: 1, clientX: 100, clientY: 0 })
+    expect(panel.getAttribute('data-resizing')).toBe('')
 
     await fireEvent.pointerUp(window, { pointerId: 1, clientX: 0, clientY: 0 })
     expect(handle.getAttribute('data-dragging')).toBeNull()
+    expect(panel.getAttribute('data-resizing')).toBeNull()
+  })
+
+  test('locks document text selection while dragging from cross target and restores afterwards', async () => {
+    const screen = render(() => (
+      <Resizable
+        renderHandle
+        intersection
+        panels={[
+          { content: 'Outer Left' },
+          {
+            content: (
+              <Resizable
+                orientation="vertical"
+                renderHandle
+                intersection
+                panels={[{ content: 'Inner Top' }, { content: 'Inner Bottom' }]}
+              />
+            ),
+          },
+        ]}
+      />
+    ))
+
+    const handles = screen.container.querySelectorAll('[data-slot="divider"]')
+    const [outerHandle, innerHandle] = Array.from(handles) as HTMLDivElement[]
+    setRect(outerHandle, createRect({ top: 0, right: 101, bottom: 200, left: 100 }))
+    setRect(innerHandle, createRect({ top: 80, right: 220, bottom: 81, left: 101 }))
+
+    const { refreshResizableHandleIntersections } = await import('./hook/manager')
+    refreshResizableHandleIntersections()
+    await Promise.resolve()
+
+    document.body.style.userSelect = 'text'
+    const crossTarget = innerHandle.querySelector('[data-slot="cross-target"]') as HTMLElement
+    await fireEvent.pointerDown(crossTarget, { pointerId: 1, clientX: 102, clientY: 80 })
+    expect(document.body.style.userSelect).toBe('none')
+
+    await fireEvent.pointerMove(window, { pointerId: 1, clientX: 132, clientY: 110 })
+    await fireEvent.pointerUp(window, { pointerId: 1, clientX: 132, clientY: 110 })
+    expect(document.body.style.userSelect).toBe('text')
   })
 })

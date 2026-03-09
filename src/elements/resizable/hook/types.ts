@@ -6,12 +6,11 @@ export type ResizableSize = number | `${number}%`
 export interface ResizablePanelItem {
   panelId?: string
   size?: ResizableSize
-  initialSize?: ResizableSize
-  minSize?: ResizableSize
-  maxSize?: ResizableSize
+  defaultSize?: ResizableSize
+  min?: ResizableSize
+  max?: ResizableSize
+  resizable?: boolean
   collapsible?: boolean
-  collapsedSize?: ResizableSize
-  collapseThreshold?: ResizableSize
   onResize?: (size: number) => void
   onCollapse?: (size: number) => void
   onExpand?: (size: number) => void
@@ -25,21 +24,14 @@ export const EPSILON = 10 ** -PRECISION
 
 export interface ResizableResolvedPanel extends Omit<
   ResizablePanelItem,
-  | 'size'
-  | 'initialSize'
-  | 'minSize'
-  | 'maxSize'
-  | 'collapsible'
-  | 'collapsedSize'
-  | 'collapseThreshold'
+  'size' | 'defaultSize' | 'min' | 'max' | 'resizable' | 'collapsible'
 > {
   panelId: string
-  initialSize?: ResizableSize
-  minSize: number
-  maxSize: number
+  defaultSize?: ResizableSize
+  min: number
+  max: number
+  resizable: boolean
   collapsible: boolean
-  collapsedSize: number
-  collapseThreshold: number
 }
 
 export interface ResizableHandleAria {
