@@ -303,7 +303,9 @@ describe('Resizable', () => {
     ))
 
     const handle = screen.container.querySelector('[data-slot="divider"]') as HTMLElement
-    const panels = screen.container.querySelectorAll('[data-slot="panel"]') as NodeListOf<HTMLDivElement>
+    const panels = screen.container.querySelectorAll(
+      '[data-slot="panel"]',
+    ) as NodeListOf<HTMLDivElement>
 
     await fireEvent.keyDown(handle, { key: 'Enter' })
 
