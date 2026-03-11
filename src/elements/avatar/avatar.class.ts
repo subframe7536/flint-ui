@@ -9,9 +9,11 @@ export const avatarRootVariants = cva(
     },
     variants: {
       size: {
+        xs: 'size-6 text-xs',
         sm: 'size-7 text-xs',
         md: 'size-8 text-sm',
         lg: 'size-10 text-base',
+        xl: 'size-11 text-lg',
       },
     },
   },
@@ -51,9 +53,11 @@ export const avatarFallbackVariants = cva(
     },
     variants: {
       size: {
+        xs: 'text-xs',
         sm: 'text-xs',
         md: 'text-sm',
         lg: 'text-base',
+        xl: 'text-lg',
       },
       status: {
         idle: 'opacity-100',
@@ -77,9 +81,11 @@ export const avatarFallbackIconVariants = cva('shrink-0', {
   },
   variants: {
     size: {
+      xs: 'text-xs',
       sm: 'text-sm',
       md: 'text-base',
       lg: 'text-lg',
+      xl: 'text-xl',
     },
   },
 })
@@ -93,9 +99,11 @@ export const avatarBadgeVariants = cva(
     },
     variants: {
       size: {
+        xs: 'size-2.5 text-[8px]',
         sm: 'size-3 text-[9px]',
         md: 'size-3.5 text-[10px]',
         lg: 'size-4 text-xs',
+        xl: 'size-4.5 text-sm',
       },
       badgePosition: {
         'top-left': '-top-0.5 -left-0.5',
@@ -113,9 +121,11 @@ export const avatarGroupItemVariants = cva('relative rounded-full ring-backgroun
   },
   variants: {
     size: {
+      xs: 'ring-2 -me-1',
       sm: 'ring-2 -me-1.5',
       md: 'ring-2 -me-1.5',
       lg: 'ring-2 -me-1.5',
+      xl: 'ring-2 -me-2',
     },
   },
 })
@@ -128,9 +138,11 @@ export const avatarGroupCountVariants = cva(
     },
     variants: {
       size: {
+        xs: 'size-6 text-xs ring-2 -me-1',
         sm: 'size-7 text-xs ring-2 -me-1.5',
         md: 'size-8 text-sm ring-2 -me-1.5',
         lg: 'size-10 text-base ring-2 -me-1.5',
+        xl: 'size-11 text-lg ring-2 -me-2',
       },
     },
   },

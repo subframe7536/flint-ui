@@ -121,6 +121,29 @@ describe('Avatar', () => {
     expect(root?.className).not.toContain('overflow-hidden')
   })
 
+  test('supports xs and xl size variants for single avatars', () => {
+    const screen = render(() => (
+      <>
+        <Avatar size="xs" fallback="i-lucide-user" badge="i-lucide-check" />
+        <Avatar size="xl" fallback="i-lucide-user" badge="i-lucide-check" />
+      </>
+    ))
+
+    const roots = Array.from(screen.container.querySelectorAll('[data-slot="root"]'))
+    const fallbackIcons = Array.from(
+      screen.container.querySelectorAll('[data-slot="fallbackIcon"]'),
+    )
+    const badges = Array.from(screen.container.querySelectorAll('[data-slot="badge"]'))
+
+    expect(roots[0]?.className).toContain('size-6')
+    expect(fallbackIcons[0]?.className).toContain('text-xs')
+    expect(badges[0]?.className).toContain('size-2.5')
+
+    expect(roots[1]?.className).toContain('size-11')
+    expect(fallbackIcons[1]?.className).toContain('text-xl')
+    expect(badges[1]?.className).toContain('size-4.5')
+  })
+
   test('generates initials from alt when text is not provided', () => {
     const screen = render(() => <Avatar alt="Rock UI Team" />)
     const fallback = screen.container.querySelector('[data-slot="fallback"]')
@@ -207,6 +230,26 @@ describe('Avatar', () => {
     expect(fallbacks[0]?.textContent).toBe('C')
     expect(fallbacks[1]?.textContent).toBe('B')
     expect(fallbacks[2]?.textContent).toBe('A')
+  })
+
+  test('supports xs and xl size variants for avatar groups', () => {
+    const screen = render(() => (
+      <>
+        <Avatar size="xs" max={1} items={[{ text: 'A' }, { text: 'B' }]} />
+        <Avatar size="xl" max={1} items={[{ text: 'A' }, { text: 'B' }]} />
+      </>
+    ))
+
+    const groupCounts = Array.from(screen.container.querySelectorAll('[data-slot="groupCount"]'))
+    const groupItems = Array.from(screen.container.querySelectorAll('[data-slot="groupItem"]'))
+
+    expect(groupCounts[0]?.className).toContain('size-6')
+    expect(groupCounts[0]?.className).toContain('-me-1')
+    expect(groupItems[0]?.className).toContain('-me-1')
+
+    expect(groupCounts[1]?.className).toContain('size-11')
+    expect(groupCounts[1]?.className).toContain('-me-2')
+    expect(groupItems[1]?.className).toContain('-me-2')
   })
 
   test('rejects arbitrary html props and class prop in type contract', () => {
