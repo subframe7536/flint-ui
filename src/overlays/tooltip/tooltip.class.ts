@@ -13,7 +13,7 @@ export const tooltipContentVariants = cva(
       },
       invert: {
         true: 'bg-foreground text-background',
-        false: 'bg-background text-foreground ring-(1 border) shadow-sm',
+        false: 'bg-background text-foreground surface-outline shadow-sm',
       },
     },
     defaultVariants: {

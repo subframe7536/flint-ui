@@ -367,7 +367,10 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
         'style-accordion-content',
         '[&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
       ],
+      ['surface-outline', 'ring-1 ring-border'],
+      ['surface-outline-inset', 'ring ring-inset ring-border'],
       ['surface-highlight', 'ring-1 ring-border/50'],
+      ['surface-overlay', 'ring-1 ring-foreground/10'],
       ['hidden-hitless', 'opacity-0 pointer-events-none'],
       [
         'effect-invalid',

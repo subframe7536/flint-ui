@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const avatarRootVariants = cva(
-  'relative inline-flex shrink-0 select-none items-center justify-center overflow-visible rounded-full bg-muted text-muted-foreground ring-1 ring-border',
+  'relative inline-flex shrink-0 select-none items-center justify-center overflow-visible rounded-full bg-muted text-muted-foreground surface-outline',
   {
     defaultVariants: {
       size: 'md',

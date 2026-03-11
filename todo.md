@@ -3,7 +3,8 @@
 - [x] invalid and other boolean state should become `data-*` driven css instead of a variant in `cva`
 - [x] unify id
 - [x] custom true/false value in form elements, reference from nuxt-ui
-- [ ] polish theme, like ring color etc.
+- [ ] extend avatar size variant like other components
+- [ ] check `props.highlight` actual usage and style effect, optimize `surface-highlight` and `surface-outline` and `surface-overlay`
 - [ ] tailwind 3 preset support, remove all unocss-specific class syntax and option to simplify by transformer
 - [ ] `styles: SlotStyles<SlotNames, JSX.CSSProperties>` (like `classes`)
 - [ ] props jsdoc

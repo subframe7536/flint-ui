@@ -17,8 +17,8 @@ export const kbdItemVariants = cva(
         xl: 'h-5.5 px-2 text-sm',
       },
       variant: {
-        default: 'bg-muted/70 ring ring-inset ring-border text-foreground',
-        outline: 'ring ring-border b-b-(2 border) text-muted-foreground',
+        default: 'bg-muted/70 surface-outline-inset text-foreground',
+        outline: 'surface-outline b-b-(2 border) text-muted-foreground',
         invert: 'bg-muted-foreground text-muted',
       },
     },

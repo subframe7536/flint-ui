@@ -31,7 +31,7 @@ describe('Badge', () => {
 
     expect(solid.container.querySelector('[data-slot="badge"]')?.className).toContain('bg-primary')
     expect(outline.container.querySelector('[data-slot="badge"]')?.className).toContain(
-      'ring-border',
+      'surface-outline-inset',
     )
   })
 

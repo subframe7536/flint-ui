@@ -200,7 +200,6 @@ export const fileUploadRemoveVariants = cva(
   },
 )
 
-export type FileUploadVariantProps = VariantProps<typeof fileUploadBaseVariants> &
-  VariantProps<typeof fileUploadRootVariants> & {
-    highlight?: boolean
-  }
+export type FileUploadVariantProps = VariantProps<typeof fileUploadBaseVariants> & {
+  highlight?: boolean
+}

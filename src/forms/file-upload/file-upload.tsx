@@ -61,11 +61,7 @@ type FileUploadSlots =
 export type FileUploadClasses = SlotClasses<FileUploadSlots>
 
 export interface FileUploadBaseProps
-  extends
-    Pick<FileUploadVariantProps, 'size' | 'highlight'>,
-    FormIdentityOptions,
-    FormRequiredOption,
-    FormDisableOption {
+  extends FileUploadVariantProps, FormIdentityOptions, FormRequiredOption, FormDisableOption {
   as?: ValidComponent
   accept?: string
   multiple?: boolean

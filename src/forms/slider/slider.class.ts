@@ -63,7 +63,7 @@ export const sliderRangeVariants = cva(
 )
 
 export const sliderThumbVariants = cva(
-  'relative block shrink-0 cursor-pointer select-none rounded-full border border-ring bg-white not-dark:bg-clip-padding shadow-xs/5 outline-none transition-[box-shadow,transform] ring-ring/50 data-dragging:(scale-120 shadow-none) data-dragging:ring-3 hover:effect-fv focus-visible:ring-3 dark:border-background data-highlight:surface-highlight',
+  'relative block shrink-0 cursor-pointer select-none rounded-full border border-ring bg-white not-dark:bg-clip-padding shadow-xs/5 outline-none transition-[box-shadow,transform] data-dragging:scale-120 hover:effect-fv focus-visible:effect-fv data-highlight:surface-highlight',
   {
     defaultVariants: {
       size: 'md',

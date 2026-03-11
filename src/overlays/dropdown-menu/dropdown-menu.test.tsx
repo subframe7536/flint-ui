@@ -138,7 +138,7 @@ describe('DropdownMenu', () => {
     expect(document.body.querySelector('[data-slot="itemIndicator"]')).not.toBeNull()
 
     expect(rootContent?.className).toContain('mr-$kb-popper-content-overflow-padding')
-    expect(rootContent?.className).toContain('ring-foreground/10')
+    expect(rootContent?.className).toContain('surface-overlay')
     expect(rootContent?.className).toContain('data-expanded:slide-in-from-right-2')
     expect(rootContent?.className).toContain('data-closed:slide-out-to-right-2')
     expect(rootContent?.className).toContain('content-class')

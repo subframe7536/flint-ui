@@ -27,7 +27,7 @@ describe('Modal', () => {
     const card = content?.querySelector('[data-slot="root"]')
 
     expect(card?.className).toContain('bg-background')
-    expect(card?.className).toContain('ring-1')
+    expect(card?.className).toContain('surface-overlay')
     expect(content?.className).toContain('data-expanded:(animate-in fade-in-0 zoom-in-95)')
   })
 
