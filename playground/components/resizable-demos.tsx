@@ -96,7 +96,7 @@ export const ResizableDemos = () => {
         title="Basic Horizontal"
         description="Two panels with auto-inserted divider and root-level handle rendering."
       >
-        <div class="border border-zinc-200 rounded-xl h-52 overflow-hidden">
+        <div class="b-1 b-border border-zinc-200 rounded-xl h-52 overflow-hidden">
           <Resizable
             renderHandle
             panels={[
@@ -124,7 +124,7 @@ export const ResizableDemos = () => {
         description="Use panel.size + onResize to sync external state. The callback now returns pixel sizes."
       >
         <div class="space-y-3">
-          <div class="border border-zinc-200 rounded-xl h-48 overflow-hidden">
+          <div class="b-1 b-border border-zinc-200 rounded-xl h-48 overflow-hidden">
             <Resizable renderHandle onResize={handleControlledResize} panels={controlledPanels} />
           </div>
           <p class="text-xs text-zinc-600">Current sizes: {formatPixelSizes(controlledSizes())}</p>
@@ -140,7 +140,7 @@ export const ResizableDemos = () => {
             <p class="text-xs text-zinc-600">
               <code>disable: false</code>
             </p>
-            <div class="border border-zinc-200 rounded-xl h-72 overflow-hidden">
+            <div class="b-1 b-border border-zinc-200 rounded-xl h-72 overflow-hidden">
               <Resizable
                 orientation="vertical"
                 renderHandle
@@ -180,7 +180,7 @@ export const ResizableDemos = () => {
             <p class="text-xs text-zinc-600">
               <code>disable: true</code>
             </p>
-            <div class="border border-zinc-200 rounded-xl h-72 overflow-hidden">
+            <div class="b-1 b-border border-zinc-200 rounded-xl h-72 overflow-hidden">
               <Resizable
                 disable
                 orientation="vertical"
@@ -223,7 +223,7 @@ export const ResizableDemos = () => {
             <p class="text-xs text-zinc-600">
               <code>intersection: true</code>
             </p>
-            <div class="border border-zinc-200 rounded-xl h-72 overflow-hidden">
+            <div class="b-1 b-border border-zinc-200 rounded-xl h-72 overflow-hidden">
               <Resizable
                 renderHandle
                 intersection
@@ -282,7 +282,7 @@ export const ResizableDemos = () => {
             <p class="text-xs text-zinc-600">
               <code>intersection: false</code>
             </p>
-            <div class="border border-zinc-200 rounded-xl h-72 overflow-hidden">
+            <div class="b-1 b-border border-zinc-200 rounded-xl h-72 overflow-hidden">
               <Resizable
                 renderHandle
                 intersection={false}
@@ -339,7 +339,7 @@ export const ResizableDemos = () => {
             <label class="space-y-1">
               <p class="text-xs text-zinc-600">Handle icon</p>
               <select
-                class="text-xs px-2 border border-zinc-300 rounded-md bg-white h-8"
+                class="text-xs px-2 b-1 b-border border-zinc-300 rounded-md bg-white h-8"
                 value={handleIcon()}
                 onChange={(event) =>
                   setHandleIcon((event.currentTarget.value as 'grip' | 'dots') ?? 'grip')
@@ -352,14 +352,14 @@ export const ResizableDemos = () => {
 
             <button
               type="button"
-              class="text-xs text-zinc-700 px-3 border border-zinc-300 rounded-md bg-white h-8 hover:bg-zinc-50"
+              class="text-xs text-zinc-700 px-3 b-1 b-border border-zinc-300 rounded-md bg-white h-8 hover:bg-zinc-50"
               onClick={toggleExternalSidebar}
             >
               {isSidebarCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'}
             </button>
           </div>
 
-          <div class="border border-zinc-200 rounded-xl h-56 overflow-hidden">
+          <div class="b-1 b-border border-zinc-200 rounded-xl h-56 overflow-hidden">
             <Resizable
               renderHandle={
                 <div class={`text-zinc-600 h-3.5 w-3.5 pointer-events-none ${handleIconClass()}`} />

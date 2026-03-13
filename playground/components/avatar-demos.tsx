@@ -36,7 +36,7 @@ export const AvatarDemos = () => {
 
           <button
             type="button"
-            class="text-sm px-3 py-2 border border-zinc-300 rounded-md bg-white hover:bg-zinc-50"
+            class="text-sm px-3 py-2 b-1 b-border border-zinc-300 rounded-md bg-white hover:bg-zinc-50"
             onClick={() => {
               setSource((current) => (current === IMAGE_A ? IMAGE_B : IMAGE_A))
             }}

@@ -20,7 +20,7 @@ export const CollapsibleDemos = () => {
         <Collapsible
           defaultOpen={false}
           classes={{
-            root: 'max-w-xl rounded-lg border border-zinc-200 bg-white',
+            root: 'max-w-xl rounded-lg b-1 b-border border-zinc-200 bg-white',
             trigger:
               'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-zinc-50',
             content: 'px-4 pb-4 text-sm text-zinc-700',
@@ -45,7 +45,7 @@ export const CollapsibleDemos = () => {
           <div class="flex gap-2">
             <button
               type="button"
-              class="text-sm px-3 py-1.5 border border-zinc-300 rounded-md hover:bg-zinc-100"
+              class="text-sm px-3 py-1.5 b-1 b-border border-zinc-300 rounded-md hover:bg-zinc-100"
               onClick={() => setOpen((value) => !value)}
             >
               Toggle controlled panel
@@ -56,7 +56,7 @@ export const CollapsibleDemos = () => {
             open={open()}
             onOpenChange={setOpen}
             classes={{
-              root: 'rounded-lg border border-zinc-200 bg-white',
+              root: 'rounded-lg b-1 b-border border-zinc-200 bg-white',
               trigger:
                 'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-zinc-50',
               content: 'px-4 pb-4 text-sm text-zinc-700',

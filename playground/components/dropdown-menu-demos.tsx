@@ -6,7 +6,7 @@ import type { DropdownMenuItems } from '../../src'
 import { DemoPage, DemoSection } from './common/demo-page'
 
 const badgeClass =
-  'rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-medium text-[11px] text-zinc-700'
+  'rounded-md b-1 b-border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-medium text-[11px] text-zinc-700'
 
 const avatarClass =
   'grid size-4 place-items-center rounded-full bg-linear-to-br from-sky-500 to-violet-500 text-[10px] font-semibold text-white'

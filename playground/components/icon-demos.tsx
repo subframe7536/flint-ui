@@ -34,7 +34,7 @@ export const IconDemos = () => (
       <div class="gap-4 grid grid-cols-4 sm:grid-cols-6">
         <For each={ICON_NAMES}>
           {(name) => (
-            <div class="p-3 border border-zinc-200 rounded-lg flex flex-col gap-2 items-center">
+            <div class="p-3 b-1 b-border border-zinc-200 rounded-lg flex flex-col gap-2 items-center">
               <Icon name={name} size={24} />
               <span class="text-[10px] text-zinc-500 truncate">
                 {name.replace('i-lucide-', '')}

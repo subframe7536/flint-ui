@@ -21,7 +21,7 @@ export const PopupDemos = () => {
       >
         <Popup
           content={
-            <div class="p-4 border rounded-xl bg-background ring-1 ring-foreground/10 shadow-md">
+            <div class="p-4 b-1 b-border rounded-xl bg-background ring-1 ring-foreground/10 shadow-md">
               <h3 class="text-sm font-semibold">Popup content</h3>
               <p class="text-sm text-muted-foreground mt-1">
                 This content controls its own spacing and visuals.
@@ -40,7 +40,7 @@ export const PopupDemos = () => {
         <Popup
           scrollable
           content={
-            <div class="p-4 border rounded-xl bg-background ring-1 ring-foreground/10 shadow-md">
+            <div class="p-4 b-1 b-border rounded-xl bg-background ring-1 ring-foreground/10 shadow-md">
               <h3 class="text-sm font-semibold">Scrollable Popup</h3>
               <div class="mt-2 space-y-1">
                 <For each={SCROLLABLE_LINES}>
@@ -62,7 +62,7 @@ export const PopupDemos = () => {
           dismissible={false}
           onClosePrevent={() => setPreventedCloseCount((value) => value + 1)}
           content={
-            <div class="p-4 border rounded-xl bg-background ring-1 ring-foreground/10 shadow-md">
+            <div class="p-4 b-1 b-border rounded-xl bg-background ring-1 ring-foreground/10 shadow-md">
               <h3 class="text-sm font-semibold">Persistent popup</h3>
               <p class="text-sm text-muted-foreground mt-1">Refresh to dismiss</p>
               <p class="text-sm text-muted-foreground mt-1">

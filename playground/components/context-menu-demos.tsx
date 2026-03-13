@@ -6,13 +6,13 @@ import type { ContextMenuItems } from '../../src'
 import { DemoPage, DemoSection } from './common/demo-page'
 
 const badgeClass =
-  'rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-medium text-[11px] text-zinc-700'
+  'rounded-md b-1 b-border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-medium text-[11px] text-zinc-700'
 
 const surfaceClass =
-  'flex h-24 w-full items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm text-zinc-700'
+  'flex h-24 w-full items-center justify-center rounded-lg b-1 b-border border-zinc-200 bg-white text-sm text-zinc-700'
 
 const panelClass =
-  'flex min-h-28 w-full flex-col justify-between rounded-lg border border-zinc-200 bg-white p-4 text-sm text-zinc-700'
+  'flex min-h-28 w-full flex-col justify-between rounded-lg b-1 b-border border-zinc-200 bg-white p-4 text-sm text-zinc-700'
 
 export const ContextMenuDemos = () => {
   const [lastAction, setLastAction] = createSignal('None')
