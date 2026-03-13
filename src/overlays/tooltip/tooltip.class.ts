@@ -2,18 +2,18 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const tooltipContentVariants = cva(
-  'z-50 w-fit max-w-xs origin-$kb-tooltip-content-transform-origin rounded-md px-2 py-1 text-xs outline-none flex items-baseline data-expanded:(animate-in fade-in-0 zoom-in-95) data-[state=delayed-open]:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95)',
+  'text-xs px-2 py-1 outline-none rounded-md flex max-w-xs w-fit origin-$kb-tooltip-content-transform-origin items-baseline z-50 data-[state=delayed-open]:(animate-in fade-in-0 zoom-in-95) data-closed:(animate-out fade-out-0 zoom-out-95) data-expanded:(animate-in fade-in-0 zoom-in-95)',
   {
     variants: {
       side: {
-        left: 'data-expanded:slide-in-from-right-1 mr-$kb-popper-content-overflow-padding',
-        right: 'data-expanded:slide-in-from-left-1 ml-$kb-popper-content-overflow-padding',
-        top: 'data-expanded:slide-in-from-bottom-1 mb-$kb-popper-content-overflow-padding',
-        bottom: 'data-expanded:slide-in-from-top-1 mt-$kb-popper-content-overflow-padding',
+        left: 'mr-$kb-popper-content-overflow-padding data-expanded:slide-in-from-right-1',
+        right: 'ml-$kb-popper-content-overflow-padding data-expanded:slide-in-from-left-1',
+        top: 'mb-$kb-popper-content-overflow-padding data-expanded:slide-in-from-bottom-1',
+        bottom: 'mt-$kb-popper-content-overflow-padding data-expanded:slide-in-from-top-1',
       },
       invert: {
-        true: 'bg-foreground text-background',
-        false: 'bg-background text-foreground surface-outline shadow-sm',
+        true: 'text-background bg-foreground',
+        false: 'text-foreground bg-background surface-outline shadow-sm',
       },
     },
     defaultVariants: {

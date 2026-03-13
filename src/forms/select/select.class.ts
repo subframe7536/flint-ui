@@ -4,7 +4,7 @@ import { cva } from 'cls-variant/cva'
 import { INPUT_VARIANT_CLASSES } from '../../shared/cva-common.class'
 
 export const selectControlVariants = cva(
-  'flex w-full cursor-pointer items-center rounded-md text-foreground outline-none transition focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid data-highlight:surface-highlight data-disabled:effect-dis',
+  'text-foreground outline-none rounded-md flex w-full cursor-pointer transition items-center focus-within:effect-fv-border data-invalid:effect-invalid data-disabled:effect-dis data-highlight:surface-highlight focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -12,11 +12,11 @@ export const selectControlVariants = cva(
     },
     variants: {
       size: {
-        xs: 'min-h-7 text-xs',
-        sm: 'min-h-8 text-xs',
-        md: 'min-h-9 text-sm',
-        lg: 'min-h-10 text-sm',
-        xl: 'min-h-11 text-base',
+        xs: 'text-xs min-h-7',
+        sm: 'text-xs min-h-8',
+        md: 'text-sm min-h-9',
+        lg: 'text-sm min-h-10',
+        xl: 'text-base min-h-11',
       },
       variant: INPUT_VARIANT_CLASSES,
     },
@@ -24,7 +24,7 @@ export const selectControlVariants = cva(
 )
 
 export const selectInputVariants = cva(
-  'flex-1 bg-transparent outline-none style-placeholder disabled:effect-dis data-readonly:cursor-pointer',
+  'style-placeholder outline-none bg-transparent flex-1 disabled:effect-dis data-readonly:cursor-pointer',
   {
     defaultVariants: {
       mode: 'single',
@@ -32,23 +32,23 @@ export const selectInputVariants = cva(
     },
     variants: {
       mode: {
-        single: 'h-$s-h px-$s-px',
-        multiSearch: 'min-w-12 ps-$s-ps',
+        single: 'px-$s-px h-$s-h',
+        multiSearch: 'ps-$s-ps min-w-12',
         multiHidden: 'sr-only',
       },
       size: {
-        xs: 'h-4 text-xs var-select-6-2-0.5',
-        sm: 'h-4.5 text-xs var-select-7-2.5-1',
-        md: 'h-5.5 text-sm var-select-8-2.5-1',
-        lg: 'h-6 text-sm var-select-9-3-1.5',
-        xl: 'h-6.5 text-base var-select-10-3-1.5',
+        xs: 'text-xs h-4 var-select-6-2-0.5',
+        sm: 'text-xs h-4.5 var-select-7-2.5-1',
+        md: 'text-sm h-5.5 var-select-8-2.5-1',
+        lg: 'text-sm h-6 var-select-9-3-1.5',
+        xl: 'text-base h-6.5 var-select-10-3-1.5',
       },
     },
   },
 )
 
 export const selectTriggerIconVariants = cva(
-  'text-muted-foreground opacity-80 cursor-pointer outline-none',
+  'text-muted-foreground outline-none opacity-80 cursor-pointer',
   {
     defaultVariants: {
       size: 'md',
@@ -65,52 +65,52 @@ export const selectTriggerIconVariants = cva(
   },
 )
 
-export const selectLeadingIconVariants = cva('shrink-0 text-muted-foreground', {
+export const selectLeadingIconVariants = cva('text-muted-foreground shrink-0', {
   defaultVariants: {
     size: 'md',
   },
   variants: {
     size: {
-      xs: 'ms-1.5 text-sm',
-      sm: 'ms-2 text-sm',
-      md: 'ms-2.5 text-base',
-      lg: 'ms-3 text-base',
-      xl: 'ms-3.5 text-lg',
+      xs: 'text-sm ms-1.5',
+      sm: 'text-sm ms-2',
+      md: 'text-base ms-2.5',
+      lg: 'text-base ms-3',
+      xl: 'text-lg ms-3.5',
     },
   },
 })
 
 export const selectClearVariants = cva(
-  'text-muted-foreground opacity-80 outline-none transition-opacity hover:opacity-100',
+  'text-muted-foreground outline-none opacity-80 transition-opacity hover:opacity-100',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'me-0.5 text-xs',
-        sm: 'me-1 text-xs',
-        md: 'me-1.5 text-sm',
-        lg: 'me-2 text-sm',
-        xl: 'me-2.5 text-base',
+        xs: 'text-xs me-0.5',
+        sm: 'text-xs me-1',
+        md: 'text-sm me-1.5',
+        lg: 'text-sm me-2',
+        xl: 'text-base me-2.5',
       },
     },
   },
 )
 
 export const selectItemVariants = cva(
-  'flex cursor-pointer items-center justify-between gap-2 rounded-sm py-1 ps-3 pe-2 outline-none data-disabled:effect-dis data-highlighted:(bg-accent text-accent-foreground)',
+  'py-1 pe-2 ps-3 outline-none rounded-sm flex gap-2 cursor-pointer items-center justify-between data-highlighted:(text-accent-foreground bg-accent) data-disabled:effect-dis',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'min-h-6 text-xs',
-        sm: 'min-h-7 text-xs',
-        md: 'min-h-8 text-sm',
-        lg: 'min-h-9 text-sm',
-        xl: 'min-h-10 text-base',
+        xs: 'text-xs min-h-6',
+        sm: 'text-xs min-h-7',
+        md: 'text-sm min-h-8',
+        lg: 'text-sm min-h-9',
+        xl: 'text-base min-h-10',
       },
     },
   },

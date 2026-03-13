@@ -19,7 +19,7 @@ export const switchContainerVariants = cva('flex items-center', {
 })
 
 export const switchBaseVariants = cva(
-  'inline-flex shrink-0 items-center rounded-full b-(1 transparent) bg-input p-px outline-none transition-[color,box-shadow] dark:bg-input/80 peer-focus-visible:effect-fv-border data-checked:bg-primary data-invalid:effect-invalid',
+  'p-px outline-none b-(1 transparent) rounded-full bg-input inline-flex shrink-0 transition-[color,box-shadow] items-center peer-focus-visible:effect-fv-border data-invalid:effect-invalid dark:bg-input/80 data-checked:bg-primary',
   {
     defaultVariants: {
       size: 'md',
@@ -37,7 +37,7 @@ export const switchBaseVariants = cva(
 )
 
 export const switchThumbVariants = cva(
-  'pointer-events-none relative flex items-center justify-center rounded-full bg-background shadow-sm transition-transform',
+  'rounded-full bg-background flex pointer-events-none shadow-sm transition-transform items-center justify-center relative',
   {
     defaultVariants: {
       size: 'md',

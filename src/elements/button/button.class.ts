@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center bg-clip-padding whitespace-nowrap font-500 transition cursor-pointer select-none text-base focus-visible:effect-fv-border aria-invalid:effect-invalid aria-disabled:effect-dis disabled:effect-dis active:shadow-none',
+  'text-base font-500 inline-flex cursor-pointer select-none whitespace-nowrap transition items-center justify-center bg-clip-padding focus-visible:effect-fv-border aria-invalid:effect-invalid aria-disabled:effect-dis disabled:effect-dis active:shadow-none',
   {
     defaultVariants: {
       size: 'md',
@@ -10,25 +10,25 @@ export const buttonVariants = cva(
     },
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        default: 'text-primary-foreground bg-primary shadow hover:bg-primary/90',
+        secondary: 'text-secondary-foreground bg-secondary hover:bg-secondary/80',
         outline:
-          'b-(1 border) bg-background text-foreground shadow-xs hover:(bg-input text-input-foreground)',
-        ghost: 'hover:(bg-accent/50 text-accent-foreground)',
+          'text-foreground b-(1 border) bg-background shadow-xs hover:(text-input-foreground bg-input)',
+        ghost: 'hover:(text-accent-foreground bg-accent/50)',
         link: 'text-primary underline-offset-4 hover:underline',
         destructive: 'text-destructive-foreground bg-destructive hover:bg-destructive/80',
       },
       size: {
-        xs: 'h-6 gap-1 px-1.5 py-1 text-xs rounded-md',
-        sm: 'h-7 gap-1.5 px-2 py-1 text-xs rounded-md',
-        md: 'h-8 gap-1.5 px-2.5 py-1 text-sm rounded-lg',
-        lg: 'h-9 gap-2 px-2.5 py-1 text-base rounded-lg',
-        xl: 'h-10 gap-2 px-2.5 py-1 text-lg rounded-xl',
-        'icon-xs': 'size-6 rounded-md',
-        'icon-sm': 'size-7 rounded-md',
-        'icon-md': 'size-8 rounded-lg',
-        'icon-lg': 'size-9 rounded-lg',
-        'icon-xl': 'size-10 rounded-xl',
+        xs: 'text-xs px-1.5 py-1 rounded-md gap-1 h-6',
+        sm: 'text-xs px-2 py-1 rounded-md gap-1.5 h-7',
+        md: 'text-sm px-2.5 py-1 rounded-lg gap-1.5 h-8',
+        lg: 'text-base px-2.5 py-1 rounded-lg gap-2 h-9',
+        xl: 'text-lg px-2.5 py-1 rounded-xl gap-2 h-10',
+        'icon-xs': 'rounded-md size-6',
+        'icon-sm': 'rounded-md size-7',
+        'icon-md': 'rounded-lg size-8',
+        'icon-lg': 'rounded-lg size-9',
+        'icon-xl': 'rounded-xl size-10',
       },
     },
   },

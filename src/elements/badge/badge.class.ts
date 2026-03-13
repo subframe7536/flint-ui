@@ -5,7 +5,7 @@ import { buttonIconSizeVariants } from '../button/button.class'
 import type { ButtonIconSizeProps } from '../button/button.class'
 
 export const badgeVariants = cva(
-  'inline-flex max-w-full shrink-0 items-center whitespace-nowrap font-500 select-none',
+  'font-500 inline-flex shrink-0 max-w-full select-none whitespace-nowrap items-center',
   {
     defaultVariants: {
       size: 'md',
@@ -13,16 +13,16 @@ export const badgeVariants = cva(
     },
     variants: {
       variant: {
-        default: 'bg-accent/50 text-accent-foreground',
-        outline: 'bg-background text-foreground surface-outline-inset',
-        solid: 'bg-primary text-primary-foreground shadow-xs',
+        default: 'text-accent-foreground bg-accent/50',
+        outline: 'text-foreground bg-background surface-outline-inset',
+        solid: 'text-primary-foreground bg-primary shadow-xs',
       },
       size: {
-        xs: 'rounded-sm px-1 text-xs',
-        sm: 'rounded-sm px-1 text-xs',
-        md: 'rounded-md px-1.5 text-sm',
-        lg: 'rounded-md px-1.5 text-sm',
-        xl: 'rounded-lg px-2 text-base',
+        xs: 'text-xs px-1 rounded-sm',
+        sm: 'text-xs px-1 rounded-sm',
+        md: 'text-sm px-1.5 rounded-md',
+        lg: 'text-sm px-1.5 rounded-md',
+        xl: 'text-base px-2 rounded-lg',
       },
     },
   },

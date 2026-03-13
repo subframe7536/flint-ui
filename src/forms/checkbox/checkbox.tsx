@@ -261,7 +261,7 @@ export function Checkbox<TTrue = boolean, TFalse = boolean>(
               <KobalteCheckbox.Indicator
                 data-slot="indicator"
                 class={cn(
-                  'flex size-full items-center justify-center bg-primary text-primary-foreground',
+                  'text-primary-foreground bg-primary flex size-full items-center justify-center',
                   styleProps.classes?.indicator,
                 )}
               >

@@ -149,7 +149,7 @@ export function Tabs(props: TabsProps): JSX.Element {
           <KobalteTabs.Content
             data-slot="content"
             value={normalizeItemValue(item, index())}
-            class={cn('w-full outline-none', localProps.classes?.content, item.class)}
+            class={cn('outline-none w-full', localProps.classes?.content, item.class)}
           >
             {item.content}
           </KobalteTabs.Content>

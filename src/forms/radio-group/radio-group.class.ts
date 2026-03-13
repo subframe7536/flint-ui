@@ -13,7 +13,7 @@ export const radioGroupFieldsetVariants = cva('flex', {
   },
 })
 
-export const radioGroupLegendVariants = cva('mb-2 block font-medium text-foreground', {
+export const radioGroupLegendVariants = cva('text-foreground font-medium mb-2 block', {
   defaultVariants: {
     size: 'md',
   },
@@ -26,7 +26,7 @@ export const radioGroupLegendVariants = cva('mb-2 block font-medium text-foregro
       xl: 'text-base',
     },
     required: {
-      true: "after:(ms-0.5 text-destructive content-['*'])",
+      true: "after:(text-destructive ms-0.5 content-['*'])",
     },
   },
 })
@@ -45,8 +45,8 @@ export const radioGroupItemVariants = cva('flex items-start data-disabled:effect
       xl: 'text-base',
     },
     variant: {
-      card: 'rounded-lg b-(1 border) data-checked:border-primary',
-      table: 'relative b-(1 muted) data-checked:(bg-primary/10 border-primary/50 z-1)',
+      card: 'b-(1 border) rounded-lg data-checked:border-primary',
+      table: 'b-(1 muted) relative data-checked:(border-primary/50 bg-primary/10 z-1)',
     },
     indicator: {
       start: 'flex-row',
@@ -127,7 +127,7 @@ export const radioGroupContainerVariants = cva('flex items-center', {
 })
 
 export const radioGroupBaseVariants = cva(
-  'inline-flex items-center justify-center overflow-hidden rounded-full b-(1 input) bg-background bg-clip-padding outline-none transition-shadow dark:bg-input/30 peer-focus-visible:effect-fv-border data-invalid:effect-invalid',
+  'outline-none b-(1 input) rounded-full bg-background inline-flex transition-shadow items-center justify-center overflow-hidden bg-clip-padding peer-focus-visible:effect-fv-border data-invalid:effect-invalid dark:bg-input/30',
   {
     defaultVariants: {
       size: 'md',

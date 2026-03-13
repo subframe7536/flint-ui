@@ -351,7 +351,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
       value={null}
       data-slot="root"
       class={cn(
-        'flex flex-col min-h-0 divide-(y border) bg-background rounded-xl',
+        'rounded-xl bg-background flex flex-col min-h-0 divide-(border y)',
         merged.classes?.root,
       )}
       onChange={handleChange}
@@ -368,7 +368,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
             item={itemProps.item}
             data-slot="item"
             class={cn(
-              'relative w-full flex items-center gap-2 cursor-default select-none outline-none rounded-md p-2 data-disabled:effect-dis data-highlighted:(bg-accent text-accent-foreground)',
+              'p-2 outline-none rounded-md flex gap-2 w-full cursor-default select-none items-center relative data-highlighted:(text-accent-foreground bg-accent) data-disabled:effect-dis',
               merged.classes?.item,
             )}
             onPointerDown={(e: PointerEvent) => e.preventDefault()}
@@ -378,7 +378,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
               <Icon
                 name={option().icon}
                 data-slot="itemLeading"
-                class={cn('shrink-0 text-muted-foreground', merged.classes?.itemLeading)}
+                class={cn('text-muted-foreground shrink-0', merged.classes?.itemLeading)}
               />
             </Show>
 
@@ -391,7 +391,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
                 <span
                   data-slot="itemLabel"
                   class={cn(
-                    'inline-flex gap-2 truncate items-baseline text-sm',
+                    'text-sm inline-flex gap-2 truncate items-baseline',
                     merged.classes?.itemLabel,
                   )}
                 >
@@ -410,7 +410,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
                     <span
                       data-slot="itemLabelSuffix"
                       class={cn(
-                        'text-muted-foreground shrink-0 text-xs',
+                        'text-xs text-muted-foreground shrink-0',
                         merged.classes?.itemLabelSuffix,
                       )}
                     >
@@ -449,19 +449,19 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
               <Icon
                 name={merged.childIcon}
                 data-slot="itemTrailing"
-                class={cn('shrink-0 text-muted-foreground', merged.classes?.itemTrailing)}
+                class={cn('text-muted-foreground shrink-0', merged.classes?.itemTrailing)}
               />
             </Show>
           </Combobox.Item>
         )
       }}
       sectionComponent={(sectionProps) => (
-        <Combobox.Section data-slot="group" class={cn('p-1 mt-2', merged.classes?.group)}>
+        <Combobox.Section data-slot="group" class={cn('mt-2 p-1', merged.classes?.group)}>
           <Show when={sectionProps.section.rawValue.label}>
             <span
               data-slot="label"
               class={cn(
-                'font-semibold text-muted-foreground px-1.5 text-sm',
+                'text-sm text-muted-foreground font-semibold px-1.5',
                 merged.classes?.label,
               )}
             >
@@ -474,7 +474,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
       {/* ── Input area ─────────────────────────────────────────────────── */}
       <Combobox.Control<NormalizedItem>
         data-slot="inputWrapper"
-        class={cn('flex items-center gap-2 px-3 h-12', merged.classes?.inputWrapper)}
+        class={cn('px-3 flex gap-2 h-12 items-center', merged.classes?.inputWrapper)}
       >
         <Show
           when={history().length > 0}
@@ -484,7 +484,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
               data-slot="search"
               loading={merged.loading}
               loadingIcon={merged.loadingIcon}
-              class={cn('size-5 text-muted-foreground pointer-events-none', merged.classes?.search)}
+              class={cn('text-muted-foreground size-5 pointer-events-none', merged.classes?.search)}
             />
           }
         >
@@ -506,7 +506,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
           ref={(el: any) => (inputRef = el)}
           data-slot="input"
           class={cn(
-            'flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:effect-dis',
+            'outline-none bg-transparent flex-1 placeholder:text-muted-foreground disabled:effect-dis',
             merged.classes?.input,
           )}
           placeholder={merged.placeholder}
@@ -535,7 +535,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
         fallback={
           <div
             data-slot="empty"
-            class={cn('text-center text-muted-foreground py-6', merged.classes?.empty)}
+            class={cn('text-muted-foreground py-6 text-center', merged.classes?.empty)}
           >
             {merged.empty}
           </div>
@@ -553,7 +553,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
       <Show when={merged.footer}>
         <div
           data-slot="footer"
-          class={cn('p-3 text-sm text-muted-foreground', merged.classes?.footer)}
+          class={cn('text-sm text-muted-foreground p-3', merged.classes?.footer)}
         >
           {merged.footer}
         </div>

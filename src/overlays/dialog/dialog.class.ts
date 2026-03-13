@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const dialogCardVariants = cva(
-  'w-full max-h-full overflow-hidden b-(1 border) bg-background text-foreground shadow-none surface-overlay',
+  'text-foreground b-(1 border) bg-background max-h-full w-full surface-overlay shadow-none overflow-hidden',
   {
     defaultVariants: {
       layout: 'default',
@@ -11,7 +11,7 @@ export const dialogCardVariants = cva(
       layout: {
         default: 'rounded-xl',
         scrollable: 'rounded-xl',
-        fullscreen: 'h-full rounded-none border-0 ring-0',
+        fullscreen: 'border-0 rounded-none h-full ring-0',
       },
     },
   },

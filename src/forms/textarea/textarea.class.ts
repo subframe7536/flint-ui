@@ -4,7 +4,7 @@ import { cva } from 'cls-variant/cva'
 import { INPUT_VARIANT_CLASSES, TEXT_SIZE_VARIANT } from '../../shared/cva-common.class'
 
 export const textareaRootVariants = cva(
-  'inline-flex w-full flex-col overflow-hidden rounded-md transition-[color,box-shadow] focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid data-highlight:surface-highlight data-disabled:effect-dis',
+  'rounded-md inline-flex flex-col w-full transition-[color,box-shadow] overflow-hidden focus-within:effect-fv-border data-invalid:effect-invalid data-disabled:effect-dis data-highlight:surface-highlight focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -18,7 +18,7 @@ export const textareaRootVariants = cva(
 )
 
 export const textareaBaseVariants = cva(
-  'flex-1 min-w-0 bg-transparent text-foreground outline-none style-placeholder disabled:effect-dis',
+  'style-placeholder text-foreground outline-none bg-transparent flex-1 min-w-0 disabled:effect-dis',
   {
     defaultVariants: {
       size: 'md',
@@ -26,11 +26,11 @@ export const textareaBaseVariants = cva(
     },
     variants: {
       size: {
-        xs: 'min-h-17 py-1 px-2',
-        sm: 'min-h-18 py-1.5 px-2.5',
-        md: 'min-h-20 py-1.5 px-2.5',
-        lg: 'min-h-22 py-2 px-3',
-        xl: 'min-h-24 py-2 px-3',
+        xs: 'px-2 py-1 min-h-17',
+        sm: 'px-2.5 py-1.5 min-h-18',
+        md: 'px-2.5 py-1.5 min-h-20',
+        lg: 'px-3 py-2 min-h-22',
+        xl: 'px-3 py-2 min-h-24',
       },
       autoresize: {
         true: 'resize-none',
@@ -41,36 +41,36 @@ export const textareaBaseVariants = cva(
 )
 
 export const textareaHeaderVariants = cva(
-  'flex w-full items-center gap-2 text-muted-foreground font-medium',
+  'text-muted-foreground font-medium flex gap-2 w-full items-center',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'px-2 pt-1.5 pb-1 text-xs',
-        sm: 'px-2.5 pt-2 pb-1 text-xs',
-        md: 'px-2.5 pt-2 pb-1.5 text-sm',
-        lg: 'px-3 pt-2.5 pb-1.5 text-sm',
-        xl: 'px-3 pt-2.5 pb-2 text-base',
+        xs: 'text-xs px-2 pb-1 pt-1.5',
+        sm: 'text-xs px-2.5 pb-1 pt-2',
+        md: 'text-sm px-2.5 pb-1.5 pt-2',
+        lg: 'text-sm px-3 pb-1.5 pt-2.5',
+        xl: 'text-base px-3 pb-2 pt-2.5',
       },
     },
   },
 )
 
 export const textareaFooterVariants = cva(
-  'flex w-full items-center gap-2 text-muted-foreground font-medium',
+  'text-muted-foreground font-medium flex gap-2 w-full items-center',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'p-1 text-xs',
-        sm: 'p-1.5 text-xs',
-        md: 'p-1.5 text-sm',
-        lg: 'p-2 text-sm',
-        xl: 'p-2 text-base',
+        xs: 'text-xs p-1',
+        sm: 'text-xs p-1.5',
+        md: 'text-sm p-1.5',
+        lg: 'text-sm p-2',
+        xl: 'text-base p-2',
       },
     },
   },

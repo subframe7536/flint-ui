@@ -17,7 +17,7 @@ export default defineConfig<PresetWind4Theme>({
     }),
     presetAnimations() as any,
     presetTheme({
-      lowLayer: true,
+      // lowLayer: true,
     }),
     presetObjectCompletion(),
     presetFunctionCompletion(),

@@ -12,7 +12,7 @@ type TransformContext = Parameters<InjectTransformer['transform']>[2]
 const TEST_PREFIX = ROCK_PREFIX
 
 async function runTransform(source: string, id: string): Promise<string> {
-  const transformer = createInjectRockPrefixTransformer()
+  const transformer = createInjectRockPrefixTransformer(TEST_PREFIX)
   const code = new MagicString(source)
   const context = {
     tokens: new Set<string>(),
@@ -25,10 +25,10 @@ async function runTransform(source: string, id: string): Promise<string> {
 
 describe('transformer-inject-rock-prefix', () => {
   test('prefixClassList is idempotent and ignores empty tokens', () => {
-    expect(prefixClassList(`${TEST_PREFIX}a b   c`)).toBe(
+    expect(prefixClassList(`${TEST_PREFIX}a b   c`, TEST_PREFIX)).toBe(
       `${TEST_PREFIX}a ${TEST_PREFIX}b ${TEST_PREFIX}c`,
     )
-    expect(prefixClassList('   ')).toBe('   ')
+    expect(prefixClassList('   ', TEST_PREFIX)).toBe('   ')
   })
 
   test('prefixes class strings in cva base, variants and compoundVariants.class only', async () => {

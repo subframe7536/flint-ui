@@ -841,7 +841,7 @@ export function Select(props: SelectProps): JSX.Element {
             <Combobox.ItemDescription
               data-slot="itemDescription"
               class={cn(
-                'col-start-1 text-xs text-muted-foreground',
+                'text-xs text-muted-foreground col-start-1',
                 styleProps.classes?.itemDescription,
               )}
             >
@@ -853,7 +853,7 @@ export function Select(props: SelectProps): JSX.Element {
         <Combobox.ItemIndicator
           data-slot="itemTrailing"
           class={cn(
-            'col-start-2 inline-flex items-center justify-center text-sm',
+            'text-sm inline-flex col-start-2 items-center justify-center',
             styleProps.classes?.itemTrailing,
           )}
         >
@@ -905,7 +905,7 @@ export function Select(props: SelectProps): JSX.Element {
         <span
           data-slot="label"
           class={cn(
-            'block px-2 py-1.5 font-medium text-muted-foreground text-xs',
+            'text-xs text-muted-foreground font-medium px-2 py-1.5 block',
             styleProps.classes?.label,
           )}
         >
@@ -1082,7 +1082,7 @@ export function Select(props: SelectProps): JSX.Element {
           <div
             data-slot="tagsContainer"
             class={cn(
-              'flex flex-1 cursor-pointer select-none flex-wrap items-center gap-1 p-1.5 max-w-full',
+              'p-1.5 flex flex-1 flex-wrap gap-1 max-w-full cursor-pointer select-none items-center',
               styleProps.classes?.tagsContainer,
             )}
             onPointerDown={(e) => {
@@ -1180,7 +1180,7 @@ export function Select(props: SelectProps): JSX.Element {
         fallback={
           <div
             data-slot="empty"
-            class={cn('p-2 text-center text-muted-foreground text-sm', styleProps.classes?.empty)}
+            class={cn('text-sm text-muted-foreground p-2 text-center', styleProps.classes?.empty)}
           >
             {typeof renderDisplayProps.emptyRender === 'string'
               ? renderDisplayProps.emptyRender
@@ -1246,7 +1246,7 @@ export function Select(props: SelectProps): JSX.Element {
                   // ref={bindListboxScroll}
                   data-slot="listbox"
                   class={cn(
-                    'max-h-$kb-popper-content-available-height overflow-y-auto outline-none',
+                    'outline-none max-h-$kb-popper-content-available-height overflow-y-auto',
                     styleProps.classes?.listbox,
                   )}
                   onScrollEnd={handleListboxScroll}
@@ -1256,7 +1256,7 @@ export function Select(props: SelectProps): JSX.Element {
               <Combobox.Listbox
                 data-slot="listbox"
                 class={cn(
-                  'max-h-$kb-popper-content-available-height overflow-y-auto p-1 outline-none',
+                  'p-1 outline-none max-h-$kb-popper-content-available-height overflow-y-auto',
                   styleProps.classes?.listbox,
                 )}
                 onScrollEnd={handleListboxScroll}
@@ -1314,7 +1314,7 @@ export function Select(props: SelectProps): JSX.Element {
       onChange={(isMultiple() ? handleMultipleChange : handleSingleChange) as any}
       closeOnSelection={!isMultiple()}
       removeOnBackspace={isMultiple()}
-      class={cn('relative inline-flex w-full h-fit', styleProps.classes?.root)}
+      class={cn('inline-flex h-fit w-full relative', styleProps.classes?.root)}
       {...field.ariaAttrs()}
       {...restProps}
       overflowPadding={-2}

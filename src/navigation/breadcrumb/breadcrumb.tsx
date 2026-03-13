@@ -77,7 +77,7 @@ export function Breadcrumb(props: BreadcrumbProps): JSX.Element {
     <nav
       data-slot="root"
       aria-label={merged['aria-label']}
-      class={cn('relative min-w-0', merged.classes?.root)}
+      class={cn('min-w-0 relative', merged.classes?.root)}
     >
       <ol
         data-slot="list"

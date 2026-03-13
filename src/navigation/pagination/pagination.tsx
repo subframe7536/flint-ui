@@ -151,7 +151,7 @@ export function Pagination(props: PaginationProps): JSX.Element {
     <nav data-slot="root" class={cn('w-full', uiProps.classes?.root)} {...restProps}>
       <ul
         data-slot="list"
-        class={cn('flex items-center justify-center gap-1', uiProps.classes?.list)}
+        class={cn('flex gap-1 items-center justify-center', uiProps.classes?.list)}
       >
         <Show when={pagingProps.showControls}>
           <li data-slot="item" class={cn(uiProps.classes?.item)}>
@@ -177,7 +177,7 @@ export function Pagination(props: PaginationProps): JSX.Element {
               <li
                 data-slot="item"
                 aria-hidden={item < 0 ? true : undefined}
-                class={cn(item < 0 && 'flex items-center size-6', uiProps.classes?.item)}
+                class={cn(item < 0 && 'flex size-6 items-center', uiProps.classes?.item)}
               >
                 <Show
                   when={item >= 0}

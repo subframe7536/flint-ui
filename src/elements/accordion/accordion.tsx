@@ -59,7 +59,7 @@ export function Accordion(props: AccordionProps): JSX.Element {
     <KobalteAccordion.Root
       data-slot="root"
       class={cn(
-        'flex w-full flex-col',
+        'flex flex-col w-full',
         behaviorProps.disabled && 'effect-dis',
         renderProps.classes?.root,
       )}
@@ -84,7 +84,7 @@ export function Accordion(props: AccordionProps): JSX.Element {
               <KobalteAccordion.Trigger
                 data-slot="trigger"
                 class={cn(
-                  'group relative flex w-full flex-1 min-w-0 items-center justify-between gap-1.5 rounded-lg b-1 b-transparent py-2.5 text-left text-sm font-medium outline-none transition hover:underline disabled:effect-dis focus-visible:effect-fv-border',
+                  'group text-sm font-medium py-2.5 text-left outline-none b-1 b-transparent rounded-lg flex flex-1 gap-1.5 min-w-0 w-full transition items-center justify-between relative focus-visible:effect-fv-border disabled:effect-dis hover:underline',
                   renderProps.classes?.trigger,
                 )}
               >
@@ -110,7 +110,7 @@ export function Accordion(props: AccordionProps): JSX.Element {
                     name={renderProps.trailing}
                     data-slot="trailing"
                     class={cn(
-                      'pointer-events-none ml-auto shrink-0 size-4 text-muted-foreground duration-150 group-aria-expanded:rotate-180',
+                      'text-muted-foreground ml-auto shrink-0 size-4 pointer-events-none duration-150 group-aria-expanded:rotate-180',
                       renderProps.classes?.trailing,
                     )}
                   />
@@ -123,7 +123,7 @@ export function Accordion(props: AccordionProps): JSX.Element {
                 <div
                   data-slot="content"
                   class={cn(
-                    'h-$kb-collapsible-content-height pb-2.5 style-accordion-content',
+                    'style-accordion-content pb-2.5 h-$kb-collapsible-content-height',
                     renderProps.classes?.content,
                   )}
                 >

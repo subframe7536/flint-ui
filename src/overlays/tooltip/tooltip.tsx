@@ -66,7 +66,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
           )}
         >
           <Show when={typeof contentProps.text === 'string'} fallback={contentProps.text}>
-            <span data-slot="text" class={cn('text-pretty leading-4', contentProps.classes?.text)}>
+            <span data-slot="text" class={cn('leading-4 text-pretty', contentProps.classes?.text)}>
               {contentProps.text}
             </span>
           </Show>

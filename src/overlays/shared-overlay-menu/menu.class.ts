@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const overlayMenuItemVariants = cva(
-  'relative grid cursor-default select-none grid-cols-[auto_1fr_auto] items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-none data-disabled:effect-dis data-highlighted:(bg-accent text-accent-foreground)',
+  'text-sm px-1.5 py-1 outline-none rounded-md gap-1.5 grid grid-cols-[auto_1fr_auto] cursor-default select-none items-center relative data-highlighted:(text-accent-foreground bg-accent) data-disabled:effect-dis',
   {
     defaultVariants: {
       color: 'default',
@@ -11,12 +11,12 @@ export const overlayMenuItemVariants = cva(
     variants: {
       color: {
         default: 'text-foreground',
-        destructive: 'text-destructive data-highlighted:(bg-destructive/10 text-destructive)',
+        destructive: 'text-destructive data-highlighted:(text-destructive bg-destructive/10)',
       },
       size: {
-        sm: 'min-h-7 text-xs',
-        md: 'min-h-8 text-sm sm:min-h-7',
-        lg: 'min-h-9 text-sm',
+        sm: 'text-xs min-h-7',
+        md: 'text-sm min-h-8 sm:min-h-7',
+        lg: 'text-sm min-h-9',
       },
     },
   },
@@ -25,7 +25,7 @@ export const overlayMenuItemVariants = cva(
 export type OverlayMenuItemVariantProps = VariantProps<typeof overlayMenuItemVariants>
 
 export const overlayMenuContentVariants = cva(
-  'z-50 origin-$kb-popper-content-transform-origin bg-popover text-popover-foreground outline-none flex flex-col min-w-32 rounded-lg p-1 shadow-lg surface-overlay data-expanded:(animate-in fade-in-0 zoom-in-90) data-closed:(animate-out fade-out-0 zoom-out-90)',
+  'text-popover-foreground p-1 outline-none rounded-lg bg-popover flex flex-col min-w-32 surface-overlay shadow-lg origin-$kb-popper-content-transform-origin z-50 data-closed:(animate-out fade-out-0 zoom-out-90) data-expanded:(animate-in fade-in-0 zoom-in-90)',
   {
     defaultVariants: {
       side: 'right',

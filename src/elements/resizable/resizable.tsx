@@ -435,7 +435,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
                 data-expanded={panelItem().collapsible && !collapsed() ? '' : undefined}
                 data-resizing={interactionResizing() ? '' : undefined}
                 class={cn(
-                  'min-h-0 min-w-0 overflow-auto transition-flex-basis duration-200 ease-out motion-reduce:transition-none data-resizing:duration-0',
+                  'min-h-0 min-w-0 duration-200 ease-out transition-flex-basis overflow-auto data-resizing:duration-0 motion-reduce:transition-none',
                   localProps.classes?.panel,
                   panelItem().class,
                 )}
@@ -494,7 +494,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
                           <div
                             data-slot="handle"
                             class={cn(
-                              'z-10 flex items-center justify-center',
+                              'flex items-center justify-center z-10',
                               localProps.classes?.handle,
                             )}
                           >
@@ -505,7 +505,7 @@ export function Resizable(props: ResizableProps): JSX.Element {
                         <div
                           data-slot="handle"
                           class={cn(
-                            'z-10 h-6 w-1 rounded-lg bg-border/90 flex shrink-0',
+                            'rounded-lg bg-border/90 flex shrink-0 h-6 w-1 z-10',
                             orientation() === 'horizontal' ? 'mx-auto' : 'rotate-90',
                             localProps.classes?.handle,
                           )}

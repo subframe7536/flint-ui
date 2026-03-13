@@ -16,10 +16,10 @@ export const formFieldSizeVariants = cva('text-sm', {
   },
 })
 
-export const formFieldLabelVariants = cva('block font-medium text-foreground', {
+export const formFieldLabelVariants = cva('text-foreground font-medium block', {
   variants: {
     required: {
-      true: "after:(ms-0.5 text-destructive) after:content-['*']",
+      true: "after:(text-destructive ms-0.5 content-['*'])",
     },
   },
 })

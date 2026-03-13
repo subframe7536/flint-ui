@@ -3,7 +3,7 @@ import { cva } from 'cls-variant/cva'
 
 import { TEXT_SIZE_VARIANT } from '../../shared/cva-common.class'
 
-export const fileUploadRootVariants = cva('relative flex flex-col data-disabled:effect-dis', {
+export const fileUploadRootVariants = cva('flex flex-col relative data-disabled:effect-dis', {
   defaultVariants: {
     size: 'md',
   },
@@ -19,7 +19,7 @@ export const fileUploadRootVariants = cva('relative flex flex-col data-disabled:
 })
 
 export const fileUploadBaseVariants = cva(
-  'group relative inline-flex w-full cursor-pointer items-center justify-center rounded-lg b-(1 input) bg-background text-center outline-none transition-[color,box-shadow] dark:bg-input/30 focus-visible:effect-fv-border data-highlight:surface-highlight data-dragging:(border-primary bg-primary/8) data-invalid:effect-invalid',
+  'group text-center outline-none b-(1 input) rounded-lg bg-background inline-flex w-full cursor-pointer transition-[color,box-shadow] items-center justify-center relative focus-visible:effect-fv-border data-dragging:(border-primary bg-primary/8) data-invalid:effect-invalid dark:bg-input/30 data-highlight:surface-highlight',
   {
     defaultVariants: {
       size: 'md',
@@ -27,11 +27,11 @@ export const fileUploadBaseVariants = cva(
     },
     variants: {
       size: {
-        xs: 'min-h-20 gap-1.5 px-2.5 py-2 text-xs',
-        sm: 'min-h-24 gap-2 px-3 py-2.5 text-xs',
-        md: 'min-h-28 gap-2 px-4 py-3 text-sm',
-        lg: 'min-h-32 gap-2.5 px-4.5 py-3.5 text-sm',
-        xl: 'min-h-36 gap-3 px-5 py-4 text-base',
+        xs: 'text-xs px-2.5 py-2 gap-1.5 min-h-20',
+        sm: 'text-xs px-3 py-2.5 gap-2 min-h-24',
+        md: 'text-sm px-4 py-3 gap-2 min-h-28',
+        lg: 'text-sm px-4.5 py-3.5 gap-2.5 min-h-32',
+        xl: 'text-base px-5 py-4 gap-3 min-h-36',
       },
       dropzone: {
         true: 'border-dashed',
@@ -42,7 +42,7 @@ export const fileUploadBaseVariants = cva(
 )
 
 export const fileUploadWrapperVariants = cva(
-  'pointer-events-none flex flex-col items-center justify-center text-center',
+  'text-center flex flex-col pointer-events-none items-center justify-center',
   {
     defaultVariants: {
       size: 'md',
@@ -74,7 +74,7 @@ export const fileUploadIconVariants = cva('text-muted-foreground', {
   },
 })
 
-export const fileUploadLabelVariants = cva('font-medium text-foreground', {
+export const fileUploadLabelVariants = cva('text-foreground font-medium', {
   defaultVariants: {
     size: 'md',
   },
@@ -108,25 +108,25 @@ export const fileUploadFilesVariants = cva('flex flex-col', {
 })
 
 export const fileUploadFileVariants = cva(
-  'relative flex items-center rounded-md b-(1 border) bg-background',
+  'b-(1 border) rounded-md bg-background flex items-center relative',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'gap-1.5 px-2 py-1.5',
-        sm: 'gap-1.5 px-2.5 py-2',
-        md: 'gap-2 px-2.5 py-2',
-        lg: 'gap-2.5 px-3 py-2.5',
-        xl: 'gap-3 px-3.5 py-3',
+        xs: 'px-2 py-1.5 gap-1.5',
+        sm: 'px-2.5 py-2 gap-1.5',
+        md: 'px-2.5 py-2 gap-2',
+        lg: 'px-3 py-2.5 gap-2.5',
+        xl: 'px-3.5 py-3 gap-3',
       },
     },
   },
 )
 
 export const fileUploadPreviewVariants = cva(
-  'relative flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted text-muted-foreground',
+  'text-muted-foreground rounded-md bg-muted flex shrink-0 items-center justify-center relative overflow-hidden',
   {
     defaultVariants: {
       size: 'md',
@@ -143,7 +143,7 @@ export const fileUploadPreviewVariants = cva(
   },
 )
 
-export const fileUploadMetaVariants = cva('flex min-w-0 flex-1 flex-col', {
+export const fileUploadMetaVariants = cva('flex flex-1 flex-col min-w-0', {
   defaultVariants: {
     size: 'md',
   },
@@ -158,7 +158,7 @@ export const fileUploadMetaVariants = cva('flex min-w-0 flex-1 flex-col', {
   },
 })
 
-export const fileUploadNameVariants = cva('truncate font-medium text-foreground', {
+export const fileUploadNameVariants = cva('text-foreground font-medium truncate', {
   defaultVariants: {
     size: 'md',
   },
@@ -167,7 +167,7 @@ export const fileUploadNameVariants = cva('truncate font-medium text-foreground'
   },
 })
 
-export const fileUploadSizeVariants = cva('truncate text-muted-foreground', {
+export const fileUploadSizeVariants = cva('text-muted-foreground truncate', {
   defaultVariants: {
     size: 'md',
   },
@@ -183,18 +183,18 @@ export const fileUploadSizeVariants = cva('truncate text-muted-foreground', {
 })
 
 export const fileUploadRemoveVariants = cva(
-  'inline-flex items-center justify-center rounded-sm b-(1 transparent) text-muted-foreground transition-colors hover:(bg-muted text-foreground) focus-visible:effect-fv-border',
+  'text-muted-foreground b-(1 transparent) rounded-sm inline-flex transition-colors items-center justify-center hover:(text-foreground bg-muted) focus-visible:effect-fv-border',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'size-5 text-xs',
-        sm: 'size-5 text-xs',
-        md: 'size-6 text-sm',
-        lg: 'size-6.5 text-sm',
-        xl: 'size-7 text-base',
+        xs: 'text-xs size-5',
+        sm: 'text-xs size-5',
+        md: 'text-sm size-6',
+        lg: 'text-sm size-6.5',
+        xl: 'text-base size-7',
       },
     },
   },

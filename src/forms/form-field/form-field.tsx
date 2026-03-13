@@ -250,7 +250,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
             <div
               data-slot="labelWrapper"
               class={cn(
-                'flex items-center justify-between gap-1',
+                'flex gap-1 items-center justify-between',
                 styleProps.classes?.labelWrapper,
               )}
             >
@@ -271,7 +271,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
                 <span
                   id={`${ariaId()}-hint`}
                   data-slot="hint"
-                  class={cn('ms-1 text-muted-foreground', styleProps.classes?.hint)}
+                  class={cn('text-muted-foreground ms-1', styleProps.classes?.hint)}
                 >
                   {contentProps.hint}
                 </span>
@@ -313,7 +313,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
                 <div
                   id={`${ariaId()}-help`}
                   data-slot="help"
-                  class={cn('mt-2 text-muted-foreground', styleProps.classes?.help)}
+                  class={cn('text-muted-foreground mt-2', styleProps.classes?.help)}
                 >
                   {contentProps.help}
                 </div>
@@ -323,7 +323,7 @@ export function FormField(props: FormFieldProps): JSX.Element {
             <div
               id={`${ariaId()}-error`}
               data-slot="error"
-              class={cn('mt-2 text-destructive', styleProps.classes?.error)}
+              class={cn('text-destructive mt-2', styleProps.classes?.error)}
             >
               {resolvedError() as JSX.Element}
             </div>

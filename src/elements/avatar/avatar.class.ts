@@ -2,25 +2,25 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const avatarRootVariants = cva(
-  'relative inline-flex shrink-0 select-none items-center justify-center overflow-visible rounded-full bg-muted text-muted-foreground surface-outline',
+  'text-muted-foreground rounded-full bg-muted inline-flex shrink-0 select-none surface-outline items-center justify-center relative overflow-visible',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'size-6 text-xs',
-        sm: 'size-7 text-xs',
-        md: 'size-8 text-sm',
-        lg: 'size-10 text-base',
-        xl: 'size-11 text-lg',
+        xs: 'text-xs size-6',
+        sm: 'text-xs size-7',
+        md: 'text-sm size-8',
+        lg: 'text-base size-10',
+        xl: 'text-lg size-11',
       },
     },
   },
 )
 
 export const avatarImageVariants = cva(
-  'absolute inset-0 size-full rounded-[inherit] object-cover transition-opacity ease-out',
+  'rounded-[inherit] size-full transition-opacity ease-out inset-0 absolute object-cover',
   {
     defaultVariants: {
       status: 'idle',
@@ -28,10 +28,10 @@ export const avatarImageVariants = cva(
     },
     variants: {
       status: {
-        idle: 'opacity-0 hidden-hitless',
-        loading: 'opacity-0 hidden-hitless',
+        idle: 'hidden-hitless opacity-0',
+        loading: 'hidden-hitless opacity-0',
         loaded: 'opacity-100',
-        error: 'opacity-0 hidden-hitless',
+        error: 'hidden-hitless opacity-0',
       },
       transition: {
         none: 'duration-0',
@@ -44,7 +44,7 @@ export const avatarImageVariants = cva(
 )
 
 export const avatarFallbackVariants = cva(
-  'absolute inset-0 flex items-center justify-center rounded-[inherit] font-medium uppercase transition-opacity ease-out',
+  'font-medium rounded-[inherit] flex uppercase transition-opacity ease-out items-center inset-0 justify-center absolute',
   {
     defaultVariants: {
       size: 'md',
@@ -62,7 +62,7 @@ export const avatarFallbackVariants = cva(
       status: {
         idle: 'opacity-100',
         loading: 'opacity-100',
-        loaded: 'opacity-0 hidden-hitless',
+        loaded: 'hidden-hitless opacity-0',
         error: 'opacity-100',
       },
       transition: {
@@ -91,7 +91,7 @@ export const avatarFallbackIconVariants = cva('shrink-0', {
 })
 
 export const avatarBadgeVariants = cva(
-  'absolute z-10 inline-flex items-center justify-center rounded-full bg-background text-foreground ring-2 ring-background',
+  'text-foreground rounded-full bg-background inline-flex ring-2 ring-background items-center justify-center absolute z-10',
   {
     defaultVariants: {
       size: 'md',
@@ -99,15 +99,15 @@ export const avatarBadgeVariants = cva(
     },
     variants: {
       size: {
-        xs: 'size-2.5 text-[8px]',
-        sm: 'size-3 text-[9px]',
-        md: 'size-3.5 text-[10px]',
-        lg: 'size-4 text-xs',
-        xl: 'size-4.5 text-sm',
+        xs: 'text-[8px] size-2.5',
+        sm: 'text-[9px] size-3',
+        md: 'text-[10px] size-3.5',
+        lg: 'text-xs size-4',
+        xl: 'text-sm size-4.5',
       },
       badgePosition: {
-        'top-left': '-top-0.5 -left-0.5',
-        'top-right': '-top-0.5 -right-0.5',
+        'top-left': '-left-0.5 -top-0.5',
+        'top-right': '-right-0.5 -top-0.5',
         'bottom-left': '-bottom-0.5 -left-0.5',
         'bottom-right': '-bottom-0.5 -right-0.5',
       },
@@ -115,7 +115,7 @@ export const avatarBadgeVariants = cva(
   },
 )
 
-export const avatarGroupItemVariants = cva('relative rounded-full ring-background first:me-0', {
+export const avatarGroupItemVariants = cva('rounded-full ring-background relative first:me-0', {
   defaultVariants: {
     size: 'md',
   },
@@ -131,18 +131,18 @@ export const avatarGroupItemVariants = cva('relative rounded-full ring-backgroun
 })
 
 export const avatarGroupCountVariants = cva(
-  'inline-flex shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground font-medium ring-background first:me-0',
+  'text-muted-foreground font-medium rounded-full bg-muted inline-flex shrink-0 ring-background items-center justify-center first:me-0',
   {
     defaultVariants: {
       size: 'md',
     },
     variants: {
       size: {
-        xs: 'size-6 text-xs ring-2 -me-1',
-        sm: 'size-7 text-xs ring-2 -me-1.5',
-        md: 'size-8 text-sm ring-2 -me-1.5',
-        lg: 'size-10 text-base ring-2 -me-1.5',
-        xl: 'size-11 text-lg ring-2 -me-2',
+        xs: 'text-xs size-6 ring-2 -me-1',
+        sm: 'text-xs size-7 ring-2 -me-1.5',
+        md: 'text-sm size-8 ring-2 -me-1.5',
+        lg: 'text-base size-10 ring-2 -me-1.5',
+        xl: 'text-lg size-11 ring-2 -me-2',
       },
     },
   },

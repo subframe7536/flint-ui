@@ -80,7 +80,7 @@ export function OverlayMenuBaseContent<
           <span
             data-slot="itemLeading"
             class={cn(
-              'col-start-1 inline-flex size-4 shrink-0 items-center justify-center',
+              'inline-flex shrink-0 col-start-1 size-4 items-center justify-center',
               props.classes?.itemLeading,
             )}
           >
@@ -91,7 +91,7 @@ export function OverlayMenuBaseContent<
         <Show when={contentProps.item.label || contentProps.item.description}>
           <span
             data-slot="itemWrapper"
-            class={cn('col-start-2 grid gap-0.5', props.classes?.itemWrapper)}
+            class={cn('gap-0.5 grid col-start-2', props.classes?.itemWrapper)}
           >
             <Show when={contentProps.item.label}>
               <span data-slot="itemLabel" class={cn('truncate', props.classes?.itemLabel)}>
@@ -102,7 +102,7 @@ export function OverlayMenuBaseContent<
             <Show when={contentProps.item.description}>
               <span
                 data-slot="itemDescription"
-                class={cn('truncate text-muted-foreground text-xs', props.classes?.itemDescription)}
+                class={cn('text-xs text-muted-foreground truncate', props.classes?.itemDescription)}
               >
                 {contentProps.item.description}
               </span>
@@ -113,7 +113,7 @@ export function OverlayMenuBaseContent<
         <span
           data-slot="itemTrailing"
           class={cn(
-            'col-start-3 inline-flex items-center justify-end gap-1.5',
+            'inline-flex gap-1.5 col-start-3 items-center justify-end',
             props.classes?.itemTrailing,
           )}
         >
@@ -136,7 +136,7 @@ export function OverlayMenuBaseContent<
             <ItemIndicator
               data-slot="itemIndicator"
               class={cn(
-                'inline-flex items-center justify-center text-sm',
+                'text-sm inline-flex items-center justify-center',
                 props.classes?.itemIndicator,
               )}
             >
@@ -174,7 +174,7 @@ export function OverlayMenuBaseContent<
             <Match when={nodeProps.item.type === 'separator'}>
               <Separator
                 data-slot="separator"
-                class={cn('mx--1 my-1 h-px b-t-border', props.classes?.separator)}
+                class={cn('mx--1 my-1 b-t-border h-px', props.classes?.separator)}
               />
             </Match>
 
@@ -182,7 +182,7 @@ export function OverlayMenuBaseContent<
               <GroupLabel
                 data-slot="label"
                 class={cn(
-                  'inline-flex px-1.5 py-1 font-medium text-muted-foreground text-xs',
+                  'text-xs text-muted-foreground font-medium px-1.5 py-1 inline-flex',
                   props.classes?.label,
                 )}
               >

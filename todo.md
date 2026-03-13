@@ -6,7 +6,7 @@
 - [x] extend avatar size variant like other components
 - [ ] check `props.highlight` actual usage and style effect, optimize `surface-highlight` and `surface-outline` and `surface-overlay`, unify text size / line height / spacing / border color , border implement style (directly border or box-shadow)
 - [x] remove all unocss-specific class syntax and option to simplify by transformer, provide preset
-- [ ] simplify theme, fix some utility classes not working when `lowLayer: true / 'use-prefix'`
+- [ ] simplify theme, fix some utility classes not working when `lowLayer: true / 'use-prefix'`, missing border / animation
 - [ ] refactor all transformer with `oxc-parser` / `oxc-walk`, add missing keyframes in `tw3.css` / `tw4.css`
 - [ ] `styles: SlotStyles<SlotNames, JSX.CSSProperties>` (like `classes`)
 - [ ] props jsdoc

@@ -1,20 +1,20 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const progressRootVariants = cva('relative gap-2', {
+export const progressRootVariants = cva('gap-2 relative', {
   defaultVariants: {
     orientation: 'horizontal',
   },
   variants: {
     orientation: {
-      horizontal: 'flex w-full flex-col',
-      vertical: 'flex h-full min-h-36 flex-row-reverse items-start',
+      horizontal: 'flex flex-col w-full',
+      vertical: 'flex flex-row-reverse h-full min-h-36 items-start',
     },
   },
 })
 
 export const progressStatusVariants = cva(
-  'flex text-muted-foreground transition-[width,height] duration-200',
+  'text-muted-foreground flex transition-[width,height] duration-200',
   {
     defaultVariants: {
       orientation: 'horizontal',
@@ -23,8 +23,8 @@ export const progressStatusVariants = cva(
     },
     variants: {
       orientation: {
-        horizontal: 'min-w-fit flex-row items-center justify-end',
-        vertical: 'min-h-fit flex-col justify-end',
+        horizontal: 'flex-row min-w-fit items-center justify-end',
+        vertical: 'flex-col min-h-fit justify-end',
       },
       size: {
         xs: 'text-xs',
@@ -44,7 +44,7 @@ export const progressStatusVariants = cva(
 )
 
 export const progressBaseVariants = cva(
-  'relative overflow-hidden rounded-full bg-input translate-z-0',
+  'rounded-full bg-input translate-z-0 relative overflow-hidden',
   {
     defaultVariants: {
       orientation: 'horizontal',
@@ -52,7 +52,7 @@ export const progressBaseVariants = cva(
     },
     variants: {
       orientation: {
-        horizontal: 'w-full h-$p-size',
+        horizontal: 'h-$p-size w-full',
         vertical: 'h-full min-h-36 w-$p-size',
       },
       size: {
@@ -67,7 +67,7 @@ export const progressBaseVariants = cva(
 )
 
 export const progressIndicatorVariants = cva(
-  'absolute inset-0 size-full rounded-full transition-transform duration-200 ease-out will-change-transform data-indeterminate:animate-(duration-2s ease-in-out iteration-infinite)',
+  'will-change-transform rounded-full size-full transition-transform duration-200 ease-out inset-0 absolute data-indeterminate:animate-(duration-2s ease-in-out iteration-infinite)',
   {
     defaultVariants: {
       color: 'primary',
@@ -167,7 +167,7 @@ export const progressStepsVariants = cva('grid items-end', {
 })
 
 export const progressStepVariants = cva(
-  'row-start-1 col-start-1 truncate text-end transition-opacity duration-200',
+  'text-end col-start-1 row-start-1 truncate transition-opacity duration-200',
   {
     defaultVariants: {
       state: 'other',
@@ -177,7 +177,7 @@ export const progressStepVariants = cva(
     variants: {
       state: {
         active: 'opacity-100',
-        first: 'opacity-100 text-muted-foreground',
+        first: 'text-muted-foreground opacity-100',
         other: 'opacity-0',
         last: 'opacity-100',
       },

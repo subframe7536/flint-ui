@@ -25,7 +25,7 @@ export function Card(props: CardProps): JSX.Element {
     <div
       data-slot="root"
       class={cn(
-        'relative flex flex-col rounded-2xl b-1 b-border bg-card not-dark:bg-clip-padding text-card-foreground shadow-xs/5',
+        'text-card-foreground b-1 b-border rounded-2xl bg-card flex flex-col shadow-xs/5 relative not-dark:bg-clip-padding',
         props.classes?.root,
       )}
     >
@@ -43,7 +43,7 @@ export function Card(props: CardProps): JSX.Element {
             <Show when={props.title}>
               <div
                 data-slot="title"
-                class={cn('font-semibold text-lg leading-none', props.classes?.title)}
+                class={cn('text-lg leading-none font-semibold', props.classes?.title)}
               >
                 {props.title}
               </div>
@@ -60,7 +60,7 @@ export function Card(props: CardProps): JSX.Element {
               <div
                 data-slot="action"
                 class={cn(
-                  'col-start-2 row-span-2 row-start-1 self-start justify-self-end inline-flex',
+                  'inline-flex row-span-2 col-start-2 row-start-1 self-start justify-self-end',
                   props.classes?.action,
                 )}
               >

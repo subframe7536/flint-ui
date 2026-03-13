@@ -101,13 +101,13 @@ export function Dialog(props: ModalProps): JSX.Element {
         <Show when={contentProps.title || contentProps.description}>
           <div
             data-slot="wrapper"
-            class={cn('min-w-0 flex-1 grid gap-1.5', contentProps.classes?.wrapper)}
+            class={cn('flex-1 gap-1.5 grid min-w-0', contentProps.classes?.wrapper)}
           >
             <Show when={contentProps.title}>
               <KobalteDialog.Title
                 data-slot="title"
                 class={cn(
-                  'text-lg font-semibold leading-none tracking-tight',
+                  'text-lg leading-none tracking-tight font-semibold',
                   contentProps.classes?.title,
                 )}
               >
@@ -133,7 +133,7 @@ export function Dialog(props: ModalProps): JSX.Element {
             data-slot="close"
             aria-label="Close"
             class={cn(
-              'absolute right-4 top-4 size-7 p-1 rounded-sm hover:bg-accent focus-visible:effect-fv transition-opacity',
+              'p-1 rounded-sm size-7 transition-opacity right-4 top-4 absolute focus-visible:effect-fv hover:bg-accent',
               contentProps.classes?.close,
             )}
           />
@@ -161,10 +161,10 @@ export function Dialog(props: ModalProps): JSX.Element {
           footer={contentProps.footer}
           classes={{
             root: dialogCardVariants({ layout: popupLayout() }),
-            header: cn('flex items-start gap-1.5 p-6', contentProps.classes?.header),
-            body: cn('pb-6 text-sm', contentProps.classes?.body),
+            header: cn('p-6 flex gap-1.5 items-start', contentProps.classes?.header),
+            body: cn('text-sm pb-6', contentProps.classes?.body),
             footer: cn(
-              'flex flex-col-reverse gap-2 px-6 pb-6 pt-0 sm:(flex-row justify-end)',
+              'px-6 pb-6 pt-0 flex flex-col-reverse gap-2 sm:(flex-row justify-end)',
               contentProps.classes?.footer,
             ),
           }}

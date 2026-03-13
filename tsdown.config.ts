@@ -9,6 +9,7 @@ import { presetTheme } from './src/unocss-preset-theme'
 import { createMigrateSyntaxTransformer } from './src/unocss-transformer-migrate-syntax'
 
 const baseUnocssConfig = (preset: any): UnoCSSPluginOptions => {
+  const theme = presetTheme()
   return {
     filter: { id: ['src/**/*.tsx', 'src/**/*.class.ts'] },
     config: {
@@ -19,14 +20,14 @@ const baseUnocssConfig = (preset: any): UnoCSSPluginOptions => {
           scale: 1.2,
         }),
         presetAnimations() as any,
-        presetTheme(),
+        theme,
       ],
       transformers: [transformerVariantGroup(), createMigrateSyntaxTransformer()],
       extractors: [
         {
           name: 'simplify',
           extract(ctx) {
-            const shortcuts = new Set((presetTheme().shortcuts as any[]).map((s) => s[0]))
+            const shortcuts = new Set((theme.shortcuts as any[]).map((s) => s[0]))
             Array.from(ctx.extracted.keys())
               .filter((e) => !e.startsWith('var-') && !shortcuts.has(e))
               .forEach((s) => ctx.extracted.delete(s))

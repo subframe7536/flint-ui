@@ -20,7 +20,7 @@ export interface PresetThemeOptions {
   colors?: Partial<AppConfig['colors']>
   icons?: Partial<AppConfig['icons']>
   idFilter?: (id: string) => boolean
-  lowLayer: boolean | 'use-prefix'
+  lowLayer?: boolean | 'use-prefix'
 }
 
 export const DEFAULT_COLORS: AppConfig['colors'] = {
@@ -81,7 +81,13 @@ export const DEFAULT_ICONS = {
 const LIGHT_BASE_COLORS = {
   background: 'rgb(248, 247, 244)',
   foreground: 'rgb(26, 31, 46)',
+  primary: { DEFAULT: 'hsl(214.9932 22.5930% 64.5044%)', foreground: 'hsl(0 0% 98.0392%)' },
+  secondary: {
+    DEFAULT: 'hsl(141.6000 13.2275% 62.9412%)',
+    foreground: 'hsl(192.0000 100.0000% 99.0196%)',
+  },
   card: { DEFAULT: 'rgb(250, 250, 248)', foreground: 'rgb(26, 31, 46)' },
+  ring: 'hsl(215.3832 18.3663% 47.0286%)',
   popover: { DEFAULT: 'rgb(250, 250, 250)', foreground: 'rgb(26, 31, 46)' },
   muted: { DEFAULT: 'rgb(232, 230, 225)', foreground: 'rgb(107, 114, 128)' },
   accent: { DEFAULT: 'rgb(215, 219, 223)', foreground: 'rgb(26, 31, 46)' },
@@ -93,7 +99,16 @@ const LIGHT_BASE_COLORS = {
 const DARK_BASE_COLORS = {
   background: 'rgb(37, 39, 38)',
   foreground: 'rgb(220, 220, 220)',
+  primary: {
+    DEFAULT: 'hsl(200.5658 97.8745% 85.9432%)',
+    foreground: 'hsl(223.8136 0.0000% 3.9388%)',
+  },
+  secondary: {
+    DEFAULT: 'hsl(48 33.3333% 97.0588%)',
+    foreground: 'hsl(60 2.1277% 18.4314%)',
+  },
   card: { DEFAULT: 'rgb(42, 45, 43)', foreground: 'rgb(220, 220, 220)' },
+  ring: 'hsl(212.7183 29.9127% 84.0160%)',
   popover: { DEFAULT: 'rgb(51, 51, 51)', foreground: 'rgb(220, 220, 220)' },
   muted: { DEFAULT: 'rgb(56, 61, 58)', foreground: 'rgb(173, 173, 173)' },
   accent: { DEFAULT: 'rgb(96, 112, 118)', foreground: 'rgb(217, 220, 227)' },
@@ -152,10 +167,11 @@ function normalizeOptions(options?: number | PresetThemeOptions): Required<Prese
 
 export const ROCK_COMPONENT_LAYER = 'rock-component'
 export const ROCK_PREFIX = 'rk'
-const ROCK_PREFIX_RE = new RegExp(escapeRegExp(ROCK_PREFIX) + '-', 'g')
-const ROCK_PREFIX_CLEAN_RE = new RegExp(`\\\\?${escapeRegExp(ROCK_PREFIX + '-')}`, 'g')
-const SCRIPT_ID_RE = /\.(?:js|jsx|ts|tsx|mjs|cjs|mts|cts)(?:$|[?#])/i
-const DEFAULT_ID_FILTER = (id: string): boolean => SCRIPT_ID_RE.test(id)
+const RE_ROCK_PREFIX = new RegExp(escapeRegExp(ROCK_PREFIX) + '-', 'g')
+const RE_ROCK_PREFIX_CLEAN = new RegExp(`\\\\?${escapeRegExp(ROCK_PREFIX + '-')}`, 'g')
+const RE_SCRIPT_ID = /\.(?:js|jsx|ts|tsx|mjs|cjs|mts|cts)(?:$|[?#])/i
+const DEFAULT_ID_FILTER = (id: string): boolean => RE_SCRIPT_ID.test(id)
+const RE_ATTR = /^(data|aria)-(\w+):/
 
 export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme> {
   const normalized = normalizeOptions(options)
@@ -190,7 +206,7 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
         idFilter: normalized.idFilter,
         transform(code) {
           const source = code.toString()
-          const nextSource = source.replace(ROCK_PREFIX_RE, '')
+          const nextSource = source.replace(RE_ROCK_PREFIX, '')
           if (nextSource !== source) {
             code.overwrite(0, code.original.length, nextSource)
           }
@@ -201,7 +217,7 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
 
   const variants: Preset['variants'] = [
     (matcher) => {
-      const match = matcher.match(/^(data|aria)-(\w+):/)
+      const match = matcher.match(RE_ATTR)
       if (!match) {
         return matcher
       }
@@ -262,13 +278,13 @@ export function presetTheme(options?: number | PresetThemeOptions): Preset<Theme
                 return
               }
 
-              util.selector = util.selector.replace(ROCK_PREFIX_CLEAN_RE, '')
+              util.selector = util.selector.replace(RE_ROCK_PREFIX_CLEAN, '')
               if (util.parent) {
-                util.parent = util.parent.replace(ROCK_PREFIX_CLEAN_RE, '')
+                util.parent = util.parent.replace(RE_ROCK_PREFIX_CLEAN, '')
               }
             },
           ]
-        : [],
+        : undefined,
     shortcuts: [
       ['effect-fv', 'outline-none ring-3px ring-ring/30'],
       ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/30'],

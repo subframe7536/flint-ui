@@ -7,8 +7,8 @@ export const stepperRootVariants = cva('flex gap-4', {
   },
   variants: {
     orientation: {
-      horizontal: 'w-full flex-col',
-      vertical: 'w-full flex-row items-start gap-6',
+      horizontal: 'flex-col w-full',
+      vertical: 'flex-row gap-6 w-full items-start',
     },
   },
 })
@@ -20,19 +20,19 @@ export const stepperHeaderVariants = cva('flex', {
   variants: {
     orientation: {
       horizontal: 'w-full',
-      vertical: 'min-w-0 flex-col gap-4',
+      vertical: 'flex-col gap-4 min-w-0',
     },
   },
 })
 
-export const stepperItemVariants = cva('relative min-w-0 data-disabled:effect-dis', {
+export const stepperItemVariants = cva('min-w-0 relative data-disabled:effect-dis', {
   defaultVariants: {
     orientation: 'horizontal',
   },
   variants: {
     orientation: {
-      horizontal: 'w-full flex-1 text-center',
-      vertical: 'flex items-start text-start gap-$st-gap',
+      horizontal: 'text-center flex-1 w-full',
+      vertical: 'text-start flex gap-$st-gap items-start',
     },
     size: {
       xs: 'var-stepper-6-4-1.5-0.5',
@@ -44,19 +44,19 @@ export const stepperItemVariants = cva('relative min-w-0 data-disabled:effect-di
   },
 })
 
-export const stepperContainerVariants = cva('relative flex items-center', {
+export const stepperContainerVariants = cva('flex items-center relative', {
   defaultVariants: {
     orientation: 'horizontal',
   },
   variants: {
     orientation: {
       horizontal: 'justify-center',
-      vertical: 'shrink-0 self-stretch flex-col',
+      vertical: 'shrink-0 flex-col self-stretch',
     },
   },
 })
 
-export const stepperTriggerVariants = cva('inline-flex justify-center size-$st-size rounded-full', {
+export const stepperTriggerVariants = cva('rounded-full inline-flex size-$st-size justify-center', {
   defaultVariants: {
     size: 'md',
     state: 'inactive',
@@ -70,15 +70,15 @@ export const stepperTriggerVariants = cva('inline-flex justify-center size-$st-s
       xl: 'text-xl p-3',
     },
     state: {
-      inactive: 'border-input bg-background text-muted-foreground shadow-xs',
-      active: 'border-primary bg-primary text-primary-foreground',
-      completed: 'border-primary bg-primary text-primary-foreground',
+      inactive: 'text-muted-foreground border-input bg-background shadow-xs',
+      active: 'text-primary-foreground border-primary bg-primary',
+      completed: 'text-primary-foreground border-primary bg-primary',
     },
   },
 })
 
 export const stepperSeparatorVariants = cva(
-  'absolute rounded-full bg-border transition-colors data-disabled:opacity-75 bg-border data-[state=completed]:bg-primary',
+  'rounded-full bg-border bg-border transition-colors absolute data-[state=completed]:bg-primary data-disabled:opacity-75',
   {
     defaultVariants: {
       orientation: 'horizontal',
@@ -86,8 +86,8 @@ export const stepperSeparatorVariants = cva(
     variants: {
       orientation: {
         horizontal:
-          'top-1/2 h-0.5 -translate-y-1/2 start-[calc(50%+var(--st-sep-x))] end-[calc(-50%+var(--st-sep-x))]',
-        vertical: 'left-1/2 w-0.5 -translate-x-1/2 top-$st-sep-top bottom--3',
+          'h-0.5 end-[calc(-50%+var(--st-sep-x))] start-[calc(50%+var(--st-sep-x))] top-1/2 -translate-y-1/2',
+        vertical: 'w-0.5 bottom--3 left-1/2 top-$st-sep-top -translate-x-1/2',
       },
     },
   },
@@ -99,13 +99,13 @@ export const stepperWrapperVariants = cva('min-w-0', {
   },
   variants: {
     orientation: {
-      horizontal: 'w-full text-center mt-$st-gap',
-      vertical: 'text-start pt-$st-pt',
+      horizontal: 'mt-$st-gap text-center w-full',
+      vertical: 'pt-$st-pt text-start',
     },
   },
 })
 
-export const stepperTitleVariants = cva('font-medium text-foreground', {
+export const stepperTitleVariants = cva('text-foreground font-medium', {
   defaultVariants: {
     size: 'md',
   },

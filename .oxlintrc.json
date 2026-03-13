@@ -9,7 +9,7 @@
       "files": ["src/**", "playground/**"],
       "jsPlugins": ["eslint-plugin-solid", "@unocss/eslint-plugin"],
       "rules": {
-        "@unocss/order": "warn",
+        "@unocss/order": ["warn", { "unoFunctions": ["cn", "cva"] }],
         "solid/event-handlers": [
           "error",
           {

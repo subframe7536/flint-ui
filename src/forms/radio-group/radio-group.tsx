@@ -249,7 +249,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                   <KobalteRadioGroup.ItemIndicator
                     data-slot="indicator"
                     class={cn(
-                      'flex size-full items-center justify-center rounded-full ring-(4 primary inset ring)',
+                      'rounded-full flex size-full ring-(4 primary ring inset) items-center justify-center',
                       styleProps.classes?.indicator,
                     )}
                   />
@@ -272,7 +272,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                       fallback={
                         <p
                           data-slot="label"
-                          class={cn('font-medium text-foreground', styleProps.classes?.label)}
+                          class={cn('text-foreground font-medium', styleProps.classes?.label)}
                         >
                           {item.label}
                         </p>
@@ -281,7 +281,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
                       <label
                         for={item.inputId}
                         data-slot="label"
-                        class={cn('font-medium text-foreground', styleProps.classes?.label)}
+                        class={cn('text-foreground font-medium', styleProps.classes?.label)}
                       >
                         {item.label}
                       </label>

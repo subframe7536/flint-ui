@@ -4,7 +4,7 @@ import { cva } from 'cls-variant/cva'
 import { INPUT_VARIANT_CLASSES } from '../../shared/cva-common.class'
 
 export const inputNumberRootVariants = cva(
-  'inline-flex w-full items-stretch overflow-hidden rounded-md transition-[color,box-shadow] focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid data-highlight:surface-highlight data-disabled:effect-dis',
+  'rounded-md inline-flex w-full transition-[color,box-shadow] items-stretch overflow-hidden focus-within:effect-fv-border data-invalid:effect-invalid data-disabled:effect-dis data-highlight:surface-highlight focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -24,7 +24,7 @@ export const inputNumberRootVariants = cva(
 )
 
 export const inputNumberBaseVariants = cva(
-  'min-w-0 flex-1 bg-transparent text-foreground outline-none style-placeholder [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none disabled:bg-transparent',
+  'style-placeholder text-foreground outline-none bg-transparent flex-1 min-w-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none disabled:bg-transparent',
   {
     defaultVariants: {
       size: 'md',
@@ -32,11 +32,11 @@ export const inputNumberBaseVariants = cva(
     },
     variants: {
       size: {
-        xs: 'px-2 text-xs',
-        sm: 'px-2.5 text-xs',
-        md: 'px-2.5 text-sm',
-        lg: 'px-3 text-sm',
-        xl: 'px-3 text-base',
+        xs: 'text-xs px-2',
+        sm: 'text-xs px-2.5',
+        md: 'text-sm px-2.5',
+        lg: 'text-sm px-3',
+        xl: 'text-base px-3',
       },
       align: {
         center: 'text-center',
@@ -70,8 +70,8 @@ export const inputNumberControlButtonVariants = cva('border-input', {
       true: 'border-t',
     },
     orientation: {
-      horizontal: 'h-full shrink-0 rounded-none border-0 shadow-none',
-      vertical: 'min-h-0 h-full w-full flex-1 rounded-none border-0 shadow-none px-0',
+      horizontal: 'border-0 rounded-none shrink-0 h-full shadow-none',
+      vertical: 'px-0 border-0 rounded-none flex-1 h-full min-h-0 w-full shadow-none',
     },
   },
   compoundVariants: [
@@ -89,7 +89,7 @@ export const inputNumberControlButtonVariants = cva('border-input', {
 })
 
 export const inputNumberControlColumnVariants = cva(
-  'flex h-full shrink-0 flex-col border-s border-input',
+  'border-s border-input flex shrink-0 flex-col h-full',
   {
     defaultVariants: {
       size: 'md',

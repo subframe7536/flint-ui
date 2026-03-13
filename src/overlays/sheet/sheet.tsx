@@ -154,7 +154,7 @@ export function Sheet(props: SheetProps): JSX.Element {
           <KobalteDialog.Overlay
             data-slot="overlay"
             class={cn(
-              'fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs data-expanded:(animate-in fade-in-0) data-closed:(animate-out fade-out-0) data-ending-style:opacity-0 data-starting-style:opacity-0 duration-150',
+              'supports-backdrop-filter:backdrop-blur-xs data-ending-style:opacity-0 data-starting-style:opacity-0 bg-black/10 duration-150 inset-0 fixed z-50 data-closed:(animate-out fade-out-0) data-expanded:(animate-in fade-in-0)',
               contentProps.classes?.overlay,
             )}
           />
@@ -179,7 +179,7 @@ export function Sheet(props: SheetProps): JSX.Element {
           <Show when={contentProps.header || hasDefaultHeader()}>
             <div
               data-slot="header"
-              class={cn('flex items-start gap-2 p-4', contentProps.classes?.header)}
+              class={cn('p-4 flex gap-2 items-start', contentProps.classes?.header)}
             >
               <Show
                 when={contentProps.header}
@@ -187,13 +187,13 @@ export function Sheet(props: SheetProps): JSX.Element {
                   <>
                     <div
                       data-slot="wrapper"
-                      class={cn('min-w-0 flex-1 grid gap-0.5', contentProps.classes?.wrapper)}
+                      class={cn('flex-1 gap-0.5 grid min-w-0', contentProps.classes?.wrapper)}
                     >
                       <Show when={contentProps.title}>
                         <KobalteDialog.Title
                           data-slot="title"
                           class={cn(
-                            'text-foreground text-base font-medium',
+                            'text-base text-foreground font-medium',
                             contentProps.classes?.title,
                           )}
                         >
@@ -205,7 +205,7 @@ export function Sheet(props: SheetProps): JSX.Element {
                         <KobalteDialog.Description
                           data-slot="description"
                           class={cn(
-                            'text-muted-foreground text-sm',
+                            'text-sm text-muted-foreground',
                             contentProps.classes?.description,
                           )}
                         >
@@ -218,7 +218,7 @@ export function Sheet(props: SheetProps): JSX.Element {
                       <div
                         data-slot="actions"
                         class={cn(
-                          'ms-auto inline-flex shrink-0 items-center gap-2',
+                          'ms-auto inline-flex shrink-0 gap-2 items-center',
                           contentProps.classes?.actions,
                         )}
                       >
@@ -230,7 +230,7 @@ export function Sheet(props: SheetProps): JSX.Element {
                       <KobalteDialog.CloseButton
                         data-slot="close"
                         class={cn(
-                          'inline-flex size-8 shrink-0 items-center justify-center rounded-md b-(1 transparent) text-muted-foreground transition-colors hover:(bg-accent text-accent-foreground) focus-visible:effect-fv-border',
+                          'text-muted-foreground b-(1 transparent) rounded-md inline-flex shrink-0 size-8 transition-colors items-center justify-center hover:(text-accent-foreground bg-accent) focus-visible:effect-fv-border',
                           contentProps.classes?.close,
                         )}
                         aria-label="Close"
@@ -264,7 +264,7 @@ export function Sheet(props: SheetProps): JSX.Element {
           <Show when={contentProps.footer}>
             <div
               data-slot="footer"
-              class={cn('mt-auto flex flex-col gap-2 p-4', contentProps.classes?.footer)}
+              class={cn('mt-auto p-4 flex flex-col gap-2', contentProps.classes?.footer)}
             >
               {contentProps.footer}
             </div>

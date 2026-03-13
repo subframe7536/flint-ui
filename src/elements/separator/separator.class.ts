@@ -1,19 +1,19 @@
 import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
-export const separatorRootVariants = cva('flex items-center text-center text-muted', {
+export const separatorRootVariants = cva('text-muted text-center flex items-center', {
   defaultVariants: {
     orientation: 'horizontal',
   },
   variants: {
     orientation: {
-      horizontal: 'w-full flex-row',
-      vertical: 'h-full min-h-10 flex-col',
+      horizontal: 'flex-row w-full',
+      vertical: 'flex-col h-full min-h-10',
     },
   },
 })
 
-export const separatorBorderVariants = cva('flex-1 shrink-0 border-current', {
+export const separatorBorderVariants = cva('border-current flex-1 shrink-0', {
   defaultVariants: {
     orientation: 'horizontal',
     size: 'xs',
@@ -21,8 +21,8 @@ export const separatorBorderVariants = cva('flex-1 shrink-0 border-current', {
   },
   variants: {
     orientation: {
-      horizontal: 'w-full b-t',
-      vertical: 'h-full b-s',
+      horizontal: 'b-t w-full',
+      vertical: 'b-s h-full',
     },
     size: {
       xs: 'b-1',
@@ -39,7 +39,7 @@ export const separatorBorderVariants = cva('flex-1 shrink-0 border-current', {
   },
 })
 
-export const separatorContainerVariants = cva('flex items-center font-medium', {
+export const separatorContainerVariants = cva('font-medium flex items-center', {
   defaultVariants: {
     orientation: 'horizontal',
   },

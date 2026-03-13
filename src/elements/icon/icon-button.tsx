@@ -65,7 +65,7 @@ export function IconButton<T extends ValidComponent = 'button'>(
       class={cn(
         getIconSizeClass(localProps.size),
         localProps.loading
-          ? 'cursor-wait opacity-80 animate-spin pointer-events-none'
+          ? 'opacity-80 cursor-wait pointer-events-none animate-spin'
           : 'cursor-pointer',
         localProps.class,
       )}

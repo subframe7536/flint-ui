@@ -4,7 +4,7 @@ import { cva } from 'cls-variant/cva'
 import { INPUT_VARIANT_CLASSES } from '../../shared/cva-common.class'
 
 export const inputRootVariants = cva(
-  'inline-flex w-full items-center overflow-hidden rounded-md transition-[color,box-shadow] focus-within:effect-fv-border data-invalid:effect-invalid focus-within:data-invalid:effect-invalid data-highlight:surface-highlight data-disabled:effect-dis',
+  'rounded-md inline-flex w-full transition-[color,box-shadow] items-center overflow-hidden focus-within:effect-fv-border data-invalid:effect-invalid data-disabled:effect-dis data-highlight:surface-highlight focus-within:data-invalid:effect-invalid',
   {
     defaultVariants: {
       size: 'md',
@@ -12,11 +12,11 @@ export const inputRootVariants = cva(
     },
     variants: {
       size: {
-        xs: 'h-7 text-xs leading-7',
-        sm: 'h-8 text-xs leading-8',
-        md: 'h-9 text-sm leading-9',
-        lg: 'h-10 text-sm leading-10',
-        xl: 'h-11 text-base leading-11',
+        xs: 'text-xs leading-7 h-7',
+        sm: 'text-xs leading-8 h-8',
+        md: 'text-sm leading-9 h-9',
+        lg: 'text-sm leading-10 h-10',
+        xl: 'text-base leading-11 h-11',
       },
       variant: INPUT_VARIANT_CLASSES,
     },
@@ -24,7 +24,7 @@ export const inputRootVariants = cva(
 )
 
 export const inputInputVariants = cva(
-  'flex-1 min-w-0 h-full bg-transparent text-foreground outline-none style-placeholder disabled:effect-dis',
+  'style-placeholder text-foreground outline-none bg-transparent flex-1 h-full min-w-0 disabled:effect-dis',
   {
     defaultVariants: {
       size: 'md',
@@ -33,7 +33,7 @@ export const inputInputVariants = cva(
     },
     variants: {
       type: {
-        file: 'text-muted-foreground file:(me-1.5 font-medium outline-none)',
+        file: 'text-muted-foreground file:(font-medium me-1.5 outline-none)',
       },
       size: {
         xs: 'var-input-1',
@@ -47,7 +47,7 @@ export const inputInputVariants = cva(
     },
   },
 )
-export const inputLeadingVariants = cva('flex items-center shrink-0 text-muted-foreground', {
+export const inputLeadingVariants = cva('text-muted-foreground flex shrink-0 items-center', {
   defaultVariants: {
     size: 'md',
   },
@@ -62,7 +62,7 @@ export const inputLeadingVariants = cva('flex items-center shrink-0 text-muted-f
   },
 })
 
-export const inputTrailingVariants = cva('flex items-center shrink-0 text-muted-foreground', {
+export const inputTrailingVariants = cva('text-muted-foreground flex shrink-0 items-center', {
   defaultVariants: {
     size: 'md',
   },

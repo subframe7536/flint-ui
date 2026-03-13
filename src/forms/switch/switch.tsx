@@ -166,7 +166,7 @@ export function Switch<TTrue = boolean, TFalse = boolean>(
       onChange={onChange}
       data-slot="root"
       class={cn(
-        'relative flex items-start',
+        'flex items-start relative',
         field.disabled() && 'effect-dis',
         styleProps.classes?.root,
       )}
@@ -248,8 +248,8 @@ export function Switch<TTrue = boolean, TFalse = boolean>(
                     for={field.id()}
                     data-slot="label"
                     class={cn(
-                      'block font-medium text-foreground',
-                      restProps.required && "after:(ms-0.5 text-destructive content-['*'])",
+                      'text-foreground font-medium block',
+                      restProps.required && "after:(text-destructive ms-0.5 content-['*'])",
                       styleProps.classes?.label,
                     )}
                   >

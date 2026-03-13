@@ -13,7 +13,7 @@ export const checkboxGroupFieldsetVariants = cva('flex', {
   },
 })
 
-export const checkboxGroupLegendVariants = cva('mb-1 block font-medium text-foreground', {
+export const checkboxGroupLegendVariants = cva('text-foreground font-medium mb-1 block', {
   defaultVariants: {
     size: 'md',
   },
@@ -26,7 +26,7 @@ export const checkboxGroupLegendVariants = cva('mb-1 block font-medium text-fore
       xl: 'text-base',
     },
     required: {
-      true: "after:(ms-0.5 text-destructive) after:content-['*']",
+      true: "after:(text-destructive ms-0.5 content-['*'])",
     },
   },
 })

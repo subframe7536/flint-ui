@@ -4,7 +4,7 @@ import { cva } from 'cls-variant/cva'
 export const tabsRootVariants = cva('flex gap-2', {
   variants: {
     orientation: {
-      horizontal: 'w-full flex-col',
+      horizontal: 'flex-col w-full',
       vertical: 'flex-row',
     },
   },
@@ -13,7 +13,7 @@ export const tabsRootVariants = cva('flex gap-2', {
   },
 })
 
-export const tabsListVariants = cva('relative inline-flex items-center p-1', {
+export const tabsListVariants = cva('p-1 inline-flex items-center relative', {
   variants: {
     variant: {
       pill: 'rounded-lg bg-muted',
@@ -30,14 +30,14 @@ export const tabsListVariants = cva('relative inline-flex items-center p-1', {
   },
 })
 
-export const tabsIndicatorVariants = cva('absolute rounded-md transition-all duration-200', {
+export const tabsIndicatorVariants = cva('rounded-md transition-all duration-200 absolute', {
   variants: {
     orientation: {
-      horizontal: 'left-0 w-$kb-tabs-indicator-size translate-x-$kb-tabs-indicator-position',
-      vertical: 'top-0 h-$kb-tabs-indicator-size translate-y-$kb-tabs-indicator-position',
+      horizontal: 'w-$kb-tabs-indicator-size translate-x-$kb-tabs-indicator-position left-0',
+      vertical: 'h-$kb-tabs-indicator-size translate-y-$kb-tabs-indicator-position top-0',
     },
     variant: {
-      pill: 'inset-y-1 bg-background shadow-xs',
+      pill: 'bg-background shadow-xs inset-y-1',
       link: 'bg-primary',
     },
   },
@@ -60,7 +60,7 @@ export const tabsIndicatorVariants = cva('absolute rounded-md transition-all dur
 })
 
 export const tabsTriggerVariants = cva(
-  'group relative inline-flex min-w-0 items-center justify-center gap-1.5 rounded-md font-medium text-muted-foreground outline-none transition cursor-pointer disabled:effect-dis data-selected:(text-foreground) focus-visible:effect-fv-border',
+  'group text-muted-foreground font-medium outline-none rounded-md inline-flex gap-1.5 min-w-0 cursor-pointer transition items-center justify-center relative data-selected:(text-foreground) focus-visible:effect-fv-border disabled:effect-dis',
   {
     variants: {
       orientation: {
@@ -72,11 +72,11 @@ export const tabsTriggerVariants = cva(
         link: 'rounded-none bg-transparent data-selected:(text-primary)',
       },
       size: {
-        xs: 'px-1 text-xs',
-        sm: 'px-2 py-1 text-xs',
-        md: 'px-2.5 py-1.5 text-sm',
-        lg: 'px-3 py-2 text-sm',
-        xl: 'px-4 py-2 text-base',
+        xs: 'text-xs px-1',
+        sm: 'text-xs px-2 py-1',
+        md: 'text-sm px-2.5 py-1.5',
+        lg: 'text-sm px-3 py-2',
+        xl: 'text-base px-4 py-2',
       },
       color: {
         primary: '',

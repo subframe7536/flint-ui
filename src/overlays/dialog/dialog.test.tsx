@@ -171,7 +171,12 @@ describe('Modal', () => {
 
     const content = document.body.querySelector('[data-slot="content"]')
 
-    expect(content?.className).toContain('fixed inset-0 flex h-full max-w-none flex-col')
+    expect(content?.className).toContain('fixed')
+    expect(content?.className).toContain('inset-0')
+    expect(content?.className).toContain('flex')
+    expect(content?.className).toContain('h-full')
+    expect(content?.className).toContain('max-w-none')
+    expect(content?.className).toContain('flex-col')
     expect(content?.className).toContain('transition-none')
     expect(content?.className).toContain('content-class')
   })

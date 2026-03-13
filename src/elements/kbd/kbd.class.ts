@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const kbdItemVariants = cva(
-  'inline-flex items-center justify-center rounded font-mono font-medium leading-none uppercase select-none',
+  'leading-none font-medium font-mono rounded inline-flex select-none uppercase items-center justify-center',
   {
     defaultVariants: {
       size: 'md',
@@ -10,16 +10,16 @@ export const kbdItemVariants = cva(
     },
     variants: {
       size: {
-        xs: 'h-3 px-1 text-2',
-        sm: 'h-4 px-1 text-2.5',
-        md: 'h-4.5 px-1.5 text-3',
-        lg: 'h-5 px-1.5 text-xs',
-        xl: 'h-5.5 px-2 text-sm',
+        xs: 'text-2 px-1 h-3',
+        sm: 'text-2.5 px-1 h-4',
+        md: 'text-3 px-1.5 h-4.5',
+        lg: 'text-xs px-1.5 h-5',
+        xl: 'text-sm px-2 h-5.5',
       },
       variant: {
-        default: 'bg-muted/70 surface-outline-inset text-foreground',
-        outline: 'surface-outline b-b-(2 border) text-muted-foreground',
-        invert: 'bg-muted-foreground text-muted',
+        default: 'text-foreground bg-muted/70 surface-outline-inset',
+        outline: 'text-muted-foreground b-b-(2 border) surface-outline',
+        invert: 'text-muted bg-muted-foreground',
       },
     },
   },
