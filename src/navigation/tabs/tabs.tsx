@@ -109,7 +109,6 @@ export function Tabs(props: TabsProps): JSX.Element {
       orientation: 'horizontal' as const,
       variant: 'pill' as const,
       size: 'md' as const,
-      color: 'primary' as const,
     },
     props,
   ) as TabsProps
@@ -118,7 +117,6 @@ export function Tabs(props: TabsProps): JSX.Element {
     'orientation',
     'variant',
     'size',
-    'color',
     'classes',
     'styles',
     'items',
@@ -167,7 +165,6 @@ export function Tabs(props: TabsProps): JSX.Element {
                   orientation: localProps.orientation,
                   variant: localProps.variant,
                   size: localProps.size,
-                  color: localProps.color,
                 },
                 localProps.classes?.trigger,
               )}

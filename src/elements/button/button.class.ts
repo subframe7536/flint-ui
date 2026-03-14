@@ -2,7 +2,7 @@ import type { VariantProps } from 'cls-variant'
 import { cva } from 'cls-variant/cva'
 
 export const buttonVariants = cva(
-  'text-base font-500 inline-flex cursor-pointer select-none whitespace-nowrap transition items-center justify-center bg-clip-padding focus-visible:effect-fv-border aria-invalid:effect-invalid aria-disabled:effect-dis disabled:effect-dis active:shadow-none',
+  'inline-flex cursor-pointer select-none whitespace-nowrap transition items-center justify-center bg-clip-padding focus-visible:effect-fv-border aria-invalid:effect-invalid aria-disabled:effect-dis data-loading:effect-loading disabled:effect-dis active:shadow-none',
   {
     defaultVariants: {
       size: 'md',
@@ -12,8 +12,7 @@ export const buttonVariants = cva(
       variant: {
         default: 'text-primary-foreground bg-primary shadow hover:bg-primary/90',
         secondary: 'text-secondary-foreground bg-secondary hover:bg-secondary/80',
-        outline:
-          'text-foreground b-(1 border) bg-background shadow-xs hover:(text-input-foreground bg-input)',
+        outline: 'b-(1 border) bg-background shadow-xs hover:(text-foreground bg-input/30)',
         ghost: 'hover:(text-accent-foreground bg-accent/50)',
         link: 'text-primary underline-offset-4 hover:underline',
         destructive: 'text-destructive-foreground bg-destructive hover:bg-destructive/80',

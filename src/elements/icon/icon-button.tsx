@@ -4,10 +4,10 @@ import type { JSX, ValidComponent } from 'solid-js'
 import { splitProps } from 'solid-js'
 
 import { cn } from '../../shared/utils'
-import { buttonVariants } from '../button/button.class'
 
 import { Icon } from './icon'
 import type { IconName } from './icon'
+import { iconButtonVariants } from './icon-button.class'
 
 /**
  * Base props for the IconButton component.
@@ -61,14 +61,7 @@ export function IconButton<T extends ValidComponent = 'button'>(
   return (
     <KobalteButton.Root
       data-slot="icon-button"
-      class={cn(
-        buttonVariants({
-          size: localProps.size ? (`icon-${localProps.size}` as any) : 'icon-md',
-          variant: 'ghost',
-        }),
-        localProps.loading ? 'opacity-80 cursor-wait pointer-events-none' : 'cursor-pointer',
-        localProps.class,
-      )}
+      class={iconButtonVariants({ size: localProps.size }, localProps.class)}
       aria-busy={localProps.loading || undefined}
       data-loading={localProps.loading ? '' : undefined}
       disabled={localProps.loading || localProps.disabled}

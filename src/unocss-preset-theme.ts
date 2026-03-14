@@ -1,18 +1,7 @@
 import type { Preset } from 'unocss'
-import type { Theme } from 'unocss/preset-wind4'
 
 import { transformerInjectPrefix } from './unocss-transformer/inject-prefix'
 import type { TransformerInjectPrefixOption } from './unocss-transformer/inject-prefix'
-
-export interface PresetThemeOptions extends Pick<TransformerInjectPrefixOption, 'beforeTransform'> {
-  radiusRem?: number
-  colors?: Record<string, unknown>
-  icons?: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
-  enableComponentLayer?:
-    | boolean
-    | 'preservePrefix'
-    | (Partial<TransformerInjectPrefixOption> & { preservePrefix?: boolean })
-}
 
 export const DEFAULT_ICONS = {
   arrowDown: 'i-lucide-arrow-down',
@@ -59,44 +48,15 @@ export const DEFAULT_ICONS = {
   warning: 'i-lucide-triangle-alert',
 } as const
 
-const LIGHT_BASE_COLORS = {
-  background: 'rgb(248, 247, 244)',
-  foreground: 'rgb(26, 31, 46)',
-  primary: { DEFAULT: 'hsl(214.9932 22.5930% 64.5044%)', foreground: 'hsl(0 0% 98.0392%)' },
-  secondary: {
-    DEFAULT: 'hsl(141.6000 13.2275% 62.9412%)',
-    foreground: 'hsl(192.0000 100.0000% 99.0196%)',
-  },
-  card: { DEFAULT: 'rgb(250, 250, 248)', foreground: 'rgb(26, 31, 46)' },
-  ring: 'hsl(215.3832 18.3663% 47.0286%)',
-  popover: { DEFAULT: 'rgb(250, 250, 250)', foreground: 'rgb(26, 31, 46)' },
-  muted: { DEFAULT: 'rgb(232, 230, 225)', foreground: 'rgb(107, 114, 128)' },
-  accent: { DEFAULT: 'rgb(215, 219, 223)', foreground: 'rgb(26, 31, 46)' },
-  border: 'rgb(232, 230, 225)',
-  input: { DEFAULT: 'rgb(212, 217, 223)', foreground: 'rgb(26, 31, 46)' },
-  destructive: { DEFAULT: 'rgb(199, 62, 58)', foreground: 'rgb(246, 234, 234)' },
-} satisfies Theme['colors']
-
-const DARK_BASE_COLORS = {
-  background: 'rgb(37, 39, 38)',
-  foreground: 'rgb(220, 220, 220)',
-  primary: {
-    DEFAULT: 'hsl(200.5658 97.8745% 85.9432%)',
-    foreground: 'hsl(223.8136 0.0000% 3.9388%)',
-  },
-  secondary: {
-    DEFAULT: 'hsl(48 33.3333% 97.0588%)',
-    foreground: 'hsl(60 2.1277% 18.4314%)',
-  },
-  card: { DEFAULT: 'rgb(42, 45, 43)', foreground: 'rgb(220, 220, 220)' },
-  ring: 'hsl(212.7183 29.9127% 84.0160%)',
-  popover: { DEFAULT: 'rgb(51, 51, 51)', foreground: 'rgb(220, 220, 220)' },
-  muted: { DEFAULT: 'rgb(56, 61, 58)', foreground: 'rgb(173, 173, 173)' },
-  accent: { DEFAULT: 'rgb(96, 112, 118)', foreground: 'rgb(217, 220, 227)' },
-  border: 'rgb(79, 79, 79)',
-  input: { DEFAULT: 'rgb(65, 65, 65)', foreground: 'rgb(220, 220, 220)' },
-  destructive: { DEFAULT: 'rgb(234, 97, 97)', foreground: 'rgb(240, 219, 219)' },
-} satisfies Theme['colors']
+export interface PresetThemeOptions extends Pick<TransformerInjectPrefixOption, 'beforeTransform'> {
+  wind3?: boolean
+  colors?: Record<string, unknown>
+  icons?: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
+  enableComponentLayer?:
+    | boolean
+    | 'preservePrefix'
+    | (Partial<TransformerInjectPrefixOption> & { preservePrefix?: boolean })
+}
 
 const ROCK_COMPONENT_LAYER = 'rock-component'
 const ROCK_PREFIX = 'rk-'
@@ -105,7 +65,7 @@ const RE_ROCK_PREFIX_CLEAN = new RegExp(`\\\\?${ROCK_PREFIX}`, 'g')
 
 const RE_ATTR = /^(data|aria)-(\w+):/
 interface ResolvedPresetThemeOptions {
-  radiusRem: number
+  wind3: boolean
   colors: Record<string, unknown>
   icons: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
   enableComponentLayer: boolean
@@ -137,7 +97,7 @@ export function resolvePresetThemeOptions(
   }
 
   return {
-    radiusRem: options?.radiusRem ?? 0.5,
+    wind3: options?.wind3 ?? false,
     colors: options?.colors ?? {},
     icons: options?.icons ?? {},
     enableComponentLayer,
@@ -149,20 +109,8 @@ export function resolvePresetThemeOptions(
   }
 }
 
-export function presetTheme(options?: PresetThemeOptions): Preset<Theme> {
+export function presetTheme(options?: PresetThemeOptions): Preset {
   const normalized = resolvePresetThemeOptions(options)
-
-  const lightTheme: Theme = {
-    colors: LIGHT_BASE_COLORS,
-  }
-
-  const darkThemeVars = Object.entries(DARK_BASE_COLORS)
-    .flatMap(([k, v]) =>
-      typeof v === 'string'
-        ? `--colors-${k}: ${v}`
-        : Object.entries(v).map(([sk, sv]) => `--colors-${k}-${sk}: ${sv}`),
-    )
-    .join(';\n')
 
   const transformers: Preset['transformers'] = []
   if (normalized.enableComponentLayer) {
@@ -218,10 +166,61 @@ export function presetTheme(options?: PresetThemeOptions): Preset<Theme> {
       }
     })
   }
+
+  function createLength(theme: { spacing?: any }, num: string | number) {
+    return `calc(${normalized.wind3 ? (theme.spacing?.[0] ?? '0.25rem') : 'var(--spacing)'} * ${num})`
+  }
+
+  const radius = {
+    sm: `calc(var(--radius) * 0.6)`,
+    md: `calc(var(--radius) * 0.8)`,
+    lg: `var(--radius)`,
+    xl: `calc(var(--radius) * 1.4)`,
+    '2xl': `calc(var(--radius) * 1.8)`,
+    '3xl': `calc(var(--radius) * 2.2)`,
+    '4xl': `calc(var(--radius) * 2.6)`,
+  }
+
+  const shadow = {
+    '2xs': 'var(--shadow-2xs)',
+    xs: 'var(--shadow-xs)',
+    sm: 'var(--shadow-sm)',
+    DEFAULT: 'var(--shadow)',
+    md: 'var(--shadow-md)',
+    lg: 'var(--shadow-lg)',
+    xl: 'var(--shadow-xl)',
+    '2xl': 'var(--shadow-2xl)',
+  }
+
+  const font = {
+    sans: 'var(--font-sans)',
+    mono: 'var(--font-mono)',
+    serif: 'var(--font-serif)',
+  }
+
   return {
     name: 'preset-theme-rock',
     theme: {
-      ...lightTheme,
+      ...(normalized.wind3
+        ? { borderRadius: radius, boxShadow: shadow, fontFamily: font }
+        : { radius, shadow, font }),
+      colors: {
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        primary: { DEFAULT: 'var(--primary)', foreground: 'var(--primary-foreground)' },
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
+        },
+        card: { DEFAULT: 'var(--card)', foreground: 'var(--card-foreground)' },
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        border: 'var(--border)',
+        popover: { DEFAULT: 'var(--popover)', foreground: 'var(--popover-foreground)' },
+        muted: { DEFAULT: 'var(--muted)', foreground: 'var(--muted-foreground)' },
+        accent: { DEFAULT: 'var(--accent)', foreground: 'var(--accent-foreground)' },
+        destructive: { DEFAULT: 'var(--destructive)', foreground: 'var(--destructive-foreground)' },
+      },
       animation: {
         keyframes: {
           'accordion-down':
@@ -263,7 +262,14 @@ export function presetTheme(options?: PresetThemeOptions): Preset<Theme> {
     shortcuts: [
       ['effect-fv', 'outline-none ring-3px ring-ring/30'],
       ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/30'],
+      ['effect-dis', 'opacity-64 pointer-events-none'],
+      ['effect-loading', 'cursor-wait opacity-80'],
+      [
+        'effect-invalid',
+        'border-destructive ring-3 ring-destructive/20 dark:(border-destructive/50 ring-destructive/40)',
+      ],
       ['transition-flex-basis', '[transition-property:flex-basis]'],
+      ['transition-bg', '[transition-property:background-color]'],
       ['style-placeholder', 'placeholder:(text-muted-foreground select-none)'],
       [
         'style-input-number',
@@ -278,11 +284,6 @@ export function presetTheme(options?: PresetThemeOptions): Preset<Theme> {
       ['surface-highlight', 'ring-1 ring-border/50'],
       ['surface-overlay', 'ring-1 ring-foreground/10'],
       ['hidden-hitless', 'opacity-0 pointer-events-none'],
-      [
-        'effect-invalid',
-        'border-destructive ring-3 ring-destructive/20 dark:(border-destructive/50 ring-destructive/40)',
-      ],
-      ['effect-dis', 'opacity-64 pointer-events-none'],
       ...Object.entries(DEFAULT_ICONS).map(
         ([k, v]) =>
           [`icon-${k.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`, v] as [string, string],
@@ -291,33 +292,33 @@ export function presetTheme(options?: PresetThemeOptions): Preset<Theme> {
     rules: [
       [
         /var-input-([\d.]+)/,
-        ([, num]) => ({
-          '--i-sm': `calc(var(--spacing) * ${num})`,
-          '--i-lg': `calc(var(--spacing) * ${Number(num) + 1})`,
+        ([, num], { theme }) => ({
+          '--i-sm': createLength(theme, num),
+          '--i-lg': createLength(theme, Number(num) + 1),
         }),
       ],
       [
         /var-progress-([\d.]+)/,
-        ([, num]) => ({
-          '--p-size': `calc(var(--spacing) * ${num})`,
+        ([, num], { theme }) => ({
+          '--p-size': createLength(theme, num),
         }),
       ],
       [
         /var-select-([\d.]+)-([\d.]+)-([\d.]+)/,
-        ([, h, px, ps]) => ({
-          '--s-h': `calc(var(--spacing) * ${h})`,
-          '--s-px': `calc(var(--spacing) * ${px})`,
-          '--s-ps': `calc(var(--spacing) * ${ps})`,
+        ([, h, px, ps], { theme }) => ({
+          '--s-h': createLength(theme, h),
+          '--s-px': createLength(theme, px),
+          '--s-ps': createLength(theme, ps),
         }),
       ],
       [
         /var-stepper-([\d.]+)-([\d.]+)-([\d.]+)-([\d.]+)/,
-        ([, triggerSize, separatorOffset, gap, verticalPt]) => ({
-          '--st-size': `calc(var(--spacing) * ${triggerSize})`,
-          '--st-sep-x': `calc(var(--spacing) * ${separatorOffset})`,
-          '--st-sep-top': `calc(var(--spacing) * ${Number(triggerSize) + 1})`,
-          '--st-gap': `calc(var(--spacing) * ${gap})`,
-          '--st-pt': `calc(var(--spacing) * ${verticalPt})`,
+        ([, triggerSize, separatorOffset, gap, verticalPt], { theme }) => ({
+          '--st-size': createLength(theme, triggerSize),
+          '--st-sep-x': createLength(theme, separatorOffset),
+          '--st-sep-top': createLength(theme, Number(triggerSize) + 1),
+          '--st-gap': createLength(theme, gap),
+          '--st-pt': createLength(theme, verticalPt),
         }),
       ],
       [
@@ -326,22 +327,6 @@ export function presetTheme(options?: PresetThemeOptions): Preset<Theme> {
           '--s-size': `${num}px`,
         }),
       ],
-    ],
-    preflights: [
-      {
-        getCSS: () => `:root {
---radius: ${normalized.radiusRem}rem;
---radius-sm: calc(var(--radius) - 4px);
---radius-md: calc(var(--radius) - 2px);
---radius-lg: var(--radius);
---radius-xl: calc(var(--radius) + 2px);
---ui-radius: var(--radius);
---ui-container: 80rem;
-}
-.dark {
-${darkThemeVars};
-}`,
-      },
     ],
   }
 }

@@ -56,26 +56,29 @@ export const stepperContainerVariants = cva('flex items-center relative', {
   },
 })
 
-export const stepperTriggerVariants = cva('rounded-full inline-flex size-$st-size justify-center', {
-  defaultVariants: {
-    size: 'md',
-    state: 'inactive',
-  },
-  variants: {
-    size: {
-      xs: 'text-xs p-1',
-      sm: 'text-sm p-1.5',
-      md: 'text-base p-2',
-      lg: 'text-lg p-2.5',
-      xl: 'text-xl p-3',
+export const stepperTriggerVariants = cva(
+  'rounded-full inline-flex size-$st-size transition-bg justify-center',
+  {
+    defaultVariants: {
+      size: 'md',
+      state: 'inactive',
     },
-    state: {
-      inactive: 'text-muted-foreground border-input bg-background shadow-xs',
-      active: 'text-primary-foreground border-primary bg-primary',
-      completed: 'text-primary-foreground border-primary bg-primary',
+    variants: {
+      size: {
+        xs: 'text-xs p-1',
+        sm: 'text-sm p-1.5',
+        md: 'text-base p-2',
+        lg: 'text-lg p-2.5',
+        xl: 'text-xl p-3',
+      },
+      state: {
+        inactive: 'text-muted-foreground border-input bg-background shadow-xs',
+        active: 'text-primary-foreground border-primary bg-primary hover:bg-primary/80',
+        completed: 'text-primary-foreground border-primary bg-primary',
+      },
     },
   },
-})
+)
 
 export const stepperSeparatorVariants = cva(
   'rounded-full bg-border bg-border transition-colors absolute data-[state=completed]:bg-primary data-disabled:opacity-75',

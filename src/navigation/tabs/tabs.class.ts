@@ -60,7 +60,7 @@ export const tabsIndicatorVariants = cva('rounded-md transition-all duration-200
 })
 
 export const tabsTriggerVariants = cva(
-  'group text-muted-foreground font-medium outline-none rounded-md inline-flex gap-1.5 min-w-0 cursor-pointer transition items-center justify-center relative data-selected:(text-foreground) focus-visible:effect-fv-border disabled:effect-dis',
+  'text-muted-foreground font-medium outline-none inline-flex gap-1.5 min-w-0 cursor-pointer transition items-center justify-center relative focus-visible:effect-fv-border disabled:effect-dis',
   {
     variants: {
       orientation: {
@@ -68,8 +68,8 @@ export const tabsTriggerVariants = cva(
         vertical: 'w-full justify-start',
       },
       variant: {
-        pill: '',
-        link: 'rounded-none bg-transparent data-selected:(text-primary)',
+        pill: 'rounded-md data-selected:text-foreground',
+        link: 'data-selected:text-primary',
       },
       size: {
         xs: 'text-xs px-1',
@@ -78,18 +78,11 @@ export const tabsTriggerVariants = cva(
         lg: 'text-sm px-3 py-2',
         xl: 'text-base px-4 py-2',
       },
-      color: {
-        primary: '',
-        neutral: '',
-        secondary: 'data-selected:(text-secondary)',
-        error: 'data-selected:(text-destructive)',
-      },
     },
     defaultVariants: {
       orientation: 'horizontal',
       variant: 'pill',
       size: 'md',
-      color: 'primary',
     },
   },
 )

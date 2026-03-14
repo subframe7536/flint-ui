@@ -145,7 +145,6 @@ export function Button<T extends ValidComponent = 'button'>(props: ButtonProps<T
           variant: styleProps.variant,
           size: styleProps.size,
         },
-        isLoading() && 'cursor-wait opacity-80',
         styleProps.classes?.base,
       )}
       aria-busy={isLoading() ? true : undefined}

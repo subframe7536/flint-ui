@@ -8,26 +8,33 @@ import solid from 'vite-plugin-solid'
 import { presetTheme } from './src/unocss-preset-theme'
 import { createMigrateSyntaxTransformer } from './src/unocss-transformer/migrate-syntax'
 
-const baseUnocssConfig = (preset: any): UnoCSSPluginOptions => {
+const baseUnocssConfig = (wind3: boolean): UnoCSSPluginOptions => {
   const theme = presetTheme()
   return {
     filter: { id: ['src/**/*.tsx', 'src/**/*.ts'] },
     config: {
       configFile: false,
       presets: [
-        preset,
+        wind3 ? presetWind3() : presetWind4({ preflights: { reset: false } }),
         presetIcons({
           scale: 1.2,
         }),
         presetAnimations() as any,
         theme,
       ],
+      preflights: wind3
+        ? [
+            {
+              getCSS: () => `:root { --spacing: 0.25rem }`,
+            },
+          ]
+        : undefined,
       transformers: [transformerVariantGroup(), createMigrateSyntaxTransformer()],
       extractors: [
         {
           name: 'simplify',
           extract(ctx) {
-            const shortcuts = new Set((theme.shortcuts as any[]).map((s) => s[0]))
+            const shortcuts = new Set<string>((theme.shortcuts as any[]).map((s) => s[0]))
             Array.from(ctx.extracted.keys())
               .filter((e) => {
                 // Keep var-* tokens
@@ -44,7 +51,7 @@ const baseUnocssConfig = (preset: any): UnoCSSPluginOptions => {
                   return false
                 }
                 // Keep shortcuts
-                if (shortcuts.has(e)) {
+                if ([...shortcuts].some((s) => e.endsWith(s))) {
                   return false
                 }
                 // Delete everything else
@@ -67,7 +74,7 @@ export default defineConfig([
       unocss({
         generateCSS: true,
         fileName: 'tw3.css',
-        ...baseUnocssConfig(presetWind3()),
+        ...baseUnocssConfig(true),
       }),
       solid(),
     ],
@@ -80,7 +87,7 @@ export default defineConfig([
       unocss({
         generateCSS: true,
         fileName: 'tw4.css',
-        ...baseUnocssConfig(presetWind4({ preflights: { reset: false } })),
+        ...baseUnocssConfig(false),
       }),
     ],
     exports: {

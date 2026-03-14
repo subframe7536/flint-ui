@@ -20,7 +20,7 @@ export const avatarRootVariants = cva(
 )
 
 export const avatarImageVariants = cva(
-  'rounded-[inherit] size-full transition-opacity ease-out inset-0 absolute object-cover',
+  'rounded-full size-full transition-opacity ease-out inset-0 absolute object-cover',
   {
     defaultVariants: {
       status: 'idle',
@@ -44,7 +44,7 @@ export const avatarImageVariants = cva(
 )
 
 export const avatarFallbackVariants = cva(
-  'font-medium rounded-[inherit] flex uppercase transition-opacity ease-out items-center inset-0 justify-center absolute',
+  'font-medium rounded-full flex uppercase transition-opacity ease-out items-center inset-0 justify-center absolute',
   {
     defaultVariants: {
       size: 'md',

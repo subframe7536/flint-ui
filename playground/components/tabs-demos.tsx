@@ -23,19 +23,19 @@ export const TabsDemos = () => {
             {
               label: 'Overview',
               value: 'overview',
-              icon: 'icon-layout-dashboard',
+              icon: 'i-lucide:layout-dashboard',
               content: <p class="text-sm text-zinc-700">Overview panel content.</p>,
             },
             {
               label: 'Settings',
               value: 'settings',
-              icon: 'icon-settings',
+              icon: 'i-lucide:settings',
               content: <p class="text-sm text-zinc-700">Settings panel content.</p>,
             },
             {
               label: 'Billing',
               value: 'billing',
-              icon: 'icon-credit-card',
+              icon: 'i-lucide:credit-card',
               content: <p class="text-sm text-zinc-700">Billing panel content.</p>,
             },
           ]}
