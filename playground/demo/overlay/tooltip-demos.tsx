@@ -2,7 +2,7 @@ import { createSignal, For } from 'solid-js'
 
 import { Button, Switch, Tooltip } from '../../../src'
 import meta from '../../.meta/tooltip.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const PLACEMENTS = ['top', 'right', 'bottom', 'left'] as const
 

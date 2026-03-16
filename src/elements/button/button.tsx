@@ -73,13 +73,10 @@ export interface ButtonBaseProps extends ButtonVariantProps {
  * Props for the Button component.
  * Polymorphic button props composed from Kobalte button root props and Rock UI button options.
  */
-export type ButtonProps<T extends ValidComponent = 'button'> = PolymorphicProps<
-  T,
-  RockUIComposeProps<
-    ButtonBaseProps,
-    KobalteButton.ButtonRootProps<ElementOf<T>>,
-    'class' | 'style'
-  >
+export type ButtonProps<T extends ValidComponent = 'button'> = RockUIComposeProps<
+  ButtonBaseProps,
+  PolymorphicProps<T, KobalteButton.ButtonRootProps<ElementOf<T>>>,
+  'class' | 'style'
 >
 
 type PromiseLikeWithFinally = PromiseLike<unknown> & {

@@ -3,7 +3,7 @@ import { createSignal, onCleanup, onMount } from 'solid-js'
 import { Button, CommandPalette, Kbd, Popup } from '../../../src'
 import type { CommandPaletteGroup } from '../../../src'
 import meta from '../../.meta/command-palette.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const BASIC_GROUPS: CommandPaletteGroup[] = [
   {

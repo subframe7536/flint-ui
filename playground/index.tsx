@@ -5,7 +5,7 @@ import { createSignal, lazy, onMount } from 'solid-js'
 import { Dynamic, render } from 'solid-js/web'
 
 import registry from './.meta/index.json'
-import { Sidebar } from './components/common/sidebar'
+import { Sidebar } from './components/sidebar'
 
 const DEMO_MAP: Record<string, Component> = {
   accordion: lazy(() => import('./demo/general/accordion-demos')),

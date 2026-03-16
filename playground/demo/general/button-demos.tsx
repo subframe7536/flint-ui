@@ -3,7 +3,7 @@ import { For, createSignal } from 'solid-js'
 import { Button } from '../../../src/elements/button/button'
 import type { ButtonVariantProps } from '../../../src/elements/button/button.class'
 import meta from '../../.meta/button.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 type ButtonVariantName = Exclude<ButtonVariantProps['variant'], undefined>
 type ButtonSizeName = Exclude<ButtonVariantProps['size'], undefined>

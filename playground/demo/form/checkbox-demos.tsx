@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Checkbox } from '../../../src'
 import meta from '../../.meta/checkbox.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 export default () => {
   const [checked, setChecked] = createSignal(true)

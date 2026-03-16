@@ -1,6 +1,8 @@
 import type { Accessor } from 'solid-js'
 import { For, Show, createMemo, createSignal } from 'solid-js'
 
+import { cn, Input } from '../../src'
+
 export interface SidebarPage {
   key: string
   label: string
@@ -37,16 +39,20 @@ export const Sidebar = (props: SidebarProps) => {
   })
 
   return (
-    <aside class="text-zinc-800 p-4 bg-zinc-100 flex shrink-0 flex-col gap-4 w-56 overflow-y-auto">
-      <div class="text-xs text-zinc-400 tracking-widest font-semibold px-2 uppercase">Rock UI</div>
+    <aside class="text-zinc-800 p-4 border-e-(1 border) bg-zinc-100 flex shrink-0 flex-col gap-4 w-56 overflow-y-auto">
+      <div class="text-xl text-zinc-700 tracking-normal font-semibold px-2 flex gap-2 items-center">
+        <img src="/favicon.svg" alt="icon" class="size-6" />
+        Rock UI
+      </div>
 
       <div class="px-1">
-        <input
+        <Input
           type="text"
           placeholder="Search..."
           value={search()}
           onInput={(e) => setSearch(e.currentTarget.value)}
-          class="text-xs px-2.5 py-1.5 outline-none b-1 b-zinc-300/50 rounded-md bg-zinc-200 w-full transition-colors placeholder:text-zinc-500 focus:b-zinc-400"
+          leading="icon-search"
+          classes={{ root: 'bg-white' }}
         />
       </div>
 
@@ -63,11 +69,12 @@ export const Sidebar = (props: SidebarProps) => {
                   {(page) => (
                     <button
                       type="button"
-                      class={`text-sm text-zinc-600 px-2.5 py-1.5 text-left rounded-md ${
+                      class={cn(
+                        'text-sm text-zinc-600 px-2.5 py-1.5 text-left rounded-md',
                         props.activePage() === page.key
-                          ? 'bg-zinc-300/80 font-medium'
-                          : 'hover:bg-zinc-200 hover:text-zinc-800'
-                      }`}
+                          ? 'bg-zinc-300/80'
+                          : 'hover:text-zinc-800 hover:bg-zinc-200',
+                      )}
                       onClick={() => props.setActivePage(page.key)}
                     >
                       {page.label}

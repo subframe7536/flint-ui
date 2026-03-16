@@ -2,7 +2,7 @@ import { For } from 'solid-js'
 
 import { Icon } from '../../../src'
 import meta from '../../.meta/icon.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const ICON_NAMES = [
   'i-lucide-search',

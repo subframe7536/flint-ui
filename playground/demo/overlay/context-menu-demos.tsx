@@ -3,7 +3,7 @@ import { createMemo, createSignal } from 'solid-js'
 import { ContextMenu } from '../../../src'
 import type { ContextMenuItems } from '../../../src'
 import meta from '../../.meta/context-menu.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const badgeClass =
   'rounded-md b-1 b-border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-medium text-[11px] text-zinc-700'

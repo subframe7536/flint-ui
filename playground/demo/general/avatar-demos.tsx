@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Avatar } from '../../../src'
 import meta from '../../.meta/avatar.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 function createSvgDataUrl(label: string, backgroundColor: string): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${backgroundColor}"/><text x="32" y="38" text-anchor="middle" fill="white" font-family="sans-serif" font-size="24">${label}</text></svg>`

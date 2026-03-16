@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Button, Progress } from '../../../src'
 import meta from '../../.meta/progress.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const STEPS = ['Queued', 'Building', 'Deploying', 'Done']
 

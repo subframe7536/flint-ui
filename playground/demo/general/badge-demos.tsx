@@ -3,7 +3,7 @@ import { For, createSignal } from 'solid-js'
 import { Badge, Button } from '../../../src'
 import type { BadgeVariantProps } from '../../../src/elements/badge/badge.class'
 import meta from '../../.meta/badge.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 type BadgeVariantName = Exclude<BadgeVariantProps['variant'], undefined>
 type BadgeSizeName = Exclude<BadgeVariantProps['size'], undefined>

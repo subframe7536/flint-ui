@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Popup } from '../../../src'
 import meta from '../../.meta/popup.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const SCROLLABLE_LINES = Array.from({ length: 48 }, (_, index) => `Popup line ${index + 1}`)
 

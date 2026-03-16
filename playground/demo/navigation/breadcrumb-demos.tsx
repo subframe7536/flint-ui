@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Breadcrumb, Button } from '../../../src'
 import meta from '../../.meta/breadcrumb.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const DEFAULT_ITEMS = [
   { label: 'Home', href: '#', icon: 'i-lucide:house' },

@@ -3,7 +3,7 @@ import { For, createSignal } from 'solid-js'
 import { Button, Form, FormField, Slider } from '../../../src'
 import type { SliderValue } from '../../../src/forms/slider/slider'
 import meta from '../../.meta/slider.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 

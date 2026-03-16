@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Popover } from '../../../src'
 import meta from '../../.meta/popover.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const PLACEMENTS = ['top', 'right', 'bottom', 'left'] as const
 

@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Button, Checkbox, CheckboxGroup, RadioGroup, Switch } from '../../../src'
 import meta from '../../.meta/form.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const wait = (ms: number) =>
   new Promise<void>((resolve) => {

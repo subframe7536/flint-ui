@@ -14,7 +14,7 @@ import {
 } from '../../../src'
 import type { SelectOption } from '../../../src/forms/select/select'
 import meta from '../../.meta/form-field.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const ROLE_OPTIONS: SelectOption[] = [
   { label: 'Developer', value: 'developer' },

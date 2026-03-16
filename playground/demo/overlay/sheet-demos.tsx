@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Sheet } from '../../../src'
 import meta from '../../.meta/sheet.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const SIDES = ['left', 'right', 'top', 'bottom'] as const
 

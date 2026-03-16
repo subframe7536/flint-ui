@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Stepper } from '../../../src'
 import meta from '../../.meta/stepper.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 // Do not share items containing JSX across multiple Stepper instances.
 const createCheckoutSteps = () => [

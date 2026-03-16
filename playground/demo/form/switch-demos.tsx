@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Switch } from '../../../src'
 import meta from '../../.meta/switch.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 export default () => {
   const [checked, setChecked] = createSignal(false)

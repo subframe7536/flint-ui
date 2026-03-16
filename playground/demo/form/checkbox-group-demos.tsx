@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { CheckboxGroup } from '../../../src'
 import meta from '../../.meta/checkbox-group.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const ITEMS = [
   { value: 'alpha', label: 'Alpha', description: 'Primary rollout channel' },

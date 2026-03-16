@@ -2,7 +2,7 @@ import { For } from 'solid-js'
 
 import { Kbd } from '../../../src'
 import meta from '../../.meta/kbd.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const VARIANTS = ['outline', 'default', 'invert'] as const

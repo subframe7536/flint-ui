@@ -2,7 +2,7 @@ import { For } from 'solid-js'
 
 import { Separator } from '../../../src'
 import meta from '../../.meta/separator.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const TYPES = ['solid', 'dashed', 'dotted'] as const
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const

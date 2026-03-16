@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Pagination } from '../../../src'
 import meta from '../../.meta/pagination.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 export default () => {
   const [page, setPage] = createSignal(3)

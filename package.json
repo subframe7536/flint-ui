@@ -7,7 +7,7 @@
     "url": "https://github.com/author/library/issues"
   },
   "license": "MIT",
-  "author": "Author Name <author.name@mail.com>",
+  "author": "subframe7536",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/author/library.git"
@@ -27,7 +27,8 @@
     },
     "./package.json": "./package.json",
     "./tw4.css": "./dist/tw4.css",
-    "./tw3.css": "./dist/tw3.css"
+    "./tw3.css": "./dist/tw3.css",
+    "./unocss-preset-theme": "./dist/unocss-preset-theme.mjs"
   },
   "publishConfig": {
     "access": "public"

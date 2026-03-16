@@ -3,7 +3,7 @@ import { createStore } from 'solid-js/store'
 
 import { Icon, Resizable } from '../../../src'
 import meta from '../../.meta/resizable.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 function formatPixelSizes(sizes: number[]): string {
   return sizes.map((size) => `${Math.round(size)}px`).join(' / ')

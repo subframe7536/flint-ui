@@ -103,6 +103,7 @@ export default defineConfig([
         }
         exports['./tw3.css'] = './dist/tw3.css'
         exports['./tw4.css'] = './dist/tw4.css'
+        exports['./unocss-preset-theme'] = './dist/unocss-preset-theme.mjs'
         return exports
       },
     },

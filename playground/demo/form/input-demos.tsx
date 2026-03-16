@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { Input, Textarea } from '../../../src'
 import meta from '../../.meta/input.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const VARIANTS = ['outline', 'subtle', 'ghost', 'none'] as const
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const

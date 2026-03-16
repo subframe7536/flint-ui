@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Accordion } from '../../../src'
 import meta from '../../.meta/accordion.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 export default () => {
   const [openValue, setOpenValue] = createSignal<string[]>(['shipping'])

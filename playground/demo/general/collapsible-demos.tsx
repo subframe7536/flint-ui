@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Collapsible } from '../../../src'
 import meta from '../../.meta/collapsible.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 export default () => {
   const [open, setOpen] = createSignal(true)

@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Dialog } from '../../../src'
 import meta from '../../.meta/dialog.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const SCROLLABLE_LINES = Array.from({ length: 16 }, (_, index) => `Release note line ${index + 1}`)
 

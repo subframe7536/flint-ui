@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { RadioGroup } from '../../../src'
 import meta from '../../.meta/radio-group.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const ITEMS = [
   { value: 'starter', label: 'Starter', description: 'For personal projects' },

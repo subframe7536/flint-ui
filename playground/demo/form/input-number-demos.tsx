@@ -2,7 +2,7 @@ import { For, createSignal } from 'solid-js'
 
 import { InputNumber } from '../../../src'
 import meta from '../../.meta/input-number.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const VARIANTS = ['outline', 'subtle', 'ghost', 'none'] as const
 

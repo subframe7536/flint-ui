@@ -3,7 +3,7 @@ import { For, createSignal } from 'solid-js'
 import { Select } from '../../../src'
 import type { SelectOption } from '../../../src/forms/select/select'
 import meta from '../../.meta/select.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const FRUIT_OPTIONS: SelectOption[] = [
   { label: 'Apple', value: 'apple' },

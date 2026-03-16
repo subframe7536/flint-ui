@@ -1,6 +1,6 @@
 import { Button, Card, FormField, Icon, Input, Select } from '../../../src'
 import meta from '../../.meta/card.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 const frameworkOptions = [
   { label: 'Vite', value: 'vite' },
@@ -17,7 +17,7 @@ export default () => (
         description="Deploy your new project in one-click."
         footer={
           <>
-            <Button class="w-full" type="submit">
+            <Button classes={{ base: 'w-full' }} type="submit">
               Deploy
             </Button>
             <div class="text-xs text-muted-foreground m-a flex gap-1 items-center">
@@ -73,7 +73,7 @@ export default () => (
               class="rounded-t-2xl w-full aspect-video object-cover brightness-60 grayscale"
             />
           }
-          footer={<Button class="w-full">Open</Button>}
+          footer={<Button classes={{ base: 'w-full' }}>Open</Button>}
         >
           <h3 class="font-semibold">Beautiful Landscape</h3>
           <p class="text-sm text-muted-foreground mt-1">

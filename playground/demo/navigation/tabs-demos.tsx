@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 
 import { Tabs } from '../../../src'
 import meta from '../../.meta/tabs.json'
-import { ComponentDocPage, DemoSection } from '../../components/common/demo-page'
+import { ComponentDocPage, DemoSection } from '../../components/demo-page'
 
 export default () => {
   const [value, setValue] = createSignal('overview')
