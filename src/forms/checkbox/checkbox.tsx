@@ -279,7 +279,6 @@ export function Checkbox<TTrue = boolean, TFalse = boolean>(
 
   return (
     <KobalteCheckbox.Root
-      as={styleProps.variant === 'card' ? 'label' : 'div'}
       id={`${field.id()}-root`}
       name={field.name()}
       disabled={field.disabled()}
@@ -299,12 +298,16 @@ export function Checkbox<TTrue = boolean, TFalse = boolean>(
           checkboxCardPaddingVariants({
             size: field.size(),
           }),
+        styleProps.variant === 'card' && 'cursor-pointer',
         styleProps.classes?.root,
       )}
       {...restProps}
     >
       {(state) => (
         <>
+          <Show when={styleProps.variant === 'card'}>
+            <label for={field.id()} class="inset-0 absolute" />
+          </Show>
           <div
             data-slot="container"
             style={merged.styles?.container}
@@ -312,6 +315,7 @@ export function Checkbox<TTrue = boolean, TFalse = boolean>(
               {
                 size: field.size(),
               },
+              styleProps.variant === 'card' && 'relative z-1',
               styleProps.classes?.container,
             )}
           >

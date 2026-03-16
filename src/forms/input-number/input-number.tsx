@@ -3,7 +3,6 @@ import type { JSX } from 'solid-js'
 import { createMemo, mergeProps, onCleanup, onMount, Show, splitProps } from 'solid-js'
 
 import { Button } from '../../elements/button'
-import type { ButtonProps } from '../../elements/button/button'
 import type { IconName } from '../../elements/icon'
 import { Icon } from '../../elements/icon'
 import type { SlotClasses, SlotStyles } from '../../shared/slot'
@@ -21,22 +20,6 @@ import {
   inputNumberRootVariants,
   resolveInputNumberAlign,
 } from './input-number.class'
-
-/**
- * Props for the control buttons in the InputNumber component.
- */
-type InputNumberControlButtonProps = Partial<
-  Omit<ButtonProps<'button'>, 'children' | 'label' | 'onClick' | 'type'>
-> & {
-  /**
-   * The slot identifier for the button.
-   */
-  'data-slot'?: 'increment' | 'decrement'
-  /**
-   * Capture click events.
-   */
-  onClickCapture?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>
-}
 
 type InputNumberSlots = 'root' | 'base' | 'increment' | 'decrement'
 
@@ -64,10 +47,10 @@ export interface InputNumberBaseProps
   placeholder?: string
 
   /**
-   * Whether to show the increment button, or custom props for it.
+   * Whether to show the increment button.
    * @default true
    */
-  increment?: boolean | InputNumberControlButtonProps
+  increment?: boolean
 
   /**
    * Icon for the increment button.
@@ -81,10 +64,10 @@ export interface InputNumberBaseProps
   incrementDisabled?: boolean
 
   /**
-   * Whether to show the decrement button, or custom props for it.
+   * Whether to show the decrement button.
    * @default true
    */
-  decrement?: boolean | InputNumberControlButtonProps
+  decrement?: boolean
 
   /**
    * Icon for the decrement button.
@@ -120,6 +103,16 @@ export interface InputNumberBaseProps
   onFocus?: JSX.FocusEventHandlerUnion<HTMLInputElement, FocusEvent>
 
   /**
+   * Callback when the increment button is clicked.
+   */
+  onIncrementClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>
+
+  /**
+   * Callback when the decrement button is clicked.
+   */
+  onDecrementClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>
+
+  /**
    * Slot-based class overrides.
    */
   classes?: InputNumberClasses
@@ -142,7 +135,7 @@ export type InputNumberProps = RockUIComposeProps<
 export function InputNumber(props: InputNumberProps): JSX.Element {
   const merged = mergeProps(
     {
-      variant: 'outlined' as const,
+      variant: 'outline' as const,
       orientation: 'horizontal' as const,
       increment: true,
       decrement: true,
@@ -163,6 +156,8 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       'decrement',
       'decrementIcon',
       'decrementDisabled',
+      'onIncrementClick',
+      'onDecrementClick',
       'autofocus',
       'autofocusDelay',
     ],
@@ -327,16 +322,17 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
     clearSuppressTrustedClickTimeout()
   })
 
-  function resolveControlProps(
-    isIncrement: boolean,
-    userProps: InputNumberControlButtonProps | undefined,
-  ): InputNumberControlButtonProps {
-    const resolvedClasses = userProps?.classes
+  const isBorderless = createMemo(
+    () => styleProps.variant === 'ghost' || styleProps.variant === 'none',
+  )
+
+  function resolveControlProps(isIncrement: boolean) {
     const slot = isIncrement ? 'increment' : 'decrement'
+    const userOnClick = isIncrement ? controlProps.onIncrementClick : controlProps.onDecrementClick
 
     return {
       'data-slot': slot,
-      style: styleProps.styles?.[slot],
+      styles: { base: styleProps.styles?.[slot] },
       disabled:
         field.disabled() ||
         (isIncrement ? controlProps.incrementDisabled : controlProps.decrementDisabled),
@@ -344,52 +340,33 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       size: `icon-${field.size()}`,
       'aria-label': isIncrement ? 'Increment' : 'Decrement',
       leading: <Icon name={isIncrement ? incrementIcon() : decrementIcon()} />,
-      ...userProps,
-      onPointerDown: (event: PointerEvent) => onControlPointerDown(event, userProps?.onPointerDown),
-      onPointerUp: (event: PointerEvent) => onControlPointerStop(event, userProps?.onPointerUp),
-      onPointerLeave: (event: PointerEvent) =>
-        onControlPointerStop(event, userProps?.onPointerLeave),
-      onPointerCancel: (event: PointerEvent) =>
-        onControlPointerStop(event, userProps?.onPointerCancel),
-      onClickCapture: (event: MouseEvent) =>
-        onControlClickCapture(event, userProps?.onClickCapture),
+      onClick: userOnClick,
+      onPointerDown: (event: PointerEvent) => onControlPointerDown(event, undefined),
+      onPointerUp: (event: PointerEvent) => onControlPointerStop(event, undefined),
+      onPointerLeave: (event: PointerEvent) => onControlPointerStop(event, undefined),
+      onPointerCancel: (event: PointerEvent) => onControlPointerStop(event, undefined),
+      onClickCapture: (event: MouseEvent) => onControlClickCapture(event, undefined),
       classes: {
-        ...resolvedClasses,
         base: inputNumberControlButtonVariants(
           {
             control: slot,
             divided: !isIncrement && isVertical() && resolvedIncrement(),
             orientation: resolvedOrientation(),
           },
+          isBorderless() && 'b-transparent',
+          styleProps.variant === 'none' && 'hover:bg-transparent',
           isIncrement ? styleProps.classes?.increment : styleProps.classes?.decrement,
-          resolvedClasses?.base,
         ),
       },
-    }
+    } as const
   }
 
   function IncrementControl(): JSX.Element {
-    return (
-      <KobalteNumberField.IncrementTrigger
-        as={Button}
-        {...resolveControlProps(
-          true,
-          typeof controlProps.increment === 'object' ? controlProps.increment : undefined,
-        )}
-      />
-    )
+    return <KobalteNumberField.IncrementTrigger as={Button} {...resolveControlProps(true)} />
   }
 
   function DecrementControl(): JSX.Element {
-    return (
-      <KobalteNumberField.DecrementTrigger
-        as={Button}
-        {...resolveControlProps(
-          false,
-          typeof controlProps.decrement === 'object' ? controlProps.decrement : undefined,
-        )}
-      />
-    )
+    return <KobalteNumberField.DecrementTrigger as={Button} {...resolveControlProps(false)} />
   }
 
   function onRawValueChange(value: number): void {
@@ -464,7 +441,13 @@ export function InputNumber(props: InputNumberProps): JSX.Element {
       <KobalteNumberField.HiddenInput />
 
       <Show when={isVertical() && (resolvedIncrement() || resolvedDecrement())}>
-        <div data-slot="controls" class={inputNumberControlColumnVariants({ size: field.size() })}>
+        <div
+          data-slot="controls"
+          class={inputNumberControlColumnVariants({
+            size: field.size(),
+            borderless: isBorderless(),
+          })}
+        >
           <Show when={resolvedIncrement()}>
             <IncrementControl />
           </Show>

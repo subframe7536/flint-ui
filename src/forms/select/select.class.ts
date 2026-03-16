@@ -24,7 +24,7 @@ export const selectControlVariants = cva(
 )
 
 export const selectInputVariants = cva(
-  'w-full style-placeholder outline-none bg-transparent flex-1 disabled:effect-dis data-readonly:cursor-pointer',
+  'style-placeholder outline-none bg-transparent flex-1 w-full disabled:effect-dis data-readonly:cursor-pointer',
   {
     defaultVariants: {
       mode: 'single',

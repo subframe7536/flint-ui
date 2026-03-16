@@ -88,26 +88,25 @@ export const inputNumberControlButtonVariants = cva('border-input', {
   ],
 })
 
-export const inputNumberControlColumnVariants = cva(
-  'border-s border-input flex shrink-0 flex-col h-full',
-  {
-    defaultVariants: {
-      size: 'md',
+export const inputNumberControlColumnVariants = cva('flex shrink-0 flex-col h-full', {
+  defaultVariants: {
+    size: 'md',
+    borderless: false,
+  },
+  variants: {
+    size: {
+      xs: 'w-7',
+      sm: 'w-8',
+      md: 'w-9',
+      lg: 'w-10',
+      xl: 'w-11',
     },
-    variants: {
-      size: {
-        xs: 'w-7',
-        sm: 'w-8',
-        md: 'w-9',
-        lg: 'w-10',
-        xl: 'w-11',
-      },
+    borderless: {
+      false: 'border-s border-input',
     },
   },
-)
+})
 
-export type InputNumberVariantProps = VariantProps<typeof inputNumberRootVariants> &
-  VariantProps<typeof inputNumberBaseVariants> &
-  VariantProps<typeof inputNumberControlButtonVariants> & {
-    highlight?: boolean
-  }
+export type InputNumberVariantProps = VariantProps<typeof inputNumberRootVariants> & {
+  highlight?: boolean
+}

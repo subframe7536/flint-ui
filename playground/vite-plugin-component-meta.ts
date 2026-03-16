@@ -1,16 +1,9 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+// work in progress
+
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, relative, resolve } from 'node:path'
 
-import { parseSync } from 'oxc-parser'
-import type {
-  Comment,
-  ExportNamedDeclaration,
-  ObjectExpression,
-  ObjectProperty,
-  TSInterfaceDeclaration,
-  TSTypeAliasDeclaration,
-} from 'oxc-parser'
-import { walk } from 'oxc-walker'
+import ts from 'typescript'
 import type { Logger, Plugin } from 'vite'
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -62,7 +55,6 @@ const CATEGORY_ORDER = ['General', 'Navigation', 'Overlay', 'Form']
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-/** Resolve component-specific type aliases to their generic form for display */
 function resolveDisplayType(typeText: string): string {
   const classesMatch = typeText.match(/^(\w+)Classes$/)
   if (classesMatch) {
@@ -82,147 +74,183 @@ function kebabToPascal(str: string): string {
     .join('')
 }
 
-function getPropertyName(key: ObjectProperty['key']): string | undefined {
-  if (key.type === 'Identifier') {
-    return key.name
+// ── TypeScript AST Utilities ───────────────────────────────────────────
+
+/** Recursively visit every node in the subtree */
+function visit(node: ts.Node, cb: (n: ts.Node) => void): void {
+  cb(node)
+  ts.forEachChild(node, (child) => visit(child, cb))
+}
+
+/** Safely get the string key from any PropertyName node */
+function getPropertyKeyName(name: ts.PropertyName): string | undefined {
+  if (ts.isIdentifier(name)) {
+    return name.text
   }
-  if (key.type === 'Literal' && typeof key.value === 'string') {
-    return key.value
+  if (ts.isStringLiteral(name)) {
+    return name.text
   }
   return undefined
 }
 
-function getObjectProperty(obj: ObjectExpression, name: string): ObjectProperty | undefined {
+/** Find a named PropertyAssignment in an ObjectLiteralExpression */
+function findObjectProp(
+  obj: ts.ObjectLiteralExpression,
+  name: string,
+): ts.PropertyAssignment | undefined {
   return obj.properties.find(
-    (p): p is ObjectProperty => p.type === 'Property' && getPropertyName(p.key) === name,
+    (p): p is ts.PropertyAssignment =>
+      ts.isPropertyAssignment(p) && getPropertyKeyName(p.name) === name,
   )
 }
 
-function findJSDoc(comments: Comment[], position: number): string {
-  let best: Comment | undefined
-  for (const c of comments) {
-    if (c.type !== 'Block') {
-      continue
-    }
-    if (c.end > position) {
-      break
-    }
-    best = c
-  }
-  if (!best || position - best.end > 20) {
+// ── JSDoc Utilities (TypeScript API) ──────────────────────────────────
+
+function jsDocCommentToString(comment: string | ts.NodeArray<ts.JSDocComment> | undefined): string {
+  if (!comment) {
     return ''
   }
-  return parseJSDocBody(best.value)
+  if (typeof comment === 'string') {
+    return comment
+  }
+  return comment.map((c) => c.text).join('')
 }
 
-function parseJSDocBody(raw: string): string {
-  return raw
-    .replace(/^\*+/, '')
-    .split('\n')
-    .map((line) => line.replace(/^\s*\*\s?/, '').trim())
-    .filter((line) => !line.startsWith('@'))
+/** Extract the description text from JSDoc attached to a node */
+function getJSDocDescription(node: ts.Node): string {
+  return ts
+    .getJSDocCommentsAndTags(node)
+    .filter((d): d is ts.JSDoc => ts.isJSDoc(d))
+    .map((doc) => jsDocCommentToString(doc.comment))
     .join(' ')
     .trim()
 }
 
-function parseJSDocDefault(raw: string): string | undefined {
-  const match = raw.match(/@default\s+(.+)/)
-  return match ? match[1].trim().replace(/^['"]|['"]$/g, '') : undefined
+/** Extract the @default tag value from JSDoc attached to a node */
+function getJSDocDefault(node: ts.Node): string | undefined {
+  const tag = ts.getJSDocTags(node).find((t) => t.tagName.text === 'default')
+  if (!tag) {
+    return undefined
+  }
+  return (
+    jsDocCommentToString(tag.comment)
+      .trim()
+      .replace(/^['"]|['"]$/g, '') || undefined
+  )
 }
 
-function findJSDocRaw(comments: Comment[], position: number): string {
-  let best: Comment | undefined
-  for (const c of comments) {
-    if (c.type !== 'Block') {
-      continue
-    }
-    if (c.end > position) {
-      break
-    }
-    best = c
+// ── TS Program ─────────────────────────────────────────────────────────
+
+/**
+ * Create a single TS program for all source files.
+ * Reads tsconfig.json from the project root when available.
+ */
+function createTsProgram(rootFiles: string[], projectRoot: string): ts.Program {
+  let compilerOptions: ts.CompilerOptions = {
+    jsx: ts.JsxEmit.Preserve,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    noEmit: true,
+    strict: false,
   }
-  if (!best || position - best.end > 20) {
-    return ''
+
+  const tsconfigPath = ts.findConfigFile(projectRoot, ts.sys.fileExists, 'tsconfig.json')
+  if (tsconfigPath) {
+    const { config, error } = ts.readConfigFile(tsconfigPath, ts.sys.readFile)
+    if (!error) {
+      const parsed = ts.parseJsonConfigFileContent(config, ts.sys, dirname(tsconfigPath))
+      compilerOptions = { ...parsed.options, noEmit: true }
+    }
   }
-  return best.value
+
+  return ts.createProgram(rootFiles, compilerOptions)
 }
 
 // ── Variant Extraction (.class.ts) ────────────────────────────────────
 
-function extractVariants(filePath: string): VariantMeta[] {
-  const source = readFileSync(filePath, 'utf-8') as string
-  if (!source) {
-    return []
-  }
-
-  const { program } = parseSync(filePath, source, { lang: 'ts', sourceType: 'module' })
+function extractVariants(sourceFile: ts.SourceFile): VariantMeta[] {
   const variants: VariantMeta[] = []
 
-  walk(program, {
-    enter(node) {
-      if (node.type !== 'CallExpression') {
-        return
-      }
-      const callee = node.callee
-      if (callee.type !== 'Identifier' || callee.name !== 'cva') {
-        return
-      }
+  // Collect names bound via VariantProps<typeof X>
+  const variantPropRefs = new Set<string>()
+  visit(sourceFile, (node) => {
+    if (ts.isTypeQueryNode(node) && ts.isIdentifier(node.exprName)) {
+      variantPropRefs.add(node.exprName.text)
+    }
+  })
 
-      const config = node.arguments[1]
-      if (!config || config.type !== 'ObjectExpression') {
-        return
-      }
+  visit(sourceFile, (node) => {
+    if (!ts.isVariableDeclaration(node)) {
+      return
+    }
+    if (!ts.isIdentifier(node.name)) {
+      return
+    }
+    if (variantPropRefs.size > 0 && !variantPropRefs.has(node.name.text)) {
+      return
+    }
+    if (!node.initializer || !ts.isCallExpression(node.initializer)) {
+      return
+    }
 
-      const variantsProp = getObjectProperty(config, 'variants')
-      const defaultsProp = getObjectProperty(config, 'defaultVariants')
+    const { expression, arguments: args } = node.initializer
+    if (!ts.isIdentifier(expression) || expression.text !== 'cva') {
+      return
+    }
 
-      const defaults: Record<string, string> = {}
-      if (defaultsProp?.value.type === 'ObjectExpression') {
-        for (const dp of defaultsProp.value.properties) {
-          if (dp.type !== 'Property') {
-            continue
-          }
-          const name = getPropertyName(dp.key)
-          if (!name) {
-            continue
-          }
-          if (dp.value.type === 'Literal' && typeof dp.value.value === 'string') {
-            defaults[name] = dp.value.value
-          }
-        }
-      }
+    const config = args[1]
+    if (!config || !ts.isObjectLiteralExpression(config)) {
+      return
+    }
 
-      if (variantsProp?.value.type !== 'ObjectExpression') {
-        return
-      }
-
-      for (const vp of variantsProp.value.properties) {
-        if (vp.type !== 'Property') {
+    // Extract defaultVariants
+    const defaults: Record<string, string> = {}
+    const defaultsProp = findObjectProp(config, 'defaultVariants')
+    if (defaultsProp && ts.isObjectLiteralExpression(defaultsProp.initializer)) {
+      for (const dp of defaultsProp.initializer.properties) {
+        if (!ts.isPropertyAssignment(dp)) {
           continue
         }
-        const variantName = getPropertyName(vp.key)
-        if (!variantName) {
-          continue
+        const key = getPropertyKeyName(dp.name)
+        if (key && ts.isStringLiteral(dp.initializer)) {
+          defaults[key] = dp.initializer.text
         }
-        const options: string[] = []
-        if (vp.value.type === 'ObjectExpression') {
-          for (const op of vp.value.properties) {
-            if (op.type !== 'Property') {
-              continue
-            }
-            const optName = getPropertyName(op.key)
-            if (optName) {
-              options.push(optName)
+      }
+    }
+
+    // Extract variants
+    const variantsProp = findObjectProp(config, 'variants')
+    if (!variantsProp || !ts.isObjectLiteralExpression(variantsProp.initializer)) {
+      return
+    }
+
+    for (const vp of variantsProp.initializer.properties) {
+      if (!ts.isPropertyAssignment(vp)) {
+        continue
+      }
+      const variantName = getPropertyKeyName(vp.name)
+      if (!variantName) {
+        continue
+      }
+
+      const options: string[] = []
+      if (ts.isObjectLiteralExpression(vp.initializer)) {
+        for (const op of vp.initializer.properties) {
+          if (ts.isPropertyAssignment(op)) {
+            const opt = getPropertyKeyName(op.name)
+            if (opt) {
+              options.push(opt)
             }
           }
         }
-        variants.push({
-          name: variantName,
-          options,
-          default: defaults[variantName],
-        })
+      } else if (
+        ts.isIdentifier(vp.initializer) &&
+        vp.initializer.text === 'INPUT_VARIANT_CLASSES'
+      ) {
+        options.push('outline', 'subtle', 'ghost', 'none')
       }
-    },
+
+      variants.push({ name: variantName, options, default: defaults[variantName] })
+    }
   })
 
   return variants
@@ -230,52 +258,48 @@ function extractVariants(filePath: string): VariantMeta[] {
 
 // ── Shared Form Options Parsing ───────────────────────────────────────
 
-function parseFormOptions(filePath: string): Map<string, PropMeta[]> {
+function parseFormOptions(
+  sourceFile: ts.SourceFile | undefined,
+  checker: ts.TypeChecker,
+): Map<string, PropMeta[]> {
   const map = new Map<string, PropMeta[]>()
-  if (!existsSync(filePath)) {
+  if (!sourceFile) {
     return map
   }
 
-  const source = readFileSync(filePath, 'utf-8') as string
-  const { program, comments } = parseSync(filePath, source, {
-    lang: 'ts',
-    sourceType: 'module',
-  })
+  visit(sourceFile, (node) => {
+    if (!ts.isInterfaceDeclaration(node)) {
+      return
+    }
 
-  walk(program, {
-    enter(node) {
-      if (node.type !== 'TSInterfaceDeclaration') {
-        return
+    const ifaceName = node.name.text
+    const props: PropMeta[] = []
+
+    for (const member of node.members) {
+      if (!ts.isPropertySignature(member) || !member.name) {
+        continue
       }
-      const iface = node as TSInterfaceDeclaration
-      const name = iface.id.name
-      const props: PropMeta[] = []
-
-      for (const member of iface.body.body) {
-        if (member.type !== 'TSPropertySignature' || member.key.type !== 'Identifier') {
-          continue
-        }
-        const propName = member.key.name
-        const typeText = member.typeAnnotation?.typeAnnotation
-          ? source.slice(
-              member.typeAnnotation.typeAnnotation.start,
-              member.typeAnnotation.typeAnnotation.end,
-            )
-          : 'unknown'
-        const raw = findJSDocRaw(comments, member.start)
-        props.push({
-          name: propName,
-          type: typeText,
-          optional: Boolean(member.optional),
-          description: parseJSDocBody(raw),
-          default: parseJSDocDefault(raw),
-          inherited: true,
-          inheritedFrom: name,
-        })
+      const propName = getPropertyKeyName(member.name as ts.PropertyName)
+      if (!propName) {
+        continue
       }
 
-      map.set(name, props)
-    },
+      const typeText = member.type
+        ? checker.typeToString(checker.getTypeFromTypeNode(member.type))
+        : 'unknown'
+
+      props.push({
+        name: propName,
+        type: typeText,
+        optional: !!member.questionToken,
+        description: getJSDocDescription(member),
+        default: getJSDocDefault(member),
+        inherited: true,
+        inheritedFrom: ifaceName,
+      })
+    }
+
+    map.set(ifaceName, props)
   })
 
   return map
@@ -291,108 +315,92 @@ interface TsxParseResult {
   extendsInterfaces: string[]
 }
 
-function parseTsx(filePath: string, formOptions: Map<string, PropMeta[]>): TsxParseResult {
-  const source = readFileSync(filePath, 'utf-8') as string
-  const { program, comments } = parseSync(filePath, source, {
-    lang: 'tsx',
-    sourceType: 'module',
-  })
-
+function parseTsx(
+  sourceFile: ts.SourceFile,
+  checker: ts.TypeChecker,
+  formOptions: Map<string, PropMeta[]>,
+): TsxParseResult {
   const props: PropMeta[] = []
   const slots: string[] = []
   let description = ''
   let polymorphic = false
   const extendsInterfaces: string[] = []
 
-  walk(program, {
-    enter(node) {
-      if (node.type === 'TSTypeAliasDeclaration') {
-        const alias = node as TSTypeAliasDeclaration
-        if (alias.id.name.endsWith('Slots') && alias.typeAnnotation.type === 'TSUnionType') {
-          for (const member of alias.typeAnnotation.types) {
-            if (
-              member.type === 'TSLiteralType' &&
-              member.literal.type === 'Literal' &&
-              typeof member.literal.value === 'string'
-            ) {
-              slots.push(member.literal.value)
-            }
+  visit(sourceFile, (node) => {
+    // ── Slots: type XxxSlots = 'a' | 'b' ──────────────────────────
+    if (ts.isTypeAliasDeclaration(node) && node.name.text.endsWith('Slots')) {
+      if (ts.isUnionTypeNode(node.type)) {
+        for (const member of node.type.types) {
+          if (ts.isLiteralTypeNode(member) && ts.isStringLiteral(member.literal)) {
+            slots.push(member.literal.text)
           }
         }
       }
+    }
 
-      if (node.type === 'TSInterfaceDeclaration') {
-        const iface = node as TSInterfaceDeclaration
-        if (!iface.id.name.endsWith('BaseProps')) {
-          return
-        }
-
-        if (iface.extends) {
-          for (const ext of iface.extends) {
-            if (ext.expression.type === 'Identifier') {
-              const extName = ext.expression.name
-              extendsInterfaces.push(extName)
-
-              if (formOptions.has(extName)) {
-                const inherited = formOptions.get(extName)!
-                props.push(...inherited)
-              }
-            }
-          }
-        }
-
-        for (const member of iface.body.body) {
-          if (member.type !== 'TSPropertySignature') {
+    // ── XxxBaseProps interface ─────────────────────────────────────
+    if (ts.isInterfaceDeclaration(node) && node.name.text.endsWith('BaseProps')) {
+      // Resolve extends clauses, injecting inherited form option props
+      for (const clause of node.heritageClauses ?? []) {
+        for (const type of clause.types) {
+          if (!ts.isIdentifier(type.expression)) {
             continue
           }
-          let propName: string
-          if (member.key.type === 'Identifier') {
-            propName = member.key.name
-          } else if (member.key.type === 'Literal' && typeof member.key.value === 'string') {
-            propName = member.key.value
-          } else {
-            continue
+          const extName = type.expression.text
+          extendsInterfaces.push(extName)
+          const inherited = formOptions.get(extName)
+          if (inherited) {
+            props.push(...inherited)
           }
-
-          const typeText = member.typeAnnotation?.typeAnnotation
-            ? source.slice(
-                member.typeAnnotation.typeAnnotation.start,
-                member.typeAnnotation.typeAnnotation.end,
-              )
-            : 'unknown'
-          const raw = findJSDocRaw(comments, member.start)
-
-          props.push({
-            name: propName,
-            type: typeText,
-            optional: Boolean(member.optional),
-            description: parseJSDocBody(raw),
-            default: parseJSDocDefault(raw),
-            inherited: false,
-          })
         }
       }
 
-      if (node.type === 'ExportNamedDeclaration') {
-        const exp = node as ExportNamedDeclaration
-        if (exp.declaration?.type === 'FunctionDeclaration') {
-          description = findJSDoc(comments, exp.start)
+      // Own members
+      for (const member of node.members) {
+        if (!ts.isPropertySignature(member) || !member.name) {
+          continue
         }
-      }
+        const propName = getPropertyKeyName(member.name as ts.PropertyName)
+        if (!propName) {
+          continue
+        }
 
-      if (node.type === 'TSTypeReference' && 'typeName' in node) {
-        const ref = node as any
-        if (ref.typeName?.type === 'Identifier' && ref.typeName.name === 'PolymorphicProps') {
-          polymorphic = true
-        }
+        // checker.typeToString gives the canonical, fully-normalized type string
+        const typeText = member.type
+          ? checker.typeToString(checker.getTypeFromTypeNode(member.type))
+          : 'unknown'
+
+        props.push({
+          name: propName,
+          type: typeText,
+          optional: !!member.questionToken,
+          description: getJSDocDescription(member),
+          default: getJSDocDefault(member),
+          inherited: false,
+        })
       }
-    },
+    }
+
+    // ── Component description: export function Xxx() ───────────────
+    if (ts.isFunctionDeclaration(node) && !description) {
+      const isExported = node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+      if (isExported) {
+        description = getJSDocDescription(node)
+      }
+    }
+
+    // ── Polymorphic: PolymorphicProps<...> ─────────────────────────
+    if (ts.isTypeReferenceNode(node) && ts.isIdentifier(node.typeName)) {
+      if (node.typeName.text === 'PolymorphicProps') {
+        polymorphic = true
+      }
+    }
   })
 
   return { props, slots, description, polymorphic, extendsInterfaces }
 }
 
-// ── Discovery ─────────────────────────────────────────────────────────
+// ── Discovery (unchanged) ─────────────────────────────────────────────
 
 function discoverComponents(srcDir: string) {
   const components: { tsxPath: string; classPath?: string; key: string; relDir: string }[] = []
@@ -421,7 +429,6 @@ function discoverComponents(srcDir: string) {
       const relDir = `${category}/${dirname(normalized)}`
       const key = basename(dirname(normalized))
       const classPath = fullPath.replace(/\.tsx$/, '.class.ts')
-
       const fileName = basename(normalized, '.tsx')
       if (fileName !== key) {
         continue
@@ -444,9 +451,22 @@ function discoverComponents(srcDir: string) {
 function extractAll(srcDir: string, outDir: string): RegistryEntry[] {
   mkdirSync(outDir, { recursive: true })
 
-  const formOptionsFile = join(srcDir, 'forms/form-field/form-options.ts')
-  const formOptions = parseFormOptions(formOptionsFile)
   const discovered = discoverComponents(srcDir)
+  const formOptionsFile = join(srcDir, 'forms/form-field/form-options.ts')
+
+  // ── Single shared program for all files ───────────────────────────
+  // This avoids redundant parsing and enables cross-file type resolution.
+  const rootFiles = [
+    ...(existsSync(formOptionsFile) ? [formOptionsFile] : []),
+    ...discovered.map((c) => c.tsxPath),
+    ...discovered.flatMap((c) => (c.classPath ? [c.classPath] : [])),
+  ]
+  const program = createTsProgram(rootFiles, srcDir)
+  const checker = program.getTypeChecker()
+
+  // Parse shared form options once
+  const formOptions = parseFormOptions(program.getSourceFile(formOptionsFile), checker)
+
   const registry: RegistryEntry[] = []
 
   for (const comp of discovered) {
@@ -457,34 +477,42 @@ function extractAll(srcDir: string, outDir: string): RegistryEntry[] {
     }
 
     const name = kebabToPascal(comp.key)
-    const variants = comp.classPath ? extractVariants(comp.classPath) : []
+
+    const classSF = comp.classPath ? program.getSourceFile(comp.classPath) : undefined
+    const variants = classSF ? extractVariants(classSF) : []
+
+    const tsxSF = program.getSourceFile(comp.tsxPath)
+    if (!tsxSF) {
+      continue
+    }
+
     const { props, slots, description, polymorphic, extendsInterfaces } = parseTsx(
-      comp.tsxPath,
+      tsxSF,
+      checker,
       formOptions,
     )
 
-    const variantExtends = extendsInterfaces.filter((e) => e.endsWith('VariantProps'))
-    if (variantExtends.length > 0 && variants.length > 0) {
+    // Inject variant props not already declared in the interface
+    if (extendsInterfaces.some((e) => e.endsWith('VariantProps')) && variants.length > 0) {
       for (const v of variants) {
         if (['hasLeading', 'hasTrailing', 'type'].includes(v.name)) {
           continue
         }
-
-        const typeStr = v.options.map((o) => `'${o}'`).join(' | ')
-        if (!props.some((p) => p.name === v.name)) {
-          props.push({
-            name: v.name,
-            type: typeStr,
-            optional: true,
-            description: `Visual ${v.name} of the component.`,
-            default: v.default,
-            inherited: false,
-          })
+        if (props.some((p) => p.name === v.name)) {
+          continue
         }
+        props.push({
+          name: v.name,
+          type: v.options.map((o) => `'${o}'`).join(' | '),
+          optional: true,
+          description: `Visual ${v.name} of the component.`,
+          default: v.default,
+          inherited: false,
+        })
       }
     }
 
-    // Resolve display types for classes/styles props
+    // Normalize display types (XxxClasses → SlotClasses<...>, etc.)
     for (const prop of props) {
       prop.type = resolveDisplayType(prop.type)
     }
@@ -508,17 +536,14 @@ function extractAll(srcDir: string, outDir: string): RegistryEntry[] {
   registry.sort((a, b) => {
     const ai = CATEGORY_ORDER.indexOf(a.category)
     const bi = CATEGORY_ORDER.indexOf(b.category)
-    if (ai !== bi) {
-      return ai - bi
-    }
-    return a.name.localeCompare(b.name)
+    return ai !== bi ? ai - bi : a.name.localeCompare(b.name)
   })
 
   writeFileSync(join(outDir, 'index.json'), JSON.stringify(registry, null, 2))
   return registry
 }
 
-// ── Plugin ────────────────────────────────────────────────────────────
+// ── Plugin (unchanged) ────────────────────────────────────────────────
 
 export function componentMetaPlugin(): Plugin {
   let srcDir: string
@@ -544,8 +569,8 @@ export function componentMetaPlugin(): Plugin {
     },
     configureServer(server) {
       server.watcher.add(srcDir)
-
       let timer: ReturnType<typeof setTimeout> | null = null
+
       server.watcher.on('change', (changed) => {
         const norm = changed.replace(/\\/g, '/')
         const srcNorm = srcDir.replace(/\\/g, '/')
