@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Popover } from '../../../src'
 import meta from '../../.meta/popover.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const PLACEMENTS = ['top', 'right', 'bottom', 'left'] as const
 
@@ -10,7 +11,7 @@ export default () => {
   const [preventedCloseCount, setPreventedCloseCount] = createSignal(0)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection title="Placement" description="Click trigger with four placement variants.">
         <div class="flex flex-wrap gap-3 items-center">
           <For each={PLACEMENTS}>
@@ -80,6 +81,6 @@ export default () => {
           </Popover>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

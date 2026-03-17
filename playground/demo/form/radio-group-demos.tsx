@@ -2,7 +2,8 @@ import { createSignal } from 'solid-js'
 
 import { RadioGroup } from '../../../src'
 import meta from '../../.meta/radio-group.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const ITEMS = [
   { value: 'starter', label: 'Starter', description: 'For personal projects' },
@@ -14,7 +15,7 @@ export default () => {
   const [value, setValue] = createSignal('pro')
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Variants"
         description="List, card, and table variants with controlled value."
@@ -39,6 +40,6 @@ export default () => {
           </div>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

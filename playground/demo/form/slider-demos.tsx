@@ -3,7 +3,8 @@ import { For, createSignal } from 'solid-js'
 import { Button, Form, FormField, Slider } from '../../../src'
 import type { SliderValue } from '../../../src/forms/slider/slider'
 import meta from '../../.meta/slider.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 
@@ -29,7 +30,7 @@ export default () => {
   }
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Controlled Single"
         description="Input phase updates with onValueChange and commit phase updates with onChange."
@@ -134,6 +135,6 @@ export default () => {
           </div>
         </Form>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

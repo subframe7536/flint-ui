@@ -2,7 +2,8 @@ import { createSignal } from 'solid-js'
 
 import { Button, Checkbox, CheckboxGroup, RadioGroup, Switch } from '../../../src'
 import meta from '../../.meta/form.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const wait = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -69,7 +70,7 @@ export default () => {
   }
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Checkbox"
         description="Single checkbox states with full-surface card interactions and controlled value."
@@ -231,6 +232,6 @@ export default () => {
           </div>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

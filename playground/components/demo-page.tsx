@@ -1,61 +1,9 @@
 import type { JSX } from 'solid-js'
-import { For, Show, createSignal } from 'solid-js'
+import { For, Show } from 'solid-js'
 
-import { Button } from '../../src'
+import { Badge } from '../../src'
 
 import { PropsTable } from './props-table'
-
-// ── DemoSection with source code preview ───────────────────────────────
-
-export interface DemoSectionProps {
-  title: string
-  description: string
-  code?: string
-  children: JSX.Element
-}
-
-export const DemoSection = (props: DemoSectionProps) => {
-  const [showCode, setShowCode] = createSignal(false)
-
-  return (
-    <section class="border border-zinc-200/80 rounded-2xl bg-white/80 shadow-sm relative overflow-hidden backdrop-blur-sm">
-      <div class="p-5">
-        <div class="mb-4">
-          <h2 class="text-sm text-zinc-600 tracking-[0.16em] font-semibold uppercase">
-            {props.title}
-          </h2>
-          <p class="text-sm text-zinc-600 mt-1">{props.description}</p>
-        </div>
-        {props.children}
-      </div>
-
-      <Show when={props.code}>
-        <Button
-          variant="ghost"
-          classes={{
-            base: [
-              'absolute end-2 top-2',
-              showCode() ? 'bg-zinc-100 text-zinc-800' : 'text-zinc-500 hover:text-zinc-600',
-            ],
-          }}
-          onClick={() => setShowCode((v) => !v)}
-          leading="i-lucide:code-xml"
-        >
-          Source
-        </Button>
-
-        <Show when={showCode()}>
-          {/* eslint-disable-next-line solid/no-innerhtml -- shiki HTML generated at build time */}
-          <div
-            class="text-xs leading-relaxed b-t border-zinc-100 overflow-x-auto [&_pre]:(m-0 p-4 bg-transparent)"
-            // oxlint-disable-next-line solid/no-innerhtml
-            innerHTML={props.code}
-          />
-        </Show>
-      </Show>
-    </section>
-  )
-}
 
 // ── ComponentDocPage ───────────────────────────────────────────────────
 
@@ -76,21 +24,19 @@ export interface ComponentDocPageProps {
   children: JSX.Element
 }
 
-export const ComponentDocPage = (props: ComponentDocPageProps) => (
+export const DemoPage = (props: ComponentDocPageProps) => (
   <main class="text-zinc-900 p-6 min-h-screen w-full from-stone-100 to-slate-100 via-zinc-50 bg-gradient-to-br sm:p-10">
     <div class="mx-auto flex flex-col gap-6 max-w-5xl">
-      <header class="text-white p-6 b-1 b-border border-zinc-200/80 rounded-2xl bg-zinc-900 shadow-lg sm:p-8">
+      <header class="text-foreground p-6 sm:p-8">
         <div class="flex flex-wrap gap-2 items-center">
-          <p class="text-sm text-zinc-300 tracking-[0.22em] uppercase">{props.meta.category}</p>
+          <p class="text-sm text-zinc-700 tracking-[0.22em] uppercase">{props.meta.category}</p>
           <Show when={props.meta.polymorphic}>
-            <span class="text-[10px] text-zinc-300 tracking-wider px-1.5 py-0.5 rounded bg-zinc-700 uppercase">
-              polymorphic
-            </span>
+            <Badge>Polymorphic</Badge>
           </Show>
         </div>
         <h1 class="text-2xl font-semibold mt-2 sm:text-3xl">{props.meta.name}</h1>
         <Show when={props.meta.description}>
-          <p class="text-sm text-zinc-300 mt-2 max-w-2xl sm:text-base">{props.meta.description}</p>
+          <p class="text-sm text-zinc-600 mt-2 max-w-2xl sm:text-base">{props.meta.description}</p>
         </Show>
         <p class="text-xs text-zinc-500 font-mono mt-3">{props.meta.sourcePath}</p>
       </header>
@@ -98,7 +44,7 @@ export const ComponentDocPage = (props: ComponentDocPageProps) => (
       {props.children}
 
       <Show when={props.meta.props.length > 0}>
-        <section class="p-5 border border-zinc-200/80 rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm">
+        <section>
           <h2 class="text-sm text-zinc-600 tracking-[0.16em] font-semibold mb-4 uppercase">
             Props
           </h2>
@@ -107,17 +53,13 @@ export const ComponentDocPage = (props: ComponentDocPageProps) => (
       </Show>
 
       <Show when={props.meta.slots.length > 0}>
-        <section class="p-5 border border-zinc-200/80 rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm">
+        <section>
           <h2 class="text-sm text-zinc-600 tracking-[0.16em] font-semibold mb-3 uppercase">
             Slots
           </h2>
           <div class="flex flex-wrap gap-1.5">
             <For each={props.meta.slots}>
-              {(slot) => (
-                <span class="text-xs text-zinc-600 font-mono px-2 py-1 rounded-md bg-zinc-100">
-                  {slot}
-                </span>
-              )}
+              {(slot) => <Badge classes={{ base: 'font-mono' }}>{slot}</Badge>}
             </For>
           </div>
         </section>

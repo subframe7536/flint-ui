@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Stepper } from '../../../src'
 import meta from '../../.meta/stepper.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 // Do not share items containing JSX across multiple Stepper instances.
 const createCheckoutSteps = () => [
@@ -74,7 +75,7 @@ export default () => {
   const [releaseStep, setReleaseStep] = createSignal('review')
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Size variants"
         description="Preview the Stepper across all supported sizes using the default linear, non-clickable behavior."
@@ -165,6 +166,6 @@ export default () => {
           <Stepper items={PIPELINE_STEPS()} orientation="vertical" defaultValue="building" />
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

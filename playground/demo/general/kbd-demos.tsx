@@ -2,13 +2,14 @@ import { For } from 'solid-js'
 
 import { Kbd } from '../../../src'
 import meta from '../../.meta/kbd.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const VARIANTS = ['outline', 'default', 'invert'] as const
 
 export default () => (
-  <ComponentDocPage meta={meta}>
+  <DemoPage meta={meta}>
     <DemoSection title="Sizes" description="Keycap sizes from xs to xl.">
       <div class="flex flex-wrap gap-3 items-center">
         <For each={SIZES}>{(size) => <Kbd size={size} value={[size.toUpperCase()]} />}</For>
@@ -27,5 +28,5 @@ export default () => (
         <Kbd value={['Ctrl', 'K']} between={<div>+</div>} />
       </p>
     </DemoSection>
-  </ComponentDocPage>
+  </DemoPage>
 )

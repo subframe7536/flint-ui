@@ -2,13 +2,14 @@ import { createSignal } from 'solid-js'
 
 import { Checkbox } from '../../../src'
 import meta from '../../.meta/checkbox.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 export default () => {
   const [checked, setChecked] = createSignal(true)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection title="Basic" description="Default and card variants with controlled state.">
         <div class="flex flex-col gap-3 max-w-md">
           <Checkbox
@@ -33,6 +34,6 @@ export default () => {
           <Checkbox label="Disabled" description="Read only" variant="card" disabled />
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

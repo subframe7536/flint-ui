@@ -3,7 +3,8 @@ import { createStore } from 'solid-js/store'
 
 import { Icon, Resizable } from '../../../src'
 import meta from '../../.meta/resizable.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 function formatPixelSizes(sizes: number[]): string {
   return sizes.map((size) => `${Math.round(size)}px`).join(' / ')
@@ -87,7 +88,7 @@ export default () => {
   }
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Basic Horizontal"
         description="Two panels with auto-inserted divider and root-level handle rendering."
@@ -397,6 +398,6 @@ export default () => {
           </p>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

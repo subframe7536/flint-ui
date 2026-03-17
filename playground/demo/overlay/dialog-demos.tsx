@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Dialog } from '../../../src'
 import meta from '../../.meta/dialog.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const SCROLLABLE_LINES = Array.from({ length: 16 }, (_, index) => `Release note line ${index + 1}`)
 
@@ -10,7 +11,7 @@ export default () => {
   const [preventedCloseCount, setPreventedCloseCount] = createSignal(0)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Default Shell"
         description="Header, description, actions, body, and footer slots."
@@ -94,6 +95,6 @@ export default () => {
           </Dialog>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

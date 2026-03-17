@@ -3,7 +3,8 @@ import { createMemo, createSignal } from 'solid-js'
 import { ContextMenu } from '../../../src'
 import type { ContextMenuItems } from '../../../src'
 import meta from '../../.meta/context-menu.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const badgeClass =
   'rounded-md b-1 b-border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-medium text-[11px] text-zinc-700'
@@ -268,7 +269,7 @@ export default () => {
   ]
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="File Explorer"
         description="A file-row context menu with move flows, shortcuts, mixed labels, and destructive actions."
@@ -357,6 +358,6 @@ export default () => {
           </div>
         </ContextMenu>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

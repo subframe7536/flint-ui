@@ -14,7 +14,8 @@ import {
 } from '../../../src'
 import type { SelectOption } from '../../../src/forms/select/select'
 import meta from '../../.meta/form-field.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const ROLE_OPTIONS: SelectOption[] = [
   { label: 'Developer', value: 'developer' },
@@ -82,7 +83,7 @@ export default () => {
   }
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Basic FormField"
         description="Labels, descriptions, hints, and required markers."
@@ -274,6 +275,6 @@ export default () => {
           </div>
         </Form>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

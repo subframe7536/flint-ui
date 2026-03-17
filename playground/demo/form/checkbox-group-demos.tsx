@@ -2,7 +2,8 @@ import { createSignal } from 'solid-js'
 
 import { CheckboxGroup } from '../../../src'
 import meta from '../../.meta/checkbox-group.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const ITEMS = [
   { value: 'alpha', label: 'Alpha', description: 'Primary rollout channel' },
@@ -14,7 +15,7 @@ export default () => {
   const [value, setValue] = createSignal<string[]>(['beta'])
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Variants"
         description="Card and table variants with controlled and uncontrolled state."
@@ -41,6 +42,6 @@ export default () => {
           </div>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

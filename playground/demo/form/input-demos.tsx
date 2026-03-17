@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { Input, Textarea } from '../../../src'
 import meta from '../../.meta/input.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const VARIANTS = ['outline', 'subtle', 'ghost', 'none'] as const
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
@@ -12,7 +13,7 @@ export default () => {
   const [composerValue, setComposerValue] = createSignal('Hello Rock UI!')
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection title="Input Variants" description="Visual style variants.">
         <div class="gap-3 grid lg:grid-cols-3 sm:grid-cols-2">
           <For each={VARIANTS}>
@@ -152,6 +153,6 @@ export default () => {
           />
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Sheet } from '../../../src'
 import meta from '../../.meta/sheet.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const SIDES = ['left', 'right', 'top', 'bottom'] as const
 
@@ -10,7 +11,7 @@ export default () => {
   const [preventedCloseCount, setPreventedCloseCount] = createSignal(0)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection title="Sides" description="Open sheet from each side with shared shell slots.">
         <div class="flex flex-wrap gap-3 items-center">
           <For each={SIDES}>
@@ -74,6 +75,6 @@ export default () => {
           </Sheet>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { InputNumber } from '../../../src'
 import meta from '../../.meta/input-number.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const VARIANTS = ['outline', 'subtle', 'ghost', 'none'] as const
 
@@ -11,7 +12,7 @@ export default () => {
   const [pressHoldValue, setPressHoldValue] = createSignal(12)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Orientations"
         description="Horizontal (default) and vertical button layouts."
@@ -102,6 +103,6 @@ export default () => {
       <DemoSection title="Disabled" description="Non-interactive disabled state.">
         <InputNumber defaultValue={7} disabled />
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

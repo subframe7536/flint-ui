@@ -2,13 +2,14 @@ import { createSignal } from 'solid-js'
 
 import { Tabs } from '../../../src'
 import meta from '../../.meta/tabs.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 export default () => {
   const [value, setValue] = createSignal('overview')
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Uncontrolled"
         description="Default value with icon-leading triggers and panel content."
@@ -65,6 +66,6 @@ export default () => {
           <p class="text-xs text-zinc-600">Current tab: {value()}</p>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

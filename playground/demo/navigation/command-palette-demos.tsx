@@ -3,7 +3,8 @@ import { createSignal, onCleanup, onMount } from 'solid-js'
 import { Button, CommandPalette, Kbd, Popup } from '../../../src'
 import type { CommandPaletteGroup } from '../../../src'
 import meta from '../../.meta/command-palette.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const BASIC_GROUPS: CommandPaletteGroup[] = [
   {
@@ -87,7 +88,7 @@ export default function CommandPaletteDemos() {
   })
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Usage"
         description="Click the button or press ⌘K to open the command palette."
@@ -175,6 +176,6 @@ export default function CommandPaletteDemos() {
           />
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

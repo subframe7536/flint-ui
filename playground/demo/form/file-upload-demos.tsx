@@ -3,7 +3,8 @@ import { createSignal } from 'solid-js'
 import { Button, FileUpload, Form, FormField } from '../../../src'
 import type { FileUploadValue } from '../../../src/forms/file-upload/file-upload'
 import meta from '../../.meta/file-upload.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 function fileCount(value: FileUploadValue): number {
   if (value === null) {
@@ -43,7 +44,7 @@ export default () => {
   }
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Single Upload"
         description="Basic single-file mode with a live readout from onValueChange."
@@ -128,6 +129,6 @@ export default () => {
           </div>
         </Form>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

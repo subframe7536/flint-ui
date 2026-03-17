@@ -3,7 +3,8 @@ import { For, createSignal } from 'solid-js'
 import { Badge, Button } from '../../../src'
 import type { BadgeVariantProps } from '../../../src/elements/badge/badge.class'
 import meta from '../../.meta/badge.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 type BadgeVariantName = Exclude<BadgeVariantProps['variant'], undefined>
 type BadgeSizeName = Exclude<BadgeVariantProps['size'], undefined>
@@ -16,7 +17,7 @@ export default () => {
   const [tags, setTags] = createSignal(INITIAL_TAGS)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection title="Variants" description="Default, outline, and solid styles.">
         <div class="flex flex-wrap gap-3 items-center">
           <For each={VARIANTS}>{(variant) => <Badge variant={variant}>{variant}</Badge>}</For>
@@ -92,6 +93,6 @@ export default () => {
           </Button>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

@@ -31,7 +31,7 @@ export function PropsTable(props: PropsTableProps): JSX.Element {
   })
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 bg-background">
       <Show when={ownProps().length > 0}>
         <PropRows props={ownProps()} />
       </Show>

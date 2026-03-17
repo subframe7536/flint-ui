@@ -3,7 +3,8 @@ import { For, createSignal } from 'solid-js'
 import { Select } from '../../../src'
 import type { SelectOption } from '../../../src/forms/select/select'
 import meta from '../../.meta/select.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const FRUIT_OPTIONS: SelectOption[] = [
   { label: 'Apple', value: 'apple' },
@@ -52,7 +53,7 @@ export default () => {
   const [loadingMore, setLoadingMore] = createSignal(false)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Single Select"
         description="Basic single selection with controlled value."
@@ -232,6 +233,6 @@ export default () => {
           <p class="text-xs text-zinc-500">Total options: {infiniteOptions().length}</p>
         </div>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }

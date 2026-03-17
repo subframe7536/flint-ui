@@ -2,7 +2,8 @@ import { For, createSignal } from 'solid-js'
 
 import { Button, Popup } from '../../../src'
 import meta from '../../.meta/popup.json'
-import { ComponentDocPage, DemoSection } from '../../components/demo-page'
+import { DemoPage } from '../../components/demo-page'
+import { DemoSection } from '../../components/demo-section'
 
 const SCROLLABLE_LINES = Array.from({ length: 48 }, (_, index) => `Popup line ${index + 1}`)
 
@@ -10,7 +11,7 @@ export default () => {
   const [preventedCloseCount, setPreventedCloseCount] = createSignal(0)
 
   return (
-    <ComponentDocPage meta={meta}>
+    <DemoPage meta={meta}>
       <DemoSection
         title="Default Container"
         description="Popup provides only container + overlay. Content styling is fully custom."
@@ -70,6 +71,6 @@ export default () => {
           <Button variant="secondary">Dismiss blocked</Button>
         </Popup>
       </DemoSection>
-    </ComponentDocPage>
+    </DemoPage>
   )
 }
