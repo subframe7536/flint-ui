@@ -5,9 +5,12 @@ import { Show, createEffect, createMemo, createSignal, lazy, onMount } from 'sol
 import { Dynamic, render } from 'solid-js/web'
 import apiIndex from 'virtual:api-doc'
 
+import { Resizable } from '../src/elements/resizable'
+
 import { Sidebar } from './components/sidebar'
 
 const DEMO_MAP: Record<string, Component> = {
+  intro: lazy(() => import('./demo/guide/intro')),
   accordion: lazy(() => import('./demo/general/accordion-demos')),
   avatar: lazy(() => import('./demo/general/avatar-demos')),
   badge: lazy(() => import('./demo/general/badge-demos')),
@@ -47,12 +50,14 @@ const DEMO_MAP: Record<string, Component> = {
 
 function App() {
   const pages = createMemo(() => {
-    return apiIndex.components
+    const componentPages = apiIndex.components
       .filter((entry) => entry.key in DEMO_MAP)
       .map((entry) => ({ key: entry.key, label: entry.name, group: entry.category }))
+
+    return [{ key: 'intro', label: 'Introduction', group: 'Guide' }, ...componentPages]
   })
 
-  const [page, setPage] = createSignal(location.hash.slice(1) || 'button')
+  const [page, setPage] = createSignal(location.hash.slice(1) || 'intro')
 
   onMount(() => {
     window.addEventListener('hashchange', () => {
@@ -81,17 +86,30 @@ function App() {
   const ActiveDemo = createMemo(() => DEMO_MAP[page()])
 
   return (
-    <div class="flex h-screen overflow-hidden">
-      <Sidebar pages={pages()} activePage={page} setActivePage={navigate} />
-      <div class="flex-1 overflow-y-auto">
-        <Show
-          when={ActiveDemo()}
-          fallback={<div class="text-sm text-zinc-500 p-6">Demo not found.</div>}
-        >
-          <Dynamic component={ActiveDemo()!} />
-        </Show>
-      </div>
-    </div>
+    <Resizable
+      panels={[
+        {
+          content: <Sidebar pages={pages()} activePage={page} setActivePage={navigate} />,
+          defaultSize: '18%',
+          min: '15%',
+          max: '20%',
+        },
+        {
+          content: (
+            <div class="overflow-y-auto">
+              <Show
+                when={ActiveDemo()}
+                fallback={<div class="text-sm text-zinc-500 p-6">Demo not found.</div>}
+              >
+                <Dynamic component={ActiveDemo()!} />
+              </Show>
+            </div>
+          ),
+        },
+      ]}
+      orientation="horizontal"
+      classes={{ root: 'h-screen' }}
+    />
   )
 }
 

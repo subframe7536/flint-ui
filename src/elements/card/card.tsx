@@ -125,7 +125,12 @@ export function Card(props: CardProps): JSX.Element {
         <div
           data-slot="body"
           style={props.styles?.body}
-          class={cn('flex-1', props.compact ? 'px-4' : 'px-6', props.classes?.body)}
+          class={cn(
+            'flex-1',
+            props.compact ? 'px-4' : 'px-6',
+            !props.footer && (props.compact ? 'mb-4' : 'mb-6'),
+            props.classes?.body,
+          )}
         >
           {props.children}
         </div>

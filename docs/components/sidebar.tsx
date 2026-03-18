@@ -39,7 +39,7 @@ export const Sidebar = (props: SidebarProps) => {
   })
 
   return (
-    <aside class="text-zinc-800 p-4 border-e-(1 border) bg-zinc-100 flex shrink-0 flex-col gap-4 w-56 overflow-y-auto">
+    <aside class="text-zinc-800 p-4 border-e-(1 border) bg-zinc-100 flex shrink-0 flex-col gap-4 w-full overflow-y-auto">
       <div class="text-xl text-zinc-700 tracking-normal font-semibold px-2 flex gap-2 items-center">
         <img src="/favicon.svg" alt="icon" class="size-6" />
         Rock UI
@@ -60,9 +60,9 @@ export const Sidebar = (props: SidebarProps) => {
         <For each={grouped()}>
           {([group, pages]) => (
             <div>
-              <div class="text-[11px] text-zinc-500 tracking-wider font-medium mb-1.5 px-2 flex uppercase items-center justify-between">
-                <span>{group}</span>
-                <span class="text-zinc-600 font-normal">{pages.length}</span>
+              <div class="text-xs text-zinc-500 tracking-wider font-medium mb-1.5 px-2 flex items-center justify-between">
+                <span class="font-medium">{group}</span>
+                <span class="text-zinc-600">{pages.length}</span>
               </div>
               <div class="flex flex-col gap-0.5">
                 <For each={pages}>

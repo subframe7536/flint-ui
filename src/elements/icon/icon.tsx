@@ -86,7 +86,7 @@ export function Icon(props: IconProps): JSX.Element {
     <Dynamic
       component={
         typeof localProps.name === 'string'
-          ? 'i'
+          ? 'div'
           : typeof localProps.name === 'function'
             ? localProps.name
             : () => localProps.name as JSX.Element

@@ -52,19 +52,9 @@ function toKebabCase(name: string): string {
 }
 
 function categoryFromSourcePath(sourcePath: string | undefined): string {
-  if (!sourcePath) {
-    return 'General'
-  }
-  if (sourcePath.startsWith('src/elements/form/')) {
-    return 'Form'
-  }
-  if (sourcePath.startsWith('src/elements/navigation/')) {
-    return 'Navigation'
-  }
-  if (sourcePath.startsWith('src/elements/overlay/')) {
-    return 'Overlay'
-  }
-  return 'General'
+  // Use the parent directory name as the category.
+  // E.g. `src/elements/button/button.tsx` => `button`
+  return sourcePath?.replace(/\\/g, '/').split('/')[1] || 'General'
 }
 
 function displayText(parts: readonly ts.SymbolDisplayPart[] | string | undefined): string {
