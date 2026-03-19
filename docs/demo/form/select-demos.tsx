@@ -17,7 +17,7 @@ const FRUIT_OPTIONS: SelectOption[] = [
 const GROUPED_OPTIONS: SelectOption[] = [
   {
     label: 'Fruits',
-    options: [
+    children: [
       { label: 'Apple', value: 'apple' },
       { label: 'Banana', value: 'banana' },
       { label: 'Cherry', value: 'cherry' },
@@ -25,7 +25,7 @@ const GROUPED_OPTIONS: SelectOption[] = [
   },
   {
     label: 'Vegetables',
-    options: [
+    children: [
       { label: 'Carrot', value: 'carrot' },
       { label: 'Broccoli', value: 'broccoli' },
       { label: 'Spinach', value: 'spinach' },

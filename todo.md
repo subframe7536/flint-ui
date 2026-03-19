@@ -13,6 +13,8 @@
 - [x] refine demo into doc?
 - [x] select trigger icon position overflow
 - [x] add `collapsibleMin` in resizable, width should be max if no default size setup, redesign collapsible behavior
+- [ ] `collapsible` in become a mode on resizable handler
+- [ ] api-doc also extract `Items`
 - [ ] unify docs: preview different variants, options; card / island to shadcn / nuxt-ui like doc ; visually render count
 - [ ] add toast using `solid-toaster`
 - [ ] check `props.highlight` actual usage and style effect, optimize `surface-highlight` and `surface-outline` and `surface-overlay`, unify text size / line height / spacing / border color , border implement style (directly border or box-shadow)

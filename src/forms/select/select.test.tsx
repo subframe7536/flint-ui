@@ -5,7 +5,7 @@ import { Form } from '../form'
 import { FormField } from '../form-field'
 
 import { Select } from './select'
-import type { SelectEmptyRenderContext, SelectOptionRender } from './select'
+import type { SelectT } from './select'
 
 const FRUITS = [
   { label: 'Apple', value: 'apple' },
@@ -16,14 +16,14 @@ const FRUITS = [
 const GROUPED_OPTIONS = [
   {
     label: 'Fruits',
-    options: [
+    children: [
       { label: 'Apple', value: 'apple' },
       { label: 'Banana', value: 'banana' },
     ],
   },
   {
     label: 'Vegetables',
-    options: [
+    children: [
       { label: 'Carrot', value: 'carrot' },
       { label: 'Daikon', value: 'daikon' },
     ],
@@ -543,9 +543,52 @@ describe('Select - groups', () => {
     expect(items[0].getAttribute('aria-posinset')).toBe('1')
     expect(items[0].getAttribute('aria-setsize')).toBe('4')
   })
+
+  test('treats empty children as a normal option', () => {
+    const options = [
+      { label: 'Standalone', value: 'standalone', children: [] },
+      { label: 'Plain', value: 'plain' },
+    ]
+
+    render(() => <Select options={options} defaultOpen placeholder="Pick" />)
+
+    const sectionLabels = queryAllBody('[data-slot="label"]')
+    const items = queryAllBody('[data-slot="item"]')
+
+    expect(sectionLabels.length).toBe(0)
+    expect(items.length).toBe(2)
+  })
 })
 
 describe('Select - render hooks', () => {
+  test('renders JSX label without string normalization', () => {
+    const jsxOptions = [
+      { label: <span data-testid="apple-label">Apple</span>, value: 'apple' },
+      { label: 'Banana', value: 'banana' },
+    ]
+
+    render(() => <Select options={jsxOptions} defaultOpen placeholder="Pick" />)
+
+    expect(queryBody('[data-testid="apple-label"]')).not.toBeNull()
+  })
+
+  test('uses option key for search when label is JSX', async () => {
+    const jsxOptions = [
+      { label: <span>Fancy Apple</span>, key: 'Apple', value: 'apple' },
+      { label: 'Banana', value: 'banana' },
+    ]
+    const screen = render(() => (
+      <Select options={jsxOptions} search defaultOpen placeholder="Pick" />
+    ))
+    const input = screen.getByRole('combobox') as HTMLInputElement
+
+    await fireEvent.input(input, { target: { value: 'app' } })
+
+    await waitFor(() => {
+      expect(queryBody('[data-slot="empty"]')).toBeNull()
+    })
+  })
+
   test('uses labelRender for item label rendering', () => {
     render(() => (
       <Select
@@ -577,7 +620,7 @@ describe('Select - render hooks', () => {
   })
 
   test('passes selected state for normal items to optionRender', () => {
-    const renderCalls: Array<Parameters<SelectOptionRender>[0]> = []
+    const renderCalls: Array<Parameters<NonNullable<SelectT.Base['optionRender']>>[0]> = []
 
     render(() => (
       <Select
@@ -598,7 +641,7 @@ describe('Select - render hooks', () => {
   })
 
   test('calls emptyRender with context when no matched items', async () => {
-    let lastContext: SelectEmptyRenderContext | undefined
+    let lastContext: SelectT.EmptyRenderContext | undefined
     const screen = render(() => (
       <Select
         multiple
@@ -980,7 +1023,7 @@ describe('Select - emptyRender string', () => {
 
 describe('Select - enriched emptyRender context', () => {
   test('context includes multiple, selectedValues, isAtMaxCount, and close', async () => {
-    let capturedContext: SelectEmptyRenderContext | undefined
+    let capturedContext: SelectT.EmptyRenderContext | undefined
     const screen = render(() => (
       <Select
         multiple

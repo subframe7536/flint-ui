@@ -39,35 +39,36 @@ export namespace RadioGroupT {
 
   export type Variant = RadioGroupVariantProps
 
-  export type Value = string
+  /**
+   * A radio item: either a string (shorthand for value and label) or an object.
+   */
+  export type Items =
+    | string
+    | {
+        /**
+         * Value of the radio item.
+         */
+        value?: string
 
-  export interface Items {
-    /**
-     * Value of the radio item.
-     */
-    value?: string
+        /**
+         * Label for the radio item.
+         */
+        label?: JSX.Element
 
-    /**
-     * Label for the radio item.
-     */
-    label?: JSX.Element
+        /**
+         * Description for the radio item.
+         */
+        description?: JSX.Element
 
-    /**
-     * Description for the radio item.
-     */
-    description?: JSX.Element
-
-    /**
-     * Whether the item is disabled.
-     */
-    disabled?: boolean
-  }
+        /**
+         * Whether the item is disabled.
+         */
+        disabled?: boolean
+      }
 
   export type Extend = KobalteRadioGroup.RadioGroupRootProps
   export interface Classes extends SlotClasses<Slot> {}
   export interface Styles extends SlotStyles<Slot> {}
-
-  export type Item = string | Items
 
   /**
    * Base props for the RadioGroup component.
@@ -75,7 +76,7 @@ export namespace RadioGroupT {
   export interface Base
     extends
       FormIdentityOptions,
-      FormValueOptions<Value>,
+      FormValueOptions<string>,
       FormRequiredOption,
       FormDisableOption,
       FormReadOnlyOption {
@@ -87,12 +88,12 @@ export namespace RadioGroupT {
     /**
      * Array of items to render in the group.
      */
-    items?: Item[]
+    items?: Items[]
 
     /**
      * Callback when the selected value changes.
      */
-    onChange?: (value: Value) => void
+    onChange?: (value: string) => void
   }
 
   /**
@@ -109,7 +110,7 @@ export interface RadioGroupProps extends RadioGroupT.Props {}
 interface NormalizedRadioGroupItem {
   id: string
   inputId: string
-  value: RadioGroupT.Value
+  value: string
   label?: JSX.Element
   description?: JSX.Element
   disabled: boolean

@@ -40,7 +40,7 @@ import type { ResizableVariantProps } from './resizable.class'
 export namespace ResizableT {
   export type Slot = 'root' | 'panel' | 'divider' | 'handle' | 'crossTarget'
   export type Variant = ResizableVariantProps
-  export interface Items {}
+  export interface Items extends ResizablePanelItem {}
   export interface Extend {}
   export interface Classes extends SlotClasses<Slot> {}
   export interface Styles extends SlotStyles<Slot> {}
@@ -56,7 +56,7 @@ export namespace ResizableT {
     /**
      * Array of panels to render.
      */
-    panels?: ResizablePanelItem[]
+    panels?: Items[]
 
     /**
      * Callback when any panel is resized.

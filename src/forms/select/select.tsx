@@ -53,6 +53,8 @@ export type SelectValue = string | number
 export interface SelectOption {
   /** Label to display for the option. */
   label?: string | JSX.Element
+  /** Text key used for filtering and matching; set this when `label` is not a string. */
+  key?: string
   /** Value of the option. */
   value?: SelectValue
   /** Whether the option is disabled. */
@@ -61,60 +63,37 @@ export interface SelectOption {
   description?: string | JSX.Element
   /** Icon shown next to the label. */
   icon?: IconName
-  /** Group children. When present, this option acts as a group header. */
-  options?: SelectOption[]
+  /** One-layer child options for grouped select. */
+  children?: SelectOption[]
 }
 
-export interface SelectFieldNames {
-  /** Key for option label. Default: 'label'. */
-  label?: string
-  /** Key for option value. Default: 'value'. */
-  value?: string
-  /** Key for group children array. Default: 'options'. */
-  options?: string
-  /** Key for group header label. Default: 'label'. */
-  groupLabel?: string
-}
-
-export interface SelectOptionRenderState {
-  /** Whether the option is currently selected. */
-  isSelected: boolean
-  /** Whether the option is currently highlighted/focused. */
-  isHighlighted: boolean
-  /** Whether the option is disabled. */
-  isDisabled: boolean
-}
-
-export type SelectOptionRender = (option: SelectOption & SelectOptionRenderState) => JSX.Element
-
-export type SelectTagRender = (option: SelectOption & { onClose: () => void }) => JSX.Element
-
-export type SelectLabelRender = (option: SelectOption) => JSX.Element
-
-export type SelectEmptyRender = string | ((context: SelectEmptyRenderContext) => JSX.Element)
-export type SelectOpenOnClick = 'control' | 'trigger'
-
-export interface SelectEmptyRenderContext {
-  /** Current input/search text. */
-  inputValue: string
-  /** Whether the select allows multiple selections. */
-  multiple: boolean
-  /** Whether the current filter has any matches. */
-  hasMatches: boolean
-  /** Currently selected values. */
-  selectedValues: SelectValue[]
-  /** Whether the maximum selection count has been reached. */
-  isAtMaxCount: boolean
-  /** Create a new tag (requires `multiple` and `allowCreate`). Returns true if successfully created. */
-  create: (value?: string) => boolean
-  /** Close the dropdown menu. */
-  close: () => void
-}
-
-type SelectSize = NonNullable<SelectControlVariantProps['size']>
-type SelectVariant = NonNullable<SelectControlVariantProps['variant']>
+export type SelectItem = SelectOption
 
 export namespace SelectT {
+  export interface OptionRenderState {
+    /** Whether the option is currently selected. */
+    isSelected: boolean
+    /** Whether the option is currently highlighted/focused. */
+    isHighlighted: boolean
+    /** Whether the option is disabled. */
+    isDisabled: boolean
+  }
+  export interface EmptyRenderContext {
+    /** Current input/search text. */
+    inputValue: string
+    /** Whether the select allows multiple selections. */
+    multiple: boolean
+    /** Whether the current filter has any matches. */
+    hasMatches: boolean
+    /** Currently selected values. */
+    selectedValues: SelectValue[]
+    /** Whether the maximum selection count has been reached. */
+    isAtMaxCount: boolean
+    /** Create a new tag (requires `multiple` and `allowCreate`). Returns true if successfully created. */
+    create: (value?: string) => boolean
+    /** Close the dropdown menu. */
+    close: () => void
+  }
   export type Slot =
     | 'root'
     | 'base'
@@ -138,7 +117,7 @@ export namespace SelectT {
 
   export type Variant = SelectControlVariantProps
 
-  export type Items = SelectOption
+  export type Items = SelectItem
 
   export type Extend = ComboboxRootProps<NormalizedOption, NormalizedGroup>
   export interface Classes extends SlotClasses<Slot> {}
@@ -157,9 +136,7 @@ export namespace SelectT {
     multiple?: boolean
 
     /** Available options. */
-    options?: SelectOption[]
-    /** Custom field name mapping for option objects. */
-    fieldNames?: SelectFieldNames
+    options?: Items[]
 
     /** Called when the selection changes. */
     onChange?: (value: SelectValue | null | SelectValue[]) => void
@@ -175,11 +152,14 @@ export namespace SelectT {
     /** Maximum search text length applied on final commit. */
     searchMaxLength?: number
     /** Filter function or boolean. `false` disables filtering. */
-    filterOption?: boolean | ((inputValue: string, option: SelectOption) => boolean)
-    /** Property on option to filter by (default: label). */
-    optionFilterProp?: string
+    filterOption?:
+      | boolean
+      | 'startsWith'
+      | 'endsWith'
+      | 'contains'
+      | ((inputValue: string, option: SelectOption) => boolean)
     /** Controls whether clicking the control opens the menu. */
-    openOnClick?: SelectOpenOnClick
+    openOnClick?: 'control' | 'trigger'
     /** Legacy alias for `openOnClick="trigger"`. */
     preventAutoOpen?: boolean
 
@@ -201,18 +181,13 @@ export namespace SelectT {
     maxTagCount?: number
 
     /** Custom renderer for each option in the dropdown. */
-    optionRender?: SelectOptionRender
+    optionRender?: (option: SelectOption & OptionRenderState) => JSX.Element
     /** Custom renderer for each selected tag (multiple/tags). */
-    tagRender?: SelectTagRender
+    tagRender?: (option: SelectOption & { onClose: () => void }) => JSX.Element
     /** Custom renderer for the option label text. */
-    labelRender?: SelectLabelRender
+    labelRender?: (option: SelectOption) => JSX.Element
     /** Custom renderer for the empty state when current filtered result has no matches. */
-    emptyRender?: SelectEmptyRender
-
-    /** Size of the select control. */
-    size?: SelectSize
-    /** Visual variant of the select control. */
-    variant?: SelectVariant
+    emptyRender?: string | ((context: EmptyRenderContext) => JSX.Element)
     /** Whether to highlight the control (e.g., on error). */
     highlight?: boolean
     /** Placeholder text shown when no value is selected. */
@@ -251,14 +226,15 @@ export interface SelectProps extends SelectT.Props {}
 
 interface NormalizedOption {
   value: string
-  label: string
+  label: string | JSX.Element
+  key: string
   disabled: boolean
   raw: SelectOption
   isGroup?: false
 }
 
 interface NormalizedGroup {
-  label: string
+  label: string | JSX.Element
   options: NormalizedOption[]
   isGroup: true
 }
@@ -273,51 +249,40 @@ interface SelectControlState {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getAtPath(data: Record<string, unknown>, path: string): unknown {
-  return path
-    .split('.')
-    .reduce<unknown>((value, key) => (value as Record<string, unknown> | undefined)?.[key], data)
-}
-
-function normalizeLeafOption(
-  option: SelectOption,
-  labelKey: string,
-  valueKey: string,
-): NormalizedOption {
-  const value = getAtPath(option as Record<string, unknown>, valueKey)
-  const label = getAtPath(option as Record<string, unknown>, labelKey)
+function normalizeLeafOption(option: SelectOption): NormalizedOption {
+  const value = option.value
+  const label = option.label
+  const normalizedValue = String(value ?? '')
+  const key = option.key ?? (typeof label === 'string' ? label : normalizedValue)
 
   return {
-    value: String(value ?? ''),
-    label: String(label ?? value ?? ''),
+    value: normalizedValue,
+    label: label ?? normalizedValue,
+    key,
     disabled: Boolean(option.disabled),
     raw: option,
   }
 }
 
+function isSelectOptionGroup(
+  option: SelectOption,
+): option is SelectOption & { children: SelectOption[] } {
+  return Array.isArray(option.children) && option.children.length > 0
+}
+
 function normalizeOptions(
   options: SelectOption[] | undefined,
-  fieldNames: SelectFieldNames | undefined,
 ): Array<NormalizedOption | NormalizedGroup> {
-  const labelKey = fieldNames?.label ?? 'label'
-  const valueKey = fieldNames?.value ?? 'value'
-  const optionsKey = fieldNames?.options ?? 'options'
-  const groupLabelKey = fieldNames?.groupLabel ?? 'label'
-
   return (options ?? []).map((option) => {
-    const children = getAtPath(option as Record<string, unknown>, optionsKey) as
-      | SelectOption[]
-      | undefined
-
-    if (children && Array.isArray(children)) {
+    if (isSelectOptionGroup(option)) {
       return {
-        label: String(getAtPath(option as Record<string, unknown>, groupLabelKey) ?? ''),
-        options: children.map((child) => normalizeLeafOption(child, labelKey, valueKey)),
+        label: option.label ?? '',
+        options: option.children.map((child) => normalizeLeafOption(child)),
         isGroup: true as const,
       }
     }
 
-    return normalizeLeafOption(option, labelKey, valueKey)
+    return normalizeLeafOption(option)
   })
 }
 
@@ -352,6 +317,7 @@ export function Select(props: SelectProps): JSX.Element {
       allowClear: false,
       triggerIcon: 'icon-chevron-down',
       loadingIcon: 'icon-loading',
+      filterOption: true,
       openOnClick: 'control' as const,
     },
     props,
@@ -368,7 +334,6 @@ export function Select(props: SelectProps): JSX.Element {
       'onSearch',
       'searchMaxLength',
       'filterOption',
-      'optionFilterProp',
       'openOnClick',
       'preventAutoOpen',
       'allowClear',
@@ -383,7 +348,6 @@ export function Select(props: SelectProps): JSX.Element {
     ],
     [
       'options',
-      'fieldNames',
       'optionRender',
       'tagRender',
       'labelRender',
@@ -426,7 +390,7 @@ export function Select(props: SelectProps): JSX.Element {
 
   // ---- Normalize options for Kobalte ----
   const normalizedOptions = createMemo(() => {
-    const base = normalizeOptions(renderDisplayProps.options, renderDisplayProps.fieldNames)
+    const base = normalizeOptions(renderDisplayProps.options)
 
     if (
       isMultiple() &&
@@ -512,24 +476,16 @@ export function Select(props: SelectProps): JSX.Element {
       return (): boolean => true
     }
 
-    if (typeof searchInteractionProps.filterOption === 'function') {
+    if (typeof searchInteractionProps.filterOption === 'string') {
+      return searchInteractionProps.filterOption
+    } else if (typeof searchInteractionProps.filterOption === 'function') {
       const userFilter = searchInteractionProps.filterOption
 
       return (option: NormalizedOption, inputValue: string): boolean =>
         userFilter(inputValue, option.raw)
+    } else {
+      return 'contains'
     }
-
-    if (searchInteractionProps.optionFilterProp) {
-      const prop = searchInteractionProps.optionFilterProp
-
-      return (option: NormalizedOption, inputValue: string): boolean => {
-        const fieldValue = String(getAtPath(option.raw as Record<string, unknown>, prop) ?? '')
-
-        return fieldValue.toLowerCase().includes(inputValue.toLowerCase())
-      }
-    }
-
-    return 'contains'
   })
 
   // ---- Input ref for controlled search ----
@@ -714,7 +670,7 @@ export function Select(props: SelectProps): JSX.Element {
 
     const lower = normalized.toLowerCase()
     const exists = allFlatOptions().find(
-      (o) => o.value.toLowerCase() === lower || o.label.toLowerCase() === lower,
+      (o) => o.value.toLowerCase() === lower || o.key.toLowerCase() === lower,
     )
 
     if (exists) {
@@ -724,6 +680,7 @@ export function Select(props: SelectProps): JSX.Element {
     const newOpt: NormalizedOption = {
       value: normalized,
       label: normalized,
+      key: normalized,
       disabled: false,
       raw: { label: normalized, value: normalized },
     }
@@ -735,7 +692,7 @@ export function Select(props: SelectProps): JSX.Element {
   function findOptionByText(text: string): NormalizedOption | undefined {
     const lower = text.toLowerCase()
     return allFlatOptions().find(
-      (o) => o.label.toLowerCase() === lower || o.value.toLowerCase() === lower,
+      (o) => o.key.toLowerCase() === lower || o.value.toLowerCase() === lower,
     )
   }
 
@@ -747,7 +704,7 @@ export function Select(props: SelectProps): JSX.Element {
     }
 
     const input = inputValue.toLowerCase()
-    const text = option.label.toLowerCase()
+    const text = option.key.toLowerCase()
 
     if (filter === 'startsWith') {
       return text.startsWith(input)
@@ -837,9 +794,9 @@ export function Select(props: SelectProps): JSX.Element {
 
   function SelectOptionRenderNode(props: {
     option: SelectOption
-    state: SelectOptionRenderState
+    state: SelectT.OptionRenderState
     indicatorIcon: IconName
-    fallbackLabel: JSX.Element
+    fallbackLabel: string | JSX.Element
   }): JSX.Element {
     function ItemLabel(): JSX.Element {
       return (
@@ -903,7 +860,7 @@ export function Select(props: SelectProps): JSX.Element {
   ) => {
     const context = useComboboxContext()
     const raw = (): SelectOption => itemProps.item.rawValue.raw
-    const renderState = createMemo<SelectOptionRenderState>(() => {
+    const renderState = createMemo<SelectT.OptionRenderState>(() => {
       const selectionManager = context.listState().selectionManager()
 
       return {
@@ -1154,7 +1111,7 @@ export function Select(props: SelectProps): JSX.Element {
                     <Badge
                       slotName="tag"
                       size={field.size()}
-                      title={option.label}
+                      title={option.key}
                       variant={renderDisplayProps.tagVariant}
                       styles={{ base: merged.styles?.tag }}
                       classes={{
@@ -1236,7 +1193,7 @@ export function Select(props: SelectProps): JSX.Element {
           </div>
         }
       >
-        {(renderDisplayProps.emptyRender as Exclude<SelectEmptyRender, string>)({
+        {(renderDisplayProps.emptyRender as (context: SelectT.EmptyRenderContext) => JSX.Element)({
           inputValue: currentInputText(),
           multiple: isMultiple(),
           hasMatches: hasMatches(),
@@ -1343,7 +1300,7 @@ export function Select(props: SelectProps): JSX.Element {
       optionValue="value"
       optionLabel="label"
       optionDisabled="disabled"
-      optionTextValue="label"
+      optionTextValue="key"
       optionGroupChildren={hasGroups() ? 'options' : undefined}
       placeholder={
         isMultiple() && selectedValueSet().size > 0 ? '' : renderDisplayProps.placeholder

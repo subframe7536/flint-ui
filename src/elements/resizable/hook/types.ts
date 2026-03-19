@@ -11,22 +11,30 @@ export interface ResizablePanelItem {
 
   /**
    * Current size of the panel (controlled).
+   * - Use string as percent, like `20%`
+   * - Use number as px, like `328`
    */
   size?: ResizableSize
 
   /**
    * Default size of the panel (uncontrolled).
+   * - Use string as percent, like `20%`
+   * - Use number as px, like `328`
    */
   defaultSize?: ResizableSize
 
   /**
    * Minimum size of the panel.
+   * - Use string as percent, like `20%`
+   * - Use number as px, like `328`
    * @default 0
    */
   min?: ResizableSize
 
   /**
    * Maximum size of the panel.
+   * - Use string as percent, like `20%`
+   * - Use number as px, like `328`
    * @default 1
    */
   max?: ResizableSize
@@ -47,6 +55,8 @@ export interface ResizablePanelItem {
   /**
    * Size of the panel when collapsed.
    * Only works when `collapsible` is true.
+   * - Use string as percent, like `20%`
+   * - Use number as px, like `328`
    * @default 0
    */
   collapsibleMin?: ResizableSize

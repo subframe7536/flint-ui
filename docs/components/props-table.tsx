@@ -30,13 +30,9 @@ export function PropsTable(props: PropsTableProps): JSX.Element {
 }
 
 function normalizeType(type: string): string {
-  if (type.endsWith('T.Classes')) {
-    return `Partial<Record<${type.split('T.')[0]}Slots, ClassValue>>`
-  }
-  if (type.endsWith('T.Styles')) {
-    return `Partial<Record<${type.split('T.')[0]}Slots, JSX.CSSProperties>>`
-  }
-  return type
+  let result = type
+  result = result.replace('cls_variant0.', '')
+  return result
 }
 
 function PropRows(tableProps: { props: PropDoc[] }): JSX.Element {
