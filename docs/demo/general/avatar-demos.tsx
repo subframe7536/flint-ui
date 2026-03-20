@@ -23,8 +23,7 @@ export default () => {
       >
         <div class="flex gap-4 items-center">
           <Avatar
-            src={source()}
-            alt="Rock UI"
+            items={[{ src: source(), alt: 'Rock UI' }]}
             classes={{
               root: 'ring-zinc-300',
             }}
@@ -44,18 +43,18 @@ export default () => {
 
       <DemoSection title="Fallback Modes" description="Text, initials-from-alt and fallback icon.">
         <div class="flex flex-wrap gap-3 items-center">
-          <Avatar text="RK" />
-          <Avatar alt="Rock UI Team" />
-          <Avatar fallback="i-lucide-user" />
+          <Avatar items={[{ text: 'RK' }]} />
+          <Avatar items={[{ alt: 'Rock UI Team' }]} />
+          <Avatar items={[{ fallback: 'i-lucide-user' }]} />
         </div>
       </DemoSection>
 
       <DemoSection title="Badge Positions" description="Top/bottom + left/right corner badge.">
         <div class="flex flex-wrap gap-3 items-center">
-          <Avatar text="A" icon="i-lucide-check" badgePosition="top-left" />
-          <Avatar text="B" icon="i-lucide-check" badgePosition="top-right" />
-          <Avatar text="C" icon="i-lucide-check" badgePosition="bottom-left" />
-          <Avatar text="D" icon="i-lucide-check" badgePosition="bottom-right" />
+          <Avatar items={[{ text: 'A', icon: 'i-lucide-check', badgePosition: 'top-left' }]} />
+          <Avatar items={[{ text: 'B', icon: 'i-lucide-check', badgePosition: 'top-right' }]} />
+          <Avatar items={[{ text: 'C', icon: 'i-lucide-check', badgePosition: 'bottom-left' }]} />
+          <Avatar items={[{ text: 'D', icon: 'i-lucide-check', badgePosition: 'bottom-right' }]} />
         </div>
       </DemoSection>
 

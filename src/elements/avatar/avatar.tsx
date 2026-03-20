@@ -1,14 +1,5 @@
 import type { JSX } from 'solid-js'
-import {
-  For,
-  Show,
-  createEffect,
-  createMemo,
-  createSignal,
-  mergeProps,
-  onCleanup,
-  splitProps,
-} from 'solid-js'
+import { For, Show, createEffect, createMemo, createSignal, mergeProps, onCleanup } from 'solid-js'
 
 import type { RockUIProps, SlotClasses, SlotStyles } from '../../shared/types'
 import { cn } from '../../shared/utils'
@@ -83,7 +74,7 @@ export namespace AvatarT {
   /**
    * Base props for the Avatar component.
    */
-  export interface Base extends Items {
+  export interface Base {
     /**
      * Array of items to render in a group.
      */
@@ -148,30 +139,19 @@ export function Avatar(props: AvatarProps): JSX.Element {
     {
       size: 'md' as const,
       transition: 'normal' as const,
-      items: undefined as AvatarT.Items[] | undefined,
+      items: [] as AvatarT.Items[],
       max: undefined as number | string | undefined,
-      badgePosition: 'bottom-right' as const,
     },
     props,
   )
 
-  const [faceProps, restProps] = splitProps(merged, [
-    'src',
-    'alt',
-    'icon',
-    'badgePosition',
-    'text',
-    'fallback',
-    'onStatusChange',
-  ])
-
   const visibleItems = createMemo(() => {
-    const allItems = restProps.items ?? []
+    const allItems = merged.items
     if (allItems.length === 0) {
       return []
     }
 
-    const max = resolveMax(restProps.max)
+    const max = resolveMax(merged.max)
     if (!max) {
       return [...allItems].reverse()
     }
@@ -180,7 +160,7 @@ export function Avatar(props: AvatarProps): JSX.Element {
   })
 
   const hiddenCount = createMemo(() => {
-    return (restProps.items?.length ?? 0) - visibleItems().length
+    return merged.items.length - visibleItems().length
   })
 
   function AvatarFace(props: AvatarT.Items & { slot: 'root' | 'groupItem' }): JSX.Element {
@@ -236,10 +216,6 @@ export function Avatar(props: AvatarProps): JSX.Element {
       loader.src = source
     })
 
-    const size = () => restProps.size
-    const transition = () => restProps.transition
-    const badgePosition = () => faceProps.badgePosition
-
     return (
       <span
         data-slot={props.slot}
@@ -247,17 +223,17 @@ export function Avatar(props: AvatarProps): JSX.Element {
         style={props.slot === 'groupItem' ? merged.styles?.groupItem : merged.styles?.root}
         class={avatarRootVariants(
           {
-            size: size(),
+            size: merged.size,
           },
           props.slot === 'groupItem'
             ? avatarGroupItemVariants(
                 {
-                  size: size(),
+                  size: merged.size,
                 },
-                restProps.classes?.root,
-                restProps.classes?.groupItem,
+                merged.classes?.root,
+                merged.classes?.groupItem,
               )
-            : restProps.classes?.root,
+            : merged.classes?.root,
         )}
       >
         <img
@@ -268,9 +244,9 @@ export function Avatar(props: AvatarProps): JSX.Element {
           class={avatarImageVariants(
             {
               status: status(),
-              transition: transition(),
+              transition: merged.transition,
             },
-            restProps.classes?.image,
+            merged.classes?.image,
           )}
         />
 
@@ -279,11 +255,11 @@ export function Avatar(props: AvatarProps): JSX.Element {
           style={merged.styles?.fallback}
           class={avatarFallbackVariants(
             {
-              size: size(),
+              size: merged.size,
               status: status(),
-              transition: transition(),
+              transition: merged.transition,
             },
-            restProps.classes?.fallback,
+            merged.classes?.fallback,
           )}
         >
           <Show when={props.fallback} fallback={resolveFallbackText(props.text, props.alt)}>
@@ -294,9 +270,9 @@ export function Avatar(props: AvatarProps): JSX.Element {
                 style={merged.styles?.fallbackIcon}
                 class={avatarFallbackIconVariants(
                   {
-                    size: size(),
+                    size: merged.size,
                   },
-                  restProps.classes?.fallbackIcon,
+                  merged.classes?.fallbackIcon,
                 )}
               />
             )}
@@ -310,10 +286,10 @@ export function Avatar(props: AvatarProps): JSX.Element {
               style={merged.styles?.badge}
               class={avatarBadgeVariants(
                 {
-                  size: size(),
-                  badgePosition: badgePosition(),
+                  size: merged.size,
+                  badgePosition: props.badgePosition ?? 'bottom-right',
                 },
-                restProps.classes?.badge,
+                merged.classes?.badge,
               )}
             >
               <Icon name={badge()} class="text-[0.75em]" />
@@ -326,13 +302,17 @@ export function Avatar(props: AvatarProps): JSX.Element {
 
   return (
     <Show
-      when={(restProps.items?.length ?? 0) > 0}
-      fallback={<AvatarFace {...faceProps} slot="root" />}
+      when={merged.items.length > 1}
+      fallback={
+        <Show when={merged.items.length === 1}>
+          <AvatarFace {...merged.items[0]!} slot="root" />
+        </Show>
+      }
     >
       <div
         data-slot="group"
         style={merged.styles?.group}
-        class={cn('inline-flex flex-row-reverse justify-end', restProps.classes?.group)}
+        class={cn('inline-flex flex-row-reverse justify-end', merged.classes?.group)}
       >
         <Show when={hiddenCount() > 0}>
           <span
@@ -340,9 +320,9 @@ export function Avatar(props: AvatarProps): JSX.Element {
             style={merged.styles?.groupCount}
             class={avatarGroupCountVariants(
               {
-                size: restProps.size,
+                size: merged.size,
               },
-              restProps.classes?.groupCount,
+              merged.classes?.groupCount,
             )}
           >
             +{hiddenCount()}

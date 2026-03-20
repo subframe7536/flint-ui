@@ -47,9 +47,29 @@ afterEach(() => {
 })
 
 describe('Avatar', () => {
+  test('renders nothing when items is undefined or empty', () => {
+    const screen = render(() => (
+      <>
+        <Avatar />
+        <Avatar items={[]} />
+      </>
+    ))
+
+    expect(screen.container.querySelectorAll('[data-slot="root"]')).toHaveLength(0)
+    expect(screen.container.querySelectorAll('[data-slot="group"]')).toHaveLength(0)
+  })
+
+  test('treats one item as single avatar structure', () => {
+    const screen = render(() => <Avatar items={[{ text: 'RK' }]} />)
+
+    expect(screen.container.querySelector('[data-slot="root"]')).not.toBeNull()
+    expect(screen.container.querySelector('[data-slot="group"]')).toBeNull()
+    expect(screen.container.querySelector('[data-slot="groupItem"]')).toBeNull()
+  })
+
   test('renders fallback first while image is loading', () => {
     outcomesBySrc.set('/loading.png', 'pending')
-    const screen = render(() => <Avatar src="/loading.png" text="RK" />)
+    const screen = render(() => <Avatar items={[{ src: '/loading.png', text: 'RK' }]} />)
 
     const root = screen.container.querySelector('[data-slot="root"]')
     const image = screen.container.querySelector('[data-slot="image"]')
@@ -62,7 +82,7 @@ describe('Avatar', () => {
 
   test('switches to loaded state and crossfades image', async () => {
     outcomesBySrc.set('/loaded.png', 'success')
-    const screen = render(() => <Avatar src="/loaded.png" alt="Rock UI" />)
+    const screen = render(() => <Avatar items={[{ src: '/loaded.png', alt: 'Rock UI' }]} />)
 
     const root = screen.container.querySelector('[data-slot="root"]')
     const image = screen.container.querySelector('[data-slot="image"]') as HTMLImageElement | null
@@ -79,7 +99,7 @@ describe('Avatar', () => {
 
   test('uses fallback icon on error state', async () => {
     outcomesBySrc.set('/broken.png', 'error')
-    const screen = render(() => <Avatar src="/broken.png" fallback="i-lucide-user" />)
+    const screen = render(() => <Avatar items={[{ src: '/broken.png', fallback: 'i-lucide-user' }]} />)
 
     const root = screen.container.querySelector('[data-slot="root"]')
     const icon = screen.container.querySelector('[data-slot="fallbackIcon"]')
@@ -94,10 +114,10 @@ describe('Avatar', () => {
   test('renders badge and supports four corner positions', () => {
     const screen = render(() => (
       <>
-        <Avatar icon="i-lucide-check" badgePosition="top-left" />
-        <Avatar icon="i-lucide-check" badgePosition="top-right" />
-        <Avatar icon="i-lucide-check" badgePosition="bottom-left" />
-        <Avatar icon="i-lucide-check" badgePosition="bottom-right" />
+        <Avatar items={[{ icon: 'i-lucide-check', badgePosition: 'top-left' }]} />
+        <Avatar items={[{ icon: 'i-lucide-check', badgePosition: 'top-right' }]} />
+        <Avatar items={[{ icon: 'i-lucide-check', badgePosition: 'bottom-left' }]} />
+        <Avatar items={[{ icon: 'i-lucide-check', badgePosition: 'bottom-right' }]} />
       </>
     ))
 
@@ -114,7 +134,7 @@ describe('Avatar', () => {
   })
 
   test('keeps badge visible by not clipping avatar root overflow', () => {
-    const screen = render(() => <Avatar icon="i-lucide-check" />)
+    const screen = render(() => <Avatar items={[{ icon: 'i-lucide-check' }]} />)
     const root = screen.container.querySelector('[data-slot="root"]')
 
     expect(root?.className).toContain('overflow-visible')
@@ -124,8 +144,8 @@ describe('Avatar', () => {
   test('supports xs and xl size variants for single avatars', () => {
     const screen = render(() => (
       <>
-        <Avatar size="xs" fallback="i-lucide-user" icon="i-lucide-check" />
-        <Avatar size="xl" fallback="i-lucide-user" icon="i-lucide-check" />
+        <Avatar size="xs" items={[{ fallback: 'i-lucide-user', icon: 'i-lucide-check' }]} />
+        <Avatar size="xl" items={[{ fallback: 'i-lucide-user', icon: 'i-lucide-check' }]} />
       </>
     ))
 
@@ -145,7 +165,7 @@ describe('Avatar', () => {
   })
 
   test('generates initials from alt when text is not provided', () => {
-    const screen = render(() => <Avatar alt="Rock UI Team" />)
+    const screen = render(() => <Avatar items={[{ alt: 'Rock UI Team' }]} />)
     const fallback = screen.container.querySelector('[data-slot="fallback"]')
 
     expect(fallback?.textContent).toBe('RU')
@@ -160,7 +180,7 @@ describe('Avatar', () => {
       const [source, setSourceSignal] = createSignal('/first.png')
       setSource = setSourceSignal
 
-      return <Avatar src={source()} text="RK" />
+      return <Avatar items={[{ src: source(), text: 'RK' }]} />
     })
 
     const root = screen.container.querySelector('[data-slot="root"]')
@@ -181,8 +201,8 @@ describe('Avatar', () => {
 
     const screen = render(() => (
       <>
-        <Avatar src="/ok.png" onStatusChange={successStatus} />
-        <Avatar src="/bad.png" onStatusChange={errorStatus} />
+        <Avatar items={[{ src: '/ok.png', onStatusChange: successStatus }]} />
+        <Avatar items={[{ src: '/bad.png', onStatusChange: errorStatus }]} />
       </>
     ))
 
@@ -255,9 +275,7 @@ describe('Avatar', () => {
   test('applies styles overrides to all slots', () => {
     const screen = render(() => (
       <Avatar
-        src="/loading.png"
-        text="RK"
-        icon="i-lucide-check"
+        items={[{ src: '/loading.png', text: 'RK', icon: 'i-lucide-check' }]}
         styles={
           {
             root: { width: '200px' },
@@ -321,11 +339,13 @@ describe('Avatar', () => {
     const invalidHtmlProps: AvatarProps = { id: 'avatar-id', as: 'div', onclick: () => {} }
     // @ts-expect-error Avatar uses classes slots instead of class prop.
     const invalidClassProp: AvatarProps = { class: 'avatar-class' }
-    // @ts-expect-error icon has been removed and renamed to badge.
-    const invalidIconProp: AvatarProps = { icon: 'i-lucide-user' }
+    // @ts-expect-error Avatar no longer accepts top-level single-item props.
+    const invalidSingleProp: AvatarProps = { src: '/avatar.png' }
+    const validItemsProp: AvatarProps = { items: [{ icon: 'i-lucide-user' }] }
 
     expect(invalidHtmlProps).toBeDefined()
     expect(invalidClassProp).toBeDefined()
-    expect(invalidIconProp).toBeDefined()
+    expect(invalidSingleProp).toBeDefined()
+    expect(validItemsProp).toBeDefined()
   })
 })
