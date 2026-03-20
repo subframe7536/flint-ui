@@ -44,23 +44,23 @@ export interface DemoSectionProps {
 
 export const DemoSection = (props: DemoSectionProps) => {
   return (
-    <section class="relative">
-      <div class="mb-4">
-        <h2 class="text-sm text-zinc-600 tracking-[0.16em] font-semibold uppercase">
+    <section class="relative space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-xs text-zinc-500 tracking-[0.18em] font-semibold uppercase">
           {props.title}
         </h2>
-        <p class="text-sm text-zinc-600 mt-1">{props.description}</p>
+        <p class="text-sm text-zinc-600">{props.description}</p>
       </div>
-      <div class="border border-zinc-200/80 rounded-xl overflow-hidden backdrop-blur-sm">
-        <div class="p-6">{props.children}</div>
+      <div class="border border-zinc-200 rounded-2xl bg-white shadow-sm overflow-hidden">
+        <div class="p-6 flex items-center justify-center">{props.children}</div>
         <Show when={props.code}>
-          <div class="relative">
+          <div class="border-t border-zinc-200 bg-zinc-50/70 relative">
             <IconButton
               name="i-lucide:copy"
               loadingIcon="i-lucide:check"
               size="md"
               classes={{
-                root: 'absolute end-2 top-2 text-zinc-600 hover:(bg-zinc-100 text-zinc-900) p-1.5',
+                root: 'absolute end-2 top-2 z-1 text-zinc-600 hover:(bg-zinc-100 text-zinc-900) p-1.5',
               }}
               loadingAuto
               onClick={() => copyCode(props.code!)}
@@ -68,7 +68,7 @@ export const DemoSection = (props: DemoSectionProps) => {
 
             {/* eslint-disable-next-line solid/no-innerhtml -- shiki HTML generated at build time */}
             <div
-              class="text-xs leading-relaxed b-t border-zinc-100 overflow-x-auto [&_pre]:(m-0 p-4 bg-transparent)"
+              class="text-xs leading-relaxed overflow-x-auto [&_code]:(font-mono) [&_pre]:(m-0 p-4 bg-transparent)"
               // oxlint-disable-next-line solid/no-innerhtml
               innerHTML={props.code}
             />

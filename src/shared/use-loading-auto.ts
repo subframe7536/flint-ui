@@ -34,10 +34,7 @@ export function useLoadingAutoClick<T, E extends Event = MouseEvent>(
   )
 
   const onClick: JSX.EventHandlerUnion<T, E> = (event) => {
-    const { result: handlerResult, defaultPrevented } = callHandler(
-      event,
-      options.onClick?.(),
-    )
+    const { result: handlerResult, defaultPrevented } = callHandler(event, options.onClick?.())
 
     if (!options.loadingAuto?.() || defaultPrevented || !isPromiseLike(handlerResult)) {
       return

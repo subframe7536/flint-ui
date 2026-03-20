@@ -39,16 +39,24 @@ export const Sidebar = (props: SidebarProps) => {
   })
 
   return (
-    <aside class="text-zinc-800 p-4 border-e-(1 border) bg-zinc-100 flex shrink-0 flex-col gap-4 w-full overflow-y-auto">
-      <div class="text-xl text-zinc-700 tracking-normal font-semibold px-2 flex gap-2 items-center">
-        <img src="/favicon.svg" alt="icon" class="size-6" />
-        Rock UI
+    <aside class="text-zinc-800 p-4 border-e-(1 border) bg-zinc-100 flex shrink-0 flex-col gap-4 h-full w-full overflow-y-auto">
+      <div class="px-2">
+        <div class="text-zinc-700 flex gap-2 items-center justify-between">
+          <div class="flex gap-2 min-w-0 items-center">
+            <img src="/favicon.svg" alt="icon" class="size-6" />
+            <div class="min-w-0">
+              <p class="text-[11px] text-zinc-500 tracking-[0.16em] uppercase">Library Docs</p>
+              <p class="text-sm font-semibold truncate">Rock UI</p>
+            </div>
+          </div>
+          <span class="text-xs text-zinc-600">{props.pages.length}</span>
+        </div>
       </div>
 
       <div class="px-1">
         <Input
           type="text"
-          placeholder="Search..."
+          placeholder="Search component..."
           value={search()}
           onInput={(e) => setSearch(e.currentTarget.value)}
           leading="icon-search"
@@ -56,24 +64,25 @@ export const Sidebar = (props: SidebarProps) => {
         />
       </div>
 
-      <nav class="flex flex-col gap-4">
+      <nav class="pb-2 flex flex-col gap-4">
         <For each={grouped()}>
           {([group, pages]) => (
-            <div>
-              <div class="text-xs text-zinc-500 tracking-wider font-medium mb-1.5 px-2 flex items-center justify-between">
-                <span class="font-medium">{group}</span>
+            <section>
+              <div class="text-[11px] text-zinc-500 tracking-[0.14em] mb-1.5 px-2 flex uppercase items-center justify-between">
+                <span class="font-semibold">{group}</span>
                 <span class="text-zinc-600">{pages.length}</span>
               </div>
+
               <div class="flex flex-col gap-0.5">
                 <For each={pages}>
                   {(page) => (
                     <button
                       type="button"
                       class={cn(
-                        'text-sm text-zinc-600 px-2.5 py-1.5 text-left rounded-md',
+                        'text-sm text-zinc-600 px-2.5 py-1.5 text-left rounded-lg transition-colors',
                         props.activePage() === page.key
-                          ? 'bg-zinc-300/80'
-                          : 'hover:text-zinc-800 hover:bg-zinc-200',
+                          ? 'text-zinc-900 bg-zinc-300/80'
+                          : 'hover:(text-zinc-800 bg-zinc-200)',
                       )}
                       onClick={() => props.setActivePage(page.key)}
                     >
@@ -82,7 +91,7 @@ export const Sidebar = (props: SidebarProps) => {
                   )}
                 </For>
               </div>
-            </div>
+            </section>
           )}
         </For>
 

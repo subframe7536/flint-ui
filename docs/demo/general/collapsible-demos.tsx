@@ -6,17 +6,18 @@ import { DemoSection } from '../../components/demo-section'
 
 export default () => {
   const [open, setOpen] = createSignal(true)
+  const [quickPanelOpen, setQuickPanelOpen] = createSignal(false)
 
   return (
     <DemoPage componentKey="collapsible">
       <DemoSection
         title="Uncontrolled"
-        description="Default closed panel using the built-in trigger slot."
+        description="Default closed panel using trigger render context."
       >
         <Collapsible
           defaultOpen={false}
           classes={{
-            root: 'max-w-xl rounded-lg b-1 b-border border-zinc-200 bg-white',
+            root: 'max-w-xl rounded-lg b-(1 border) bg-white',
             trigger:
               'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-zinc-50',
             content: 'px-4 pb-4 text-sm text-zinc-700',
@@ -30,18 +31,16 @@ export default () => {
             </>
           )}
         >
-          <p>
-            Version 0.1 includes initial Tabs, Pagination, Navigation Menu, and Breadcrumb ports.
-          </p>
+          <p>Version 0.1 includes Tabs, Pagination, Breadcrumb, and Form primitives.</p>
         </Collapsible>
       </DemoSection>
 
-      <DemoSection title="Controlled" description="External state control and disabled handling.">
+      <DemoSection title="Controlled" description="External state controls the panel open status.">
         <div class="max-w-xl space-y-3">
           <div class="flex gap-2">
             <button
               type="button"
-              class="text-sm px-3 py-1.5 b-1 b-border border-zinc-300 rounded-md hover:bg-zinc-100"
+              class="text-sm px-3 py-1.5 b-(1 zinc-300) rounded-md hover:bg-zinc-100"
               onClick={() => setOpen((value) => !value)}
             >
               Toggle controlled panel
@@ -52,7 +51,7 @@ export default () => {
             open={open()}
             onOpenChange={setOpen}
             classes={{
-              root: 'rounded-lg b-1 b-border border-zinc-200 bg-white',
+              root: 'rounded-lg b-(1 border) bg-white',
               trigger:
                 'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-zinc-50',
               content: 'px-4 pb-4 text-sm text-zinc-700',
@@ -67,6 +66,85 @@ export default () => {
             )}
           >
             <p>Current state: {open() ? 'open' : 'closed'}</p>
+          </Collapsible>
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Disabled + Force Mount"
+        description="Disabled trigger and force-mount content behavior."
+      >
+        <div class="gap-3 grid lg:grid-cols-2">
+          <Collapsible
+            disabled
+            defaultOpen
+            classes={{
+              root: 'rounded-lg b-(1 border) bg-white',
+              trigger:
+                'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between data-disabled:opacity-60',
+              content: 'px-4 pb-4 text-sm text-zinc-700',
+            }}
+            trigger={({ open: isOpen }) => (
+              <>
+                <span>Disabled panel</span>
+                <span class={`text-zinc-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                  <span class="i-lucide-chevron-down" />
+                </span>
+              </>
+            )}
+          >
+            <p>Trigger is disabled, content keeps current state.</p>
+          </Collapsible>
+
+          <Collapsible
+            forceMount
+            open={quickPanelOpen()}
+            onOpenChange={setQuickPanelOpen}
+            classes={{
+              root: 'rounded-lg b-(1 border) bg-white',
+              trigger:
+                'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-zinc-50',
+              content: 'px-4 pb-4 text-sm text-zinc-700',
+            }}
+            trigger={({ open: isOpen }) => (
+              <>
+                <span>Force-mount panel</span>
+                <span class={`text-zinc-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                  <span class="i-lucide-chevron-down" />
+                </span>
+              </>
+            )}
+          >
+            <p>Content DOM stays mounted even when closed.</p>
+          </Collapsible>
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Compact Trigger Composition"
+        description="Use compact trigger UI for dense list and settings surfaces."
+      >
+        <div class="max-w-xl space-y-2">
+          <Collapsible
+            defaultOpen
+            classes={{
+              root: 'rounded-lg b-(1 border) bg-white',
+              trigger:
+                'w-full px-3 py-2 text-left text-xs font-semibold tracking-wide flex items-center justify-between hover:bg-zinc-50',
+              content: 'px-3 pb-3 text-sm text-zinc-700',
+            }}
+            trigger={({ open: isOpen }) => (
+              <>
+                <span class="text-zinc-600 uppercase">Quick panel</span>
+                <span
+                  class={`rounded bg-zinc-100 inline-flex size-5 transition-transform items-center justify-center ${isOpen ? 'rotate-180' : ''}`}
+                >
+                  <span class="i-lucide-chevron-down text-xs text-zinc-600" />
+                </span>
+              </>
+            )}
+          >
+            <p>Small trigger footprint for navigation and side content.</p>
           </Collapsible>
         </div>
       </DemoSection>

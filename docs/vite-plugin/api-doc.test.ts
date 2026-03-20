@@ -251,7 +251,9 @@ export interface ExternalProps {
     const inheritedGroup = externalDoc!.props.inherited.find((group) => group.from === 'opaque-lib')
     expect(inheritedGroup).toBeDefined()
 
-    const keyboardDelegateProp = inheritedGroup!.props.find((prop) => prop.name === 'keyboardDelegate')
+    const keyboardDelegateProp = inheritedGroup!.props.find(
+      (prop) => prop.name === 'keyboardDelegate',
+    )
     expect(keyboardDelegateProp).toBeDefined()
     expect(keyboardDelegateProp!.type).toBe('KeyboardDelegate')
     expect(keyboardDelegateProp!.type).not.toContain('import("')
@@ -371,7 +373,9 @@ describe('componentApiPlugin', () => {
       | { handler: (id: string) => Promise<string | null | undefined> | string | null | undefined }
       | undefined
     const loaded =
-      typeof load === 'function' ? await load(resolvedId as string) : await load?.handler(resolvedId as string)
+      typeof load === 'function'
+        ? await load(resolvedId as string)
+        : await load?.handler(resolvedId as string)
 
     expect(loaded).toBe('export default { components: [] }')
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('serving empty data'))

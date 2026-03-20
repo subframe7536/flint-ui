@@ -1,8 +1,12 @@
-import { createSignal } from 'solid-js'
+import { For, createSignal } from 'solid-js'
 
 import { RadioGroup } from '../../../src'
+import type { RadioGroupVariantProps } from '../../../src/forms/radio-group/radio-group.class'
 import { DemoPage } from '../../components/demo-page'
 import { DemoSection } from '../../components/demo-section'
+
+type RadioGroupSizeName = Exclude<RadioGroupVariantProps['size'], undefined>
+type RadioGroupIndicatorName = Exclude<RadioGroupVariantProps['indicator'], undefined>
 
 const ITEMS = [
   { value: 'starter', label: 'Starter', description: 'For personal projects' },
@@ -10,33 +14,122 @@ const ITEMS = [
   { value: 'enterprise', label: 'Enterprise', description: 'For regulated workloads' },
 ]
 
+const SIZES: RadioGroupSizeName[] = ['xs', 'sm', 'md', 'lg', 'xl']
+const INDICATORS: RadioGroupIndicatorName[] = ['start', 'end', 'hidden']
+
 export default () => {
   const [value, setValue] = createSignal('pro')
 
   return (
     <DemoPage componentKey="radio-group">
       <DemoSection
-        title="Variants"
-        description="List, card, and table variants with controlled value."
+        title="Variant Matrix"
+        description="List, card, and table variants for single selection."
       >
-        <div class="mb-4 p-4 b-1 b-border border-zinc-200 rounded-lg">
-          <RadioGroup legend="Default list" items={ITEMS} defaultValue="pro" />
-        </div>
-        <div class="gap-4 grid sm:grid-cols-2">
-          <div class="p-4 b-1 b-border border-zinc-200 rounded-lg">
-            <RadioGroup legend="Card variant" items={ITEMS} variant="card" defaultValue="starter" />
+        <div class="gap-4 grid lg:grid-cols-3 sm:grid-cols-2">
+          <div class="p-4 b-(1 zinc-200) rounded-lg">
+            <RadioGroup legend="List" items={ITEMS} defaultValue="starter" />
           </div>
-          <div class="p-4 b-1 b-border border-zinc-200 rounded-lg space-y-3">
+          <div class="p-4 b-(1 zinc-200) rounded-lg">
+            <RadioGroup legend="Card" items={ITEMS} variant="card" defaultValue="pro" />
+          </div>
+          <div class="p-4 b-(1 zinc-200) rounded-lg">
             <RadioGroup
-              legend="Table variant (controlled)"
+              legend="Table"
               items={ITEMS}
-              orientation="horizontal"
               variant="table"
-              value={value()}
-              onChange={setValue}
+              orientation="horizontal"
+              defaultValue="enterprise"
             />
-            <p class="text-xs text-zinc-600">Plan: {value()}</p>
           </div>
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Indicator Positions"
+        description="Start/end/hidden indicator styles with card variant."
+      >
+        <div class="gap-4 grid lg:grid-cols-3 sm:grid-cols-2">
+          <For each={INDICATORS}>
+            {(indicator) => (
+              <div class="p-4 b-(1 zinc-200) rounded-lg">
+                <RadioGroup
+                  legend={`Indicator ${indicator}`}
+                  items={ITEMS}
+                  variant="card"
+                  indicator={indicator}
+                  defaultValue="pro"
+                />
+              </div>
+            )}
+          </For>
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Sizes + Orientation"
+        description="Size scale and vertical/horizontal modes."
+      >
+        <div class="gap-4 grid lg:grid-cols-2">
+          <div class="space-y-3">
+            <For each={SIZES}>
+              {(size) => (
+                <div class="p-4 b-(1 zinc-200) rounded-lg">
+                  <RadioGroup
+                    legend={`Size ${size}`}
+                    items={ITEMS}
+                    size={size}
+                    defaultValue="starter"
+                  />
+                </div>
+              )}
+            </For>
+          </div>
+          <div class="space-y-3">
+            <div class="p-4 b-(1 zinc-200) rounded-lg">
+              <RadioGroup
+                legend="Horizontal card"
+                items={ITEMS}
+                variant="card"
+                orientation="horizontal"
+                defaultValue="pro"
+              />
+            </div>
+            <div class="p-4 b-(1 zinc-200) rounded-lg">
+              <RadioGroup
+                legend="Horizontal table"
+                items={ITEMS}
+                variant="table"
+                orientation="horizontal"
+                defaultValue="enterprise"
+              />
+            </div>
+          </div>
+        </div>
+      </DemoSection>
+
+      <DemoSection
+        title="Controlled + Disabled"
+        description="Controlled value with disabled option in data set."
+      >
+        <div class="max-w-xl space-y-3">
+          <RadioGroup
+            legend="Plan selector"
+            items={[
+              ...ITEMS,
+              {
+                value: 'legacy',
+                label: 'Legacy',
+                description: 'No longer available',
+                disabled: true,
+              },
+            ]}
+            value={value()}
+            onChange={setValue}
+            variant="table"
+            orientation="horizontal"
+          />
+          <p class="text-xs text-zinc-600">Current plan: {value()}</p>
         </div>
       </DemoSection>
     </DemoPage>

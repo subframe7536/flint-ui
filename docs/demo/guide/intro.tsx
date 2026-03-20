@@ -1,128 +1,203 @@
-import { Button } from '../../../src/elements/button/button'
-import { Card } from '../../../src/elements/card/card'
-import { Icon } from '../../../src/elements/icon/icon'
+import { For, createMemo } from 'solid-js'
+import apiIndex from 'virtual:api-doc'
+
+import { Badge, Button, Card, Icon, Tabs } from '../../../src'
+
+const STARTER_KEYS = ['button', 'input', 'select', 'dialog', 'form-field', 'tabs']
 
 export default () => {
+  const groupedComponents = createMemo(() => {
+    const map = new Map<string, typeof apiIndex.components>()
+
+    for (const component of apiIndex.components) {
+      const list = map.get(component.category) ?? []
+      list.push(component)
+      map.set(component.category, list)
+    }
+
+    return [...map.entries()].map(([category, components]) => ({
+      category,
+      count: components.length,
+      components: [...components].sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+  })
+
+  const starterComponents = createMemo(() => {
+    const indexMap = new Map(STARTER_KEYS.map((key, index) => [key, index]))
+
+    return apiIndex.components
+      .filter((component) => indexMap.has(component.key))
+      .sort((a, b) => (indexMap.get(a.key) ?? 0) - (indexMap.get(b.key) ?? 0))
+  })
+
   return (
-    <div class="mx-auto mb-12 p-6 max-w-4xl space-y-12">
-      {/* Hero Section */}
-      <div class="my-12 space-y-4">
-        <h1 class="text-4xl text-foreground font-bold">Introduction</h1>
-        <p class="text-xl text-muted-foreground max-w-2xl">
-          A comprehensive component library for SolidJS, inspired by Nuxt UI and Shadcn.
-        </p>
-      </div>
-
-      {/* What is Rock UI */}
-      <div class="space-y-4">
-        <h2 class="text-2xl text-foreground font-semibold">What is Rock UI?</h2>
-        <div class="space-y-4">
-          <p class="text-muted-foreground">
-            Rock UI provides a collection of high-quality, accessible components built with SolidJS.
-            Designed for modern web applications, it offers a consistent design system and developer
-            experience.
+    <div class="mx-auto p-5 max-w-6xl space-y-10 lg:p-10 sm:p-8">
+      <section class="py-2">
+        <div class="flex flex-col gap-4 max-w-3xl">
+          <p class="text-xs text-zinc-500 tracking-[0.18em] font-semibold uppercase">Rock UI</p>
+          <h1 class="text-3xl text-zinc-900 leading-tight font-semibold sm:text-4xl">
+            SolidJS component library for building production-grade interfaces quickly.
+          </h1>
+          <p class="text-zinc-600 max-w-2xl sm:text-lg">
+            Inspired by Nuxt UI and shadcn. Rock UI gives you composable primitives, rich variants,
+            and form-focused ergonomics with UnoCSS-first styling.
           </p>
-          <p class="text-muted-foreground">
-            If you're building a SolidJS project with UnoCSS, Rock UI is a great default choice. It
-            provides high-level, ready-to-use components while still allowing advanced customization
-            when needed.
-          </p>
-        </div>
-      </div>
-
-      {/* Features */}
-      <div class="space-y-4">
-        <h2 class="text-2xl text-foreground font-semibold">Key Features</h2>
-        <div class="gap-4 grid md:grid-cols-2">
-          <Card
-            title={
-              <div class="flex gap-2 items-center">
-                <Icon name="i-lucide-zap" />
-                SolidJS First
-              </div>
-            }
-            compact
-          >
-            <p class="text-sm text-muted-foreground">
-              Built specifically for SolidJS with reactive primitives and optimized performance.
-            </p>
-          </Card>
-          <Card
-            title={
-              <div class="flex gap-2 items-center">
-                <Icon name="i-lucide-code" />
-                TypeScript Support
-              </div>
-            }
-            compact
-          >
-            <p class="text-sm text-muted-foreground">
-              Full TypeScript support with comprehensive type definitions and IntelliSense.
-            </p>
-          </Card>
-          <Card
-            title={
-              <div class="flex gap-2 items-center">
-                <Icon name="i-lucide-palette" />
-                Atomic Styled Class
-              </div>
-            }
-            compact
-          >
-            <p class="text-sm text-muted-foreground">
-              Works with UnoCSS and Tailwind CSS. Copy-paste shadcn theme CSS variables
-            </p>
-          </Card>
-          <Card
-            title={
-              <div class="flex gap-2 items-center">
-                <Icon name="i-lucide-shield-check" />
-                Accessible by Default
-              </div>
-            }
-            compact
-          >
-            <p class="text-sm text-muted-foreground">
-              Components follow accessibility best practices with proper ARIA support.
-            </p>
-          </Card>
-        </div>
-      </div>
-
-      {/* Getting Started */}
-      <div class="space-y-4">
-        <h2 class="text-2xl text-foreground font-semibold">Getting Started</h2>
-        <div class="space-y-4">
-          <p class="text-muted-foreground">
-            Explore the components in the sidebar to see examples and usage patterns. Each component
-            page includes interactive demos, API documentation, and code examples.
-          </p>
-          <div class="space-y-4">
-            <div>
-              <h3 class="text-foreground font-semibold mb-2">Installation</h3>
-              <pre class="text-sm p-3 rounded-lg bg-muted overflow-x-auto">
-                <code>npm install @subf/rock-ui</code>
-              </pre>
-            </div>
-            <p class="text-sm text-muted-foreground">
-              For more detailed setup instructions, check the main README in the project root.
-            </p>
+          <div class="pt-1 flex flex-wrap gap-2">
+            <Button as="a" href="#button">
+              Browse components
+            </Button>
+            <Button as="a" href="#form" variant="secondary">
+              View form patterns
+            </Button>
+            <Button
+              as="a"
+              href="https://github.com/subframe7536/rock-ui"
+              variant="outline"
+              target="_blank"
+              rel="noreferrer"
+              leading="i-lucide:github"
+            >
+              GitHub
+            </Button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Quick Links */}
-      <div class="mt-12 flex justify-around">
-        <Button variant="link" as="a" href="#button">
-          View Components →
-        </Button>
-        <Button variant="link" as="a" href="https://github.com/solidjs/solid" target="_blank">
-          SolidJS Docs →
-        </Button>
-        <Button variant="link" as="a" href="https://unocss.dev/" target="_blank">
-          UnoCSS Docs →
-        </Button>
-      </div>
+      <section class="gap-4 grid lg:grid-cols-3 sm:grid-cols-2">
+        <Card
+          compact
+          title={
+            <span class="flex gap-2 items-center">
+              <Icon name="i-lucide:layers-3" />
+              Composable API
+            </span>
+          }
+        >
+          <p class="text-sm text-zinc-600">
+            Slot-based APIs with class and style overrides, designed for real product surfaces.
+          </p>
+        </Card>
+
+        <Card
+          compact
+          title={
+            <span class="flex gap-2 items-center">
+              <Icon name="i-lucide:sliders-horizontal" />
+              Variant Coverage
+            </span>
+          }
+        >
+          <p class="text-sm text-zinc-600">
+            Visual variants, sizes, orientation, and state controls aligned across components.
+          </p>
+        </Card>
+
+        <Card
+          compact
+          title={
+            <span class="flex gap-2 items-center">
+              <Icon name="i-lucide:shield-check" />
+              Accessible by Default
+            </span>
+          }
+        >
+          <p class="text-sm text-zinc-600">
+            Keyboard and aria-ready primitives built on top of mature SolidJS foundations.
+          </p>
+        </Card>
+      </section>
+
+      <section class="space-y-4">
+        <div class="space-y-1">
+          <h2 class="text-xl text-zinc-900 font-semibold">Quick Start</h2>
+          <p class="text-sm text-zinc-600">
+            Install and start exploring component pages from the sidebar.
+          </p>
+        </div>
+
+        <Tabs
+          defaultValue="bun"
+          variant="link"
+          size="sm"
+          classes={{
+            list: 'w-fit',
+            content: 'pt-1 [&_pre]:rounded-lg',
+            trigger: 'flex-none',
+          }}
+          items={[
+            {
+              label: 'bun',
+              value: 'bun',
+              content: (
+                <pre class="text-sm text-zinc-800 font-mono p-4 bg-zinc-100 overflow-x-auto">
+                  <code>bun add @subf/rock-ui</code>
+                </pre>
+              ),
+            },
+            {
+              label: 'pnpm',
+              value: 'pnpm',
+              content: (
+                <pre class="text-sm text-zinc-800 font-mono p-4 bg-zinc-100 overflow-x-auto">
+                  <code>pnpm add @subf/rock-ui</code>
+                </pre>
+              ),
+            },
+            {
+              label: 'npm',
+              value: 'npm',
+              content: (
+                <pre class="text-sm text-zinc-800 font-mono p-4 bg-zinc-100 overflow-x-auto">
+                  <code>npm i @subf/rock-ui</code>
+                </pre>
+              ),
+            },
+          ]}
+        />
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-xl text-zinc-900 font-semibold">Recommended First Components</h2>
+        <div class="flex flex-wrap gap-2">
+          <For each={starterComponents()}>
+            {(component) => (
+              <Button as="a" href={`#${component.key}`} variant="outline" size="sm">
+                {component.name}
+              </Button>
+            )}
+          </For>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <div class="flex flex-wrap gap-2 items-center justify-between">
+          <h2 class="text-xl text-zinc-900 font-semibold">Components</h2>
+          <Badge variant="outline">{apiIndex.components.length} components</Badge>
+        </div>
+
+        <div class="space-y-6">
+          <For each={groupedComponents()}>
+            {(group) => (
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">{group.category}</div>
+                <div class="gap-2 grid lg:grid-cols-4 sm:grid-cols-2">
+                  <For each={group.components}>
+                    {(component) => (
+                      <a
+                        href={`#${component.key}`}
+                        class="p-3 border border-zinc-200 rounded-lg bg-white block transition hover:bg-zinc-50"
+                      >
+                        <p class="text-sm text-zinc-800 font-medium">{component.name}</p>
+                        <p class="text-xs text-zinc-500 mt-2">{component.description}</p>
+                      </a>
+                    )}
+                  </For>
+                </div>
+              </div>
+            )}
+          </For>
+        </div>
+      </section>
     </div>
   )
 }
