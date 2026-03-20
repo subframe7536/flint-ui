@@ -80,6 +80,7 @@ describe('IconButton', () => {
         loadingIcon="i-lucide:check"
         aria-label="Copy"
         loadingAuto
+        classes={{ icon: 'data-loading:animate-loading' }}
         onClick={onClick}
       />
     ))
@@ -93,14 +94,14 @@ describe('IconButton', () => {
 
     await waitFor(() => {
       expect(icon()?.className).toContain('i-lucide:check')
-      expect(icon()?.className).toContain('animate-loading')
+      expect(icon()?.className).toContain('data-loading:animate-loading')
     })
 
     deferred.resolve()
 
     await waitFor(() => {
       expect(icon()?.className).toContain('i-lucide:copy')
-      expect(icon()?.className).not.toContain('animate-loading')
+      expect(icon()?.className).toContain('data-loading:animate-loading')
     })
   })
 })

@@ -43,10 +43,9 @@ test('uses css variable classes for input sizing across modes', () => {
   const single = render(() => <Select options={FRUITS} size="xs" placeholder="XS" />)
   const singleInput = single.container.querySelector('[data-slot="input"]')
 
-  expect(singleInput?.className).toContain('h-4')
   expect(singleInput?.className).toContain('px-$s-p')
   expect(singleInput?.className).toContain('text-xs')
-  expect(singleInput?.className).toContain('var-select-6-0.5')
+  expect(singleInput?.className).toContain('var-select-0.5')
 
   const multiSearch = render(() => (
     <Select multiple search options={FRUITS} size="lg" placeholder="LG" />
@@ -55,7 +54,7 @@ test('uses css variable classes for input sizing across modes', () => {
 
   expect(multiInput?.className).toContain('min-w-12')
   expect(multiInput?.className).toContain('ps-$s-p')
-  expect(multiInput?.className).toContain('var-select-9-1.5')
+  expect(multiInput?.className).toContain('var-select-1.5')
   expect(multiInput?.className).toContain('text-sm')
 })
 
@@ -193,12 +192,13 @@ describe('Select - single mode', () => {
     expect(cherryItem.getAttribute('aria-disabled')).toBe('true')
   })
 
-  test('keeps loading trigger icon animation class', () => {
+  test('shows loading trigger icon while loading', () => {
     const screen = render(() => <Select options={FRUITS} loading placeholder="Pick" />)
     const trigger = screen.container.querySelector('[data-slot="trigger"]')
-    const icon = trigger?.firstElementChild
+    const icon = trigger?.querySelector('[data-slot="icon"]')
 
-    expect(icon?.className).toContain('animate-loading')
+    expect(trigger?.hasAttribute('data-loading')).toBe(true)
+    expect(icon?.className).toContain('icon-loading')
   })
 })
 
@@ -367,6 +367,39 @@ describe('Select - tag creation', () => {
 
     const input = screen.getByRole('combobox') as HTMLInputElement
     expect(input.hasAttribute('readonly')).toBe(true)
+    expect(input.className).toContain('min-w-12')
+    expect(input.className).not.toContain('sr-only')
+  })
+
+  test('keeps the same input structure after selections in non-searchable multiple mode', () => {
+    const screen = render(() => (
+      <Select multiple options={FRUITS} value={['apple']} placeholder="Type..." />
+    ))
+
+    const input = screen.getByRole('combobox') as HTMLInputElement
+    expect(input.hasAttribute('readonly')).toBe(true)
+    expect(input.className).toContain('min-w-12')
+    expect(input.className).not.toContain('sr-only')
+  })
+
+  test('toggles menu when clicking readonly input in multiple mode', async () => {
+    const screen = render(() => <Select multiple options={FRUITS} placeholder="Pick" />)
+    const input = screen.getByRole('combobox') as HTMLInputElement
+
+    await fireEvent.click(input)
+
+    await waitFor(() => {
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      expect(queryBody('[data-slot="content"]')).not.toBeNull()
+    })
+
+    await fireEvent.click(input)
+
+    await waitFor(() => {
+      const content = queryBody('[data-slot="content"]')
+      expect(input.getAttribute('aria-expanded')).toBe('false')
+      expect(content?.hasAttribute('data-closed')).toBe(true)
+    })
   })
 
   test('does not auto-create tag on Enter when no matched option', async () => {
@@ -436,6 +469,21 @@ describe('Select - search', () => {
 
     await waitFor(() => {
       expect(input.getAttribute('aria-expanded')).toBe('true')
+    })
+  })
+
+  test('dismisses menu when searchable input is clicked again in control mode', async () => {
+    const screen = render(() => <Select options={FRUITS} search placeholder="Search..." />)
+    const input = screen.getByRole('combobox') as HTMLInputElement
+
+    await fireEvent.click(input)
+    await waitFor(() => {
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+    })
+
+    await fireEvent.click(input)
+    await waitFor(() => {
+      expect(input.getAttribute('aria-expanded')).toBe('false')
     })
   })
 

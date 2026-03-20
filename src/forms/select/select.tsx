@@ -914,6 +914,7 @@ export function Select(props: SelectProps): JSX.Element {
         size={field.size()}
         classes={{
           root: selectTriggerIconVariants({ size: field.size() }, styleProps.classes?.trigger),
+          icon: 'data-loading:animate-loading',
         }}
         loading={renderDisplayProps.loading}
         loadingIcon={renderDisplayProps.loadingIcon}
@@ -964,7 +965,7 @@ export function Select(props: SelectProps): JSX.Element {
           data-readonly={!isSearchable() && !isMultiple()}
           class={selectInputVariants(
             {
-              mode: isMultiple() ? (isSearchable() ? 'multiSearch' : 'multiHidden') : 'single',
+              mode: isMultiple() ? 'multiSearch' : 'single',
               size: field.size(),
             },
             styleProps.classes?.input,
@@ -981,12 +982,15 @@ export function Select(props: SelectProps): JSX.Element {
               openMenu()
             }
           }}
+          onPointerDown={(e: PointerEvent) => {
+            if (isMultiple()) {
+              e.stopPropagation()
+            }
+          }}
           onClick={() => {
             if (opensFromControlClick()) {
-              // With triggerMode="manual", clicks don't auto-open.
-              // Searchable inputs should open on click, while readonly inputs
-              // keep the existing toggle behavior.
-              openMenu(isSearchable() ? undefined : () => context.close())
+              // With triggerMode="manual", control click should toggle menu state.
+              openMenu(() => context.close())
             }
           }}
           onKeyDown={(e: KeyboardEvent) => {
@@ -1093,11 +1097,6 @@ export function Select(props: SelectProps): JSX.Element {
               }
             }}
           >
-            <Show when={!isSearchable() && props.selectedOptions().length === 0}>
-              <span class="text-sm text-muted-foreground px-1">
-                {renderDisplayProps.placeholder}
-              </span>
-            </Show>
             <For each={visibleTags()}>
               {(option) => {
                 const onClose = () => props.remove(option)
@@ -1114,7 +1113,10 @@ export function Select(props: SelectProps): JSX.Element {
                       styles={{ base: merged.styles?.tag }}
                       classes={{
                         base: ['max-w-50% pe-0', styleProps.classes?.tag],
-                        trailing: ['rounded hover:bg-accent', styleProps.classes?.tagRemove],
+                        trailing: [
+                          'rounded hover:bg-accent scale-85',
+                          styleProps.classes?.tagRemove,
+                        ],
                       }}
                       trailing={renderDisplayProps.closeIcon ?? 'icon-close'}
                       onTrailingClick={(e) => {
@@ -1138,7 +1140,6 @@ export function Select(props: SelectProps): JSX.Element {
                 +{overflowCount()}
               </span>
             </Show>
-
             <Input />
           </div>
         </Show>

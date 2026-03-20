@@ -306,9 +306,8 @@ export function presetTheme(options?: PresetThemeOptions): Preset {
         }),
       ],
       [
-        /var-select-([\d.]+)-([\d.]+)/,
-        ([, h, px], { theme }) => ({
-          '--s-h': createLength(theme, h),
+        /var-select-([\d.]+)/,
+        ([, px], { theme }) => ({
           '--s-p': createLength(theme, px),
         }),
       ],
