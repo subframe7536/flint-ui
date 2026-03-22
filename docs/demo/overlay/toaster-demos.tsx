@@ -66,7 +66,6 @@ export default () => {
           <SourceCode lang="tsx">{`import 'solid-toaster/style.css'
 
 import { Toaster, toast } from 'solid-toaster'
-import 'solid-toaster/style.css'
 
 export default function App() {
   return (
@@ -75,10 +74,10 @@ export default function App() {
       <Toaster
         preventDuplicate
         style={{
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)",
+          '--normal-bg': 'var(--popover)',
+          '--normal-text': 'var(--popover-foreground)',
+          '--normal-border': 'var(--border)',
+          '--border-radius': 'var(--radius)',
         }}
       />
     </>

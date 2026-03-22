@@ -17,9 +17,9 @@ export default () => {
         <Collapsible
           defaultOpen={false}
           classes={{
-            root: 'max-w-xl rounded-lg b-(1 border) bg-background',
+            root: 'w-xl rounded-lg b-(1 border) bg-muted',
             trigger:
-              'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-muted',
+              'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between',
             content: 'px-4 pb-4 text-sm text-foreground',
           }}
           trigger={(props) => (
@@ -53,7 +53,7 @@ export default () => {
             open={open()}
             onOpenChange={setOpen}
             classes={{
-              root: 'rounded-lg b-(1 border) bg-background',
+              root: 'rounded-lg b-(1 border)',
               trigger:
                 'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-muted',
               content: 'px-4 pb-4 text-sm text-foreground',
@@ -83,7 +83,7 @@ export default () => {
             disabled
             defaultOpen
             classes={{
-              root: 'rounded-lg b-(1 border) bg-background',
+              root: 'rounded-lg b-(1 border)',
               trigger:
                 'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between data-disabled:opacity-60',
               content: 'px-4 pb-4 text-sm text-foreground',
@@ -107,9 +107,9 @@ export default () => {
             open={quickPanelOpen()}
             onOpenChange={setQuickPanelOpen}
             classes={{
-              root: 'rounded-lg b-(1 border) bg-background',
+              root: 'rounded-lg b-(1 border)',
               trigger:
-                'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between hover:bg-muted',
+                'w-full px-4 py-3 text-left text-sm font-medium flex items-center justify-between',
               content: 'px-4 pb-4 text-sm text-foreground',
             }}
             trigger={({ open: isOpen }) => (
@@ -136,9 +136,9 @@ export default () => {
           <Collapsible
             defaultOpen
             classes={{
-              root: 'rounded-lg b-(1 border) bg-background',
+              root: 'rounded-lg b-(1 border)',
               trigger:
-                'w-full px-3 py-2 text-left text-xs font-semibold tracking-wide flex items-center justify-between hover:bg-muted',
+                'w-xl px-3 py-2 text-left text-xs font-semibold tracking-wide flex items-center justify-between',
               content: 'px-3 pb-3 text-sm text-foreground',
             }}
             trigger={({ open: isOpen }) => (
