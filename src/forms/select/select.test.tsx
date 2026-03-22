@@ -57,7 +57,7 @@ test('uses css variable classes for input sizing in single mode', () => {
   const single = render(() => <Select options={FRUITS} size="xs" placeholder="XS" />)
   const singleInput = single.container.querySelector('[data-slot="input"]')
 
-  expect(singleInput?.className).toContain('px-$s-p')
+  expect(singleInput?.className).toContain('mx-$s-p')
   expect(singleInput?.className).toContain('text-xs')
   expect(singleInput?.className).toContain('var-select-0.5')
 })

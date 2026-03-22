@@ -19,12 +19,13 @@ A comprehensive, opinionated component library for SolidJS, built on top of Koba
 bun add @subf/rock-ui solid-js
 ```
 
-### Style
+### UnoCSS
 
 ```bash
 bun add unocss oxc-parser oxc-walker
 ```
 
+### Tailwind CSS
 ```bash
 bun add tailwindcss
 ```
@@ -149,7 +150,24 @@ Then import the CSS:
 @tailwind utilities;
 ```
 
-### Override Built-in `cn`
+### Override
+
+#### Component Style
+
+Almost all component support `classes` and `styles` props, key is the same as `Slot`.
+
+```tsx
+import { Button } from '@subf/rock-ui'
+
+<Button
+  classes={{ label: 'bg-green-500' }}
+  styles={{ root: 'bg-red-500' }}
+>
+  Click me
+</Button>
+```
+
+#### Built-in `cn`
 
 Builtin `cn` only support concat classes, you can extend it by `extendCN`
 
