@@ -16,7 +16,17 @@ A comprehensive, opinionated component library for SolidJS, built on top of Koba
 ## Installation
 
 ```bash
-bun add @subf/rock-ui solid-js @kobalte/core unocss
+bun add @subf/rock-ui solid-js
+```
+
+### Style
+
+```bash
+bun add unocss oxc-parser oxc-walker
+```
+
+```bash
+bun add tailwindcss
 ```
 
 ## Quick Start
@@ -99,7 +109,9 @@ export default defineConfig({
   presets: [
     // presetWind3(),
     presetWind4(),
-    presetTheme(),
+    presetTheme({
+      enableComponentLayer: true
+    }),
     // ... other presets
   ],
 })
@@ -135,6 +147,17 @@ Then import the CSS:
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+```
+
+### Override Built-in `cn`
+
+Builtin `cn` only support concat classes, you can extend it by `extendCN`
+
+```ts
+import { extendCN } from '@subf/rock-ui'
+import { twMerge } from 'tailwind-merge'
+
+extendCN(twMerge)
 ```
 
 ## Development

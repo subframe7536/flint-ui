@@ -50,7 +50,6 @@ export const DEFAULT_ICONS = {
 
 export interface PresetThemeOptions extends Pick<TransformerInjectPrefixOption, 'beforeTransform'> {
   wind3?: boolean
-  colors?: Record<string, unknown>
   icons?: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
   enableComponentLayer?:
     | boolean
@@ -66,7 +65,6 @@ const RE_ROCK_PREFIX_CLEAN = new RegExp(`\\\\?${ROCK_PREFIX}`, 'g')
 const RE_ATTR = /^(data|aria)-(\w+):/
 interface ResolvedPresetThemeOptions {
   wind3: boolean
-  colors: Record<string, unknown>
   icons: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
   enableComponentLayer: boolean
   preservePrefix: boolean
@@ -98,7 +96,6 @@ export function resolvePresetThemeOptions(
 
   return {
     wind3: options?.wind3 ?? false,
-    colors: options?.colors ?? {},
     icons: options?.icons ?? {},
     enableComponentLayer,
     preservePrefix,

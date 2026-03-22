@@ -46,10 +46,10 @@ export function useId(
 
   return resolvedId
 }
-type PatchCNFunction = (clz: string) => string
+type extendCNFunction = (clz: string) => string
 
-let __fn: PatchCNFunction = (s) => s
-export function patchCN(fn: PatchCNFunction) {
+let __fn: extendCNFunction = (s) => s
+export function extendCN(fn: extendCNFunction) {
   __fn = fn
 }
 
