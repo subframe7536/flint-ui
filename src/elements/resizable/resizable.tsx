@@ -697,7 +697,10 @@ export function Resizable(props: ResizableProps): JSX.Element {
             () => localProps.disable === true || !layoutReady() || !isHandleResizable(index),
           )
           const handleCollapseAction = createMemo(
-            () => localProps.handleAction === 'collapse' && localProps.disable !== true && layoutReady(),
+            () =>
+              localProps.handleAction === 'collapse' &&
+              localProps.disable !== true &&
+              layoutReady(),
           )
           const handleRenderDisabled = createMemo(() =>
             localProps.handleAction === 'collapse'

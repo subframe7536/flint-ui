@@ -28,6 +28,11 @@ interface ApiDocInjection {
   componentKey: string
 }
 
+interface ExtraApiDocsInjection {
+  propInsertPos: number
+  componentKeys: string[]
+}
+
 interface InjectionResult {
   pos: number
   text: string
@@ -122,6 +127,70 @@ function getLiteralStringAttribute(
   }
 
   return undefined
+}
+
+function getLiteralStringArrayAttribute(
+  node: { attributes: unknown[] },
+  attrName: string,
+): string[] | undefined {
+  const attr = node.attributes.find(
+    (item) =>
+      typeof item === 'object' &&
+      item !== null &&
+      'type' in item &&
+      item.type === 'JSXAttribute' &&
+      'name' in item &&
+      typeof item.name === 'object' &&
+      item.name !== null &&
+      'type' in item.name &&
+      item.name.type === 'JSXIdentifier' &&
+      'name' in item.name &&
+      item.name.name === attrName,
+  )
+
+  if (!attr || typeof attr !== 'object' || !('value' in attr)) {
+    return undefined
+  }
+
+  const value = attr.value
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    !('type' in value) ||
+    value.type !== 'JSXExpressionContainer' ||
+    !('expression' in value)
+  ) {
+    return undefined
+  }
+
+  const expression = value.expression
+  if (
+    !expression ||
+    typeof expression !== 'object' ||
+    !('type' in expression) ||
+    expression.type !== 'ArrayExpression' ||
+    !('elements' in expression) ||
+    !Array.isArray(expression.elements)
+  ) {
+    return undefined
+  }
+
+  const keys: string[] = []
+  for (const element of expression.elements) {
+    if (
+      !element ||
+      typeof element !== 'object' ||
+      !('type' in element) ||
+      element.type !== 'Literal' ||
+      !('value' in element) ||
+      typeof element.value !== 'string'
+    ) {
+      return undefined
+    }
+    keys.push(element.value)
+  }
+
+  return keys
 }
 
 function normalizeHighlightLang(lang: string | undefined): 'tsx' | 'bash' {
@@ -219,7 +288,12 @@ function extractSourceCodeText(node: unknown, code: string): string | undefined 
     }
   }
 
-  if ('start' in onlyChild && 'end' in onlyChild && typeof onlyChild.start === 'number' && typeof onlyChild.end === 'number') {
+  if (
+    'start' in onlyChild &&
+    'end' in onlyChild &&
+    typeof onlyChild.start === 'number' &&
+    typeof onlyChild.end === 'number'
+  ) {
     return code.slice(onlyChild.start, onlyChild.end)
   }
 
@@ -241,7 +315,10 @@ function resolveChildBoundaries(
       if (node.type !== 'JSXElement') {
         return
       }
-      if (!isJsxIdentifierName(node.openingElement.name, targetName) || node.openingElement.selfClosing) {
+      if (
+        !isJsxIdentifierName(node.openingElement.name, targetName) ||
+        node.openingElement.selfClosing
+      ) {
         return
       }
 
@@ -271,6 +348,7 @@ export async function transformDemoSource(
   const demoSectionInjections: CodeInjection[] = []
   const sourceCodeInjections: CodeInjection[] = []
   const apiDocInjections: ApiDocInjection[] = []
+  const extraApiDocsInjections: ExtraApiDocsInjection[] = []
 
   walk(program, {
     enter(node) {
@@ -313,19 +391,22 @@ export async function transformDemoSource(
       }
 
       if (node.name.name === 'DemoPage') {
-        if (hasJsxAttribute(node, 'apiDoc')) {
-          return
-        }
-
+        const propInsertPos = node.selfClosing ? node.end - 2 : node.end - 1
         const componentKey = getLiteralStringAttribute(node, 'componentKey')
-        if (!componentKey) {
-          return
+        if (!hasJsxAttribute(node, 'apiDoc') && componentKey) {
+          apiDocInjections.push({
+            propInsertPos,
+            componentKey,
+          })
         }
 
-        apiDocInjections.push({
-          propInsertPos: node.selfClosing ? node.end - 2 : node.end - 1,
-          componentKey,
-        })
+        const extraApiKeys = getLiteralStringArrayAttribute(node, 'extraApiKeys')
+        if (!hasJsxAttribute(node, 'extraApiDocs') && extraApiKeys && extraApiKeys.length > 0) {
+          extraApiDocsInjections.push({
+            propInsertPos,
+            componentKeys: extraApiKeys,
+          })
+        }
       }
     },
   })
@@ -339,20 +420,23 @@ export async function transformDemoSource(
 
   const validSourceCodeInjections = sourceCodeInjections.filter((inj) => inj.childEnd > 0)
   const validCodeInjections = [...validDemoSectionInjections, ...validSourceCodeInjections]
-  if (validCodeInjections.length === 0 && apiDocInjections.length === 0) {
+  if (
+    validCodeInjections.length === 0 &&
+    apiDocInjections.length === 0 &&
+    extraApiDocsInjections.length === 0
+  ) {
     return null
   }
 
   const allInjections: InjectionResult[] = []
 
   for (const inj of validCodeInjections) {
-    const rawChildrenSource = (
+    const rawChildrenSource =
       inj.sourceText ??
       code
         .slice(inj.childStart, inj.childEnd)
         .trim()
         .replace(/^\n+|\n+$/g, '')
-    )
 
     const childrenSource = dedentSource(rawChildrenSource)
     const html = toHTML(childrenSource, normalizeHighlightLang(inj.lang))
@@ -365,6 +449,17 @@ export async function transformDemoSource(
     if (doc) {
       const serialized = JSON.stringify(doc)
       allInjections.push({ pos: inj.propInsertPos, text: ` apiDoc={${serialized}}` })
+    }
+  }
+
+  for (const inj of extraApiDocsInjections) {
+    const docs = [...new Set(inj.componentKeys)]
+      .map((key) => loadApiDoc(projectRoot, key))
+      .filter((doc): doc is unknown => Boolean(doc))
+
+    if (docs.length > 0) {
+      const serialized = JSON.stringify(docs)
+      allInjections.push({ pos: inj.propInsertPos, text: ` extraApiDocs={${serialized}}` })
     }
   }
 

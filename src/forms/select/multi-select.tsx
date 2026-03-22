@@ -426,7 +426,12 @@ export function MultiSelect(props: MultiSelectProps): JSX.Element {
       return { next: current, appended: false, blockedByMaxCount: true, blockedByDisabled: false }
     }
 
-    return { next: [...current, option], appended: true, blockedByMaxCount: false, blockedByDisabled: false }
+    return {
+      next: [...current, option],
+      appended: true,
+      blockedByMaxCount: false,
+      blockedByDisabled: false,
+    }
   }
 
   function resolveOptionForInput(

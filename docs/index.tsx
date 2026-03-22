@@ -39,7 +39,6 @@ const DEMO_MAP: Record<string, Component> = {
   'dropdown-menu': lazy(() => import('./demo/overlay/dropdown-menu-demos')),
   'file-upload': lazy(() => import('./demo/form/file-upload-demos')),
   form: lazy(() => import('./demo/form/form-demos')),
-  'form-field': lazy(() => import('./demo/form/form-field-demos')),
   icon: lazy(() => import('./demo/general/icon-demos')),
   input: lazy(() => import('./demo/form/input-demos')),
   'input-number': lazy(() => import('./demo/form/input-number-demos')),

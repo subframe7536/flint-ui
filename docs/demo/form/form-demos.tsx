@@ -1,237 +1,439 @@
 import { createSignal } from 'solid-js'
+import * as v from 'valibot'
 
-import { Button, Checkbox, CheckboxGroup, RadioGroup, Switch } from '../../../src'
+import {
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Form,
+  FormField,
+  Input,
+  RadioGroup,
+  Select,
+  Switch,
+  Textarea,
+} from '../../../src'
+import type { SelectT } from '../../../src/forms/select/select'
 import { DemoPage } from '../../components/demo-page'
 import { DemoSection } from '../../components/demo-section'
 
-const wait = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms)
-  })
+const ROLE_OPTIONS: SelectT.Items[] = [
+  { label: 'Developer', value: 'developer' },
+  { label: 'Designer', value: 'designer' },
+  { label: 'Manager', value: 'manager' },
+]
 
-const CHECKBOX_GROUP_ITEMS = [
+const SEVERITY_OPTIONS: SelectT.Items[] = [
+  { label: 'P1 - Critical', value: 'p1' },
+  { label: 'P2 - Major', value: 'p2' },
+  { label: 'P3 - Minor', value: 'p3' },
+]
+
+const ENVIRONMENT_OPTIONS = [
+  {
+    value: 'staging',
+    label: 'Staging',
+    description: 'Pre-production verification',
+  },
+  {
+    value: 'production',
+    label: 'Production',
+    description: 'Public traffic rollout',
+  },
+]
+
+const RELEASE_CHANNEL_OPTIONS = [
   {
     value: 'alpha',
     label: 'Alpha',
-    description: 'Primary rollout channel',
+    description: 'Internal team first',
   },
   {
     value: 'beta',
     label: 'Beta',
-    description: 'Early access channel',
+    description: 'Limited external users',
   },
   {
     value: 'stable',
     label: 'Stable',
-    description: 'Production channel',
+    description: 'Full production release',
   },
 ]
 
-const RADIO_ITEMS = [
+const APPROVAL_LEVEL_OPTIONS = [
   {
-    value: 'starter',
-    label: 'Starter',
-    description: 'For personal projects',
+    value: 'peer',
+    label: 'Peer Review',
+    description: 'One teammate sign-off',
   },
   {
-    value: 'pro',
-    label: 'Pro',
-    description: 'For teams and scaling',
+    value: 'lead',
+    label: 'Tech Lead',
+    description: 'Owner team approval',
   },
   {
-    value: 'ultra',
-    label: 'Ultra',
-    description: 'For power user',
+    value: 'qa',
+    label: 'QA + Lead',
+    description: 'Formal release gate',
+  },
+]
+
+const ACCESS_SCOPE_OPTIONS = [
+  {
+    value: 'repo:read',
+    label: 'Repository Read',
+    description: 'View code and PRs',
   },
   {
-    value: 'enterprise',
-    label: 'Enterprise',
-    description: 'For regulated workloads',
+    value: 'repo:write',
+    label: 'Repository Write',
+    description: 'Push and merge changes',
+  },
+  {
+    value: 'deploy:prod',
+    label: 'Production Deploy',
+    description: 'Trigger release pipelines',
+  },
+]
+
+const REVIEWER_OPTIONS = [
+  {
+    value: 'security',
+    label: 'Security Team',
+    description: 'Permission boundary review',
+  },
+  {
+    value: 'platform',
+    label: 'Platform Team',
+    description: 'Infrastructure and ops review',
+  },
+  {
+    value: 'manager',
+    label: 'Line Manager',
+    description: 'Business ownership approval',
   },
 ]
 
 export default () => {
-  const [agreeChecked, setAgreeChecked] = createSignal(true)
-  const [statusValue, setStatusValue] = createSignal<'active' | 'inactive'>('active')
+  const [workspaceState, setWorkspaceState] = createSignal({
+    workspaceName: '',
+    ownerEmail: '',
+    role: 'developer' as string | null,
+    environment: 'staging',
+    enableAudit: true,
+  })
 
-  const [groupValue, setGroupValue] = createSignal<string[]>(['beta'])
+  const [incidentState, setIncidentState] = createSignal({
+    policy: {
+      name: '',
+      severity: 'p1' as string | null,
+      notifyEmail: '',
+      autoRollback: true,
+      summary: '',
+    },
+  })
 
-  const [planValue, setPlanValue] = createSignal('pro')
+  const [accessState, setAccessState] = createSignal({
+    requester: '',
+    reason: '',
+    temporary: true,
+    scopes: ['repo:read'],
+    reviewers: ['security'],
+  })
 
-  const [switchValue, setSwitchValue] = createSignal(false)
-  const [visibilityValue, setVisibilityValue] = createSignal<0 | 1>(1)
-  const [switchLoading, setSwitchLoading] = createSignal(false)
+  const releaseSchema = v.object({
+    releaseVersion: v.pipe(v.string(), v.minLength(1, 'Release version is required.')),
+    channels: v.pipe(v.array(v.string()), v.nonEmpty('Select at least one release channel.')),
+    approvalLevel: v.picklist(['peer', 'lead', 'qa'], 'Select an approval gate.'),
+    rolloutConfirmed: v.pipe(v.boolean(), v.value(true, 'You must confirm rollback readiness.')),
+    notes: v.pipe(v.string(), v.minLength(10, 'Add at least 10 characters of release notes.')),
+  })
 
-  const runSwitchLoading = async () => {
-    setSwitchLoading(true)
-    await wait(900)
-    setSwitchLoading(false)
+  const incidentSchema = v.object({
+    policy: v.object({
+      name: v.pipe(v.string(), v.minLength(1, 'Policy name is required.')),
+      severity: v.pipe(v.string(), v.minLength(1, 'Severity is required.')),
+      notifyEmail: v.pipe(
+        v.string(),
+        v.minLength(1, 'Notify email is required.'),
+        v.email('Enter a valid notify email.'),
+      ),
+      autoRollback: v.boolean(),
+      summary: v.pipe(
+        v.string(),
+        v.minLength(12, 'Summary should explain when this policy applies.'),
+      ),
+    }),
+  })
+
+  const updateWorkspace = (field: string, value: string | boolean | null) => {
+    setWorkspaceState((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const updateIncident = (field: string, value: string | boolean | null) => {
+    setIncidentState((prev) => ({
+      ...prev,
+      policy: {
+        ...prev.policy,
+        [field]: value,
+      },
+    }))
+  }
+
+  const updateAccess = (field: string, value: string | boolean | string[]) => {
+    setAccessState((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
-    <DemoPage componentKey="form">
+    <DemoPage componentKey="form" extraApiKeys={['form-field']}>
       <DemoSection
-        title="Checkbox"
-        description="Single checkbox states with full-surface card interactions and controlled value."
+        title="Workspace Provisioning"
+        description="Create a new workspace with owner identity, default role, and rollout target."
       >
-        <div class="gap-4 grid sm:grid-cols-2">
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <Checkbox
-              label="Default list style"
-              description="No variant prop, focus ring follows keyboard focus"
-              defaultChecked
-            />
-            <Checkbox
-              label="Default list style"
-              description="No variant prop, focus ring follows keyboard focus"
-              defaultChecked
-            />
-            <Checkbox
-              label="Default list style"
-              description="No variant prop, focus ring follows keyboard focus"
-              defaultChecked
-            />
-          </div>
+        <Form
+          state={workspaceState()}
+          validate={(state) => {
+            const errors: { name: string; message: string }[] = []
 
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <Checkbox
-              label="Accept terms"
-              description="Required before creating workspace"
-              variant="card"
-              defaultChecked
-            />
-            <Checkbox
-              label="Disabled option"
-              description="Read only preview"
-              variant="card"
-              disabled
-            />
-          </div>
+            if (!state?.workspaceName?.trim()) {
+              errors.push({ name: 'workspaceName', message: 'Workspace name is required.' })
+            }
 
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <Checkbox
-              label="Controlled consent"
-              description={`Current: ${agreeChecked() ? 'checked' : 'unchecked'}`}
-              variant="list"
-              indicator="end"
-              checked={agreeChecked()}
-              onChange={setAgreeChecked}
-            />
+            if (!state?.ownerEmail?.trim()) {
+              errors.push({ name: 'ownerEmail', message: 'Owner email is required.' })
+            } else if (!state.ownerEmail.includes('@')) {
+              errors.push({ name: 'ownerEmail', message: 'Enter a valid owner email.' })
+            }
 
-            <Checkbox
-              label="Custom status"
-              description={`Current value: ${statusValue()}`}
-              variant="list"
-              checked={statusValue()}
-              trueValue="active"
-              falseValue="inactive"
-              onChange={(nextValue) => setStatusValue(nextValue as 'active' | 'inactive')}
-            />
+            if (!state?.role) {
+              errors.push({ name: 'role', message: 'Select a default role.' })
+            }
+
+            return errors
+          }}
+        >
+          <div class="mx-auto max-w-2xl w-full space-y-4">
+            <FormField name="workspaceName" label="Workspace Name" required>
+              <Input
+                value={workspaceState().workspaceName}
+                onValueChange={(v) => updateWorkspace('workspaceName', String(v))}
+                placeholder="acme-platform"
+              />
+            </FormField>
+
+            <FormField name="ownerEmail" label="Owner Email" required>
+              <Input
+                type="email"
+                value={workspaceState().ownerEmail}
+                onValueChange={(v) => updateWorkspace('ownerEmail', String(v))}
+                placeholder="owner@acme.dev"
+              />
+            </FormField>
+
+            <FormField name="role" label="Default Team Role" required>
+              <Select
+                options={ROLE_OPTIONS}
+                value={workspaceState().role}
+                onChange={(v) => updateWorkspace('role', v as string | null)}
+                placeholder="Select role"
+              />
+            </FormField>
+
+            <FormField name="environment" label="Initial Deployment Target" required>
+              <RadioGroup
+                items={ENVIRONMENT_OPTIONS}
+                variant="table"
+                value={workspaceState().environment}
+                onChange={(v) => updateWorkspace('environment', String(v))}
+              />
+            </FormField>
+
+            <FormField
+              name="enableAudit"
+              label="Audit Logging"
+              description="Enable immutable audit trail for permissions and deploy actions."
+            >
+              <Switch
+                checked={workspaceState().enableAudit}
+                onChange={(v) => updateWorkspace('enableAudit', Boolean(v))}
+                checkedIcon="i-lucide-shield-check"
+                uncheckedIcon="i-lucide-shield"
+              />
+            </FormField>
+
+            <Button type="submit">Create Workspace</Button>
           </div>
-        </div>
+        </Form>
       </DemoSection>
 
       <DemoSection
-        title="Checkbox Group"
-        description="Supports object items with card/table variants and controlled arrays."
+        title="Release Readiness Checklist"
+        description="Validate release metadata, rollout channels, and approval gate before deployment."
       >
-        <div class="gap-4 grid sm:grid-cols-2">
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <CheckboxGroup
-              legend="Uncontrolled channels"
-              items={CHECKBOX_GROUP_ITEMS}
-              variant="card"
-              defaultValue={['alpha']}
-            />
-          </div>
+        <Form schema={releaseSchema}>
+          <div class="mx-auto max-w-2xl w-full space-y-4">
+            <FormField name="releaseVersion" label="Release Version" required>
+              <Input placeholder="v2.14.0" />
+            </FormField>
 
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <CheckboxGroup
-              legend="Controlled channels"
-              items={CHECKBOX_GROUP_ITEMS}
-              orientation="horizontal"
-              variant="table"
-              value={groupValue()}
-              onChange={setGroupValue}
-            />
-            <p class="text-xs text-muted-foreground">
-              Selected: {groupValue().join(', ') || 'none'}
-            </p>
+            <FormField name="channels" label="Rollout Channels" required>
+              <CheckboxGroup items={RELEASE_CHANNEL_OPTIONS} variant="table" />
+            </FormField>
+
+            <FormField name="approvalLevel" label="Approval Gate" required>
+              <RadioGroup items={APPROVAL_LEVEL_OPTIONS} variant="card" />
+            </FormField>
+
+            <FormField name="notes" label="Release Notes" required>
+              <Textarea
+                placeholder="Summarize risk, migration notes, and rollback strategy..."
+                rows={4}
+              />
+            </FormField>
+
+            <FormField name="rolloutConfirmed" label="Rollback Prepared" required>
+              <Checkbox label="I confirmed rollback commands and owner on-call availability." />
+            </FormField>
+
+            <Button type="submit">Approve Release</Button>
           </div>
-        </div>
+        </Form>
       </DemoSection>
 
       <DemoSection
-        title="Radio Group"
-        description="Single-selection options with card/table layouts and controlled value."
+        title="Incident Escalation Policy"
+        description="Configure nested policy fields for severity routing and automatic rollback behavior."
       >
-        <div class="mb-4 p-4 b-1 b-border border-border rounded-lg">
-          <RadioGroup legend="Default list plan" items={RADIO_ITEMS} defaultValue="pro" />
-        </div>
+        <Form state={incidentState()} schema={incidentSchema}>
+          <div class="mx-auto max-w-2xl w-full space-y-4">
+            <FormField name={['policy', 'name']} label="Policy Name" required>
+              <Input
+                value={incidentState().policy.name}
+                onValueChange={(v) => updateIncident('name', String(v))}
+                placeholder="payments-latency-spike"
+              />
+            </FormField>
 
-        <div class="gap-4 grid sm:grid-cols-2">
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <RadioGroup
-              legend="Uncontrolled plan"
-              items={RADIO_ITEMS}
-              variant="card"
-              defaultValue="starter"
-            />
-          </div>
+            <FormField name={['policy', 'severity']} label="Default Severity" required>
+              <Select
+                options={SEVERITY_OPTIONS}
+                value={incidentState().policy.severity}
+                onChange={(v) => updateIncident('severity', v as string | null)}
+                placeholder="Select severity"
+              />
+            </FormField>
 
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <RadioGroup
-              legend="Controlled plan"
-              items={RADIO_ITEMS}
-              orientation="horizontal"
-              variant="table"
-              value={planValue()}
-              onChange={setPlanValue}
-            />
-            <p class="text-xs text-muted-foreground">Current plan: {planValue()}</p>
+            <FormField name={['policy', 'notifyEmail']} label="Escalation Email" required>
+              <Input
+                type="email"
+                value={incidentState().policy.notifyEmail}
+                onValueChange={(v) => updateIncident('notifyEmail', String(v))}
+                placeholder="oncall@acme.dev"
+              />
+            </FormField>
+
+            <FormField
+              name={['policy', 'autoRollback']}
+              label="Auto Rollback"
+              description="Trigger rollback when alert duration crosses the policy threshold."
+            >
+              <Switch
+                checked={incidentState().policy.autoRollback}
+                onChange={(v) => updateIncident('autoRollback', Boolean(v))}
+              />
+            </FormField>
+
+            <FormField name={['policy', 'summary']} label="Policy Summary" required>
+              <Textarea
+                value={incidentState().policy.summary}
+                onValueChange={(v) => updateIncident('summary', String(v))}
+                placeholder="Describe conditions and handoff details for incident response."
+                rows={3}
+              />
+            </FormField>
+
+            <Button type="submit">Save Escalation Policy</Button>
           </div>
-        </div>
+        </Form>
       </DemoSection>
 
       <DemoSection
-        title="Switch"
-        description="Toggle states with icon slots and loading lock behavior."
+        title="Access Request Review"
+        description="Review temporary access requests with scoped permissions and required reviewers."
       >
-        <div class="gap-4 grid sm:grid-cols-2">
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <Switch
-              label="Email alerts"
-              description="Uncontrolled state"
-              checkedIcon="i-lucide-bell"
-              uncheckedIcon="i-lucide-bell-off"
-            />
+        <Form
+          state={accessState()}
+          validate={(state) => {
+            const errors: { name: string; message: string }[] = []
+
+            if (!state?.requester?.trim()) {
+              errors.push({ name: 'requester', message: 'Requester is required.' })
+            }
+
+            if (!state?.reason?.trim()) {
+              errors.push({ name: 'reason', message: 'Business reason is required.' })
+            }
+
+            if (!state?.scopes || state.scopes.length === 0) {
+              errors.push({ name: 'scopes', message: 'Select at least one permission scope.' })
+            }
+
+            if (!state?.reviewers || state.reviewers.length === 0) {
+              errors.push({ name: 'reviewers', message: 'Select at least one reviewer.' })
+            }
+
+            return errors
+          }}
+        >
+          <div class="mx-auto max-w-2xl w-full space-y-4">
+            <FormField name="requester" label="Requester" required>
+              <Input
+                value={accessState().requester}
+                onValueChange={(v) => updateAccess('requester', String(v))}
+                placeholder="alex.chen"
+              />
+            </FormField>
+
+            <FormField name="reason" label="Business Reason" required>
+              <Textarea
+                value={accessState().reason}
+                onValueChange={(v) => updateAccess('reason', String(v))}
+                placeholder="Need short-term access for production incident mitigation."
+                rows={3}
+              />
+            </FormField>
+
+            <FormField
+              name="temporary"
+              label="Temporary Access"
+              description="Enable automatic expiry for this permission grant."
+            >
+              <Switch
+                checked={accessState().temporary}
+                onChange={(v) => updateAccess('temporary', Boolean(v))}
+              />
+            </FormField>
+
+            <FormField name="scopes" label="Requested Scopes" required>
+              <CheckboxGroup
+                items={ACCESS_SCOPE_OPTIONS}
+                value={accessState().scopes}
+                onChange={(v) => updateAccess('scopes', v)}
+                variant="card"
+              />
+            </FormField>
+
+            <FormField name="reviewers" label="Required Reviewers" required>
+              <CheckboxGroup
+                items={REVIEWER_OPTIONS}
+                value={accessState().reviewers}
+                onChange={(v) => updateAccess('reviewers', v)}
+              />
+            </FormField>
+
+            <Button type="submit">Submit Access Request</Button>
           </div>
-
-          <div class="p-4 b-1 b-border border-border rounded-lg space-y-3">
-            <Switch
-              label="Deploy protection"
-              description={`Current: ${switchValue() ? 'enabled' : 'disabled'}`}
-              checked={switchValue()}
-              onChange={setSwitchValue}
-              loading={switchLoading()}
-              checkedIcon="i-lucide-shield-check"
-              uncheckedIcon="i-lucide-shield"
-            />
-
-            <Switch
-              label="Visibility flag"
-              description={`Current value: ${visibilityValue()}`}
-              checked={visibilityValue()}
-              trueValue={1}
-              falseValue={0}
-              onChange={(nextValue) => setVisibilityValue(nextValue as 0 | 1)}
-            />
-
-            <Button size="sm" variant="outline" onclick={runSwitchLoading}>
-              Simulate loading
-            </Button>
-          </div>
-        </div>
+        </Form>
       </DemoSection>
     </DemoPage>
   )

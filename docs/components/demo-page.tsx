@@ -29,6 +29,10 @@ export interface DemoPageProps {
   componentKey: string
   /** Auto-injected by vite-plugin-demo-source at build time */
   apiDoc?: ComponentApiDoc
+  /** Used by vite-plugin-demo-source to inject extraApiDocs */
+  extraApiKeys?: string[]
+  /** Auto-injected by vite-plugin-demo-source at build time */
+  extraApiDocs?: ComponentApiDoc[]
   children: JSX.Element
 }
 
@@ -37,10 +41,10 @@ export const DemoPage = (props: DemoPageProps) => {
   const propsDoc = () => props.apiDoc?.props ?? { own: [], inherited: [] }
   const itemsDoc = () => props.apiDoc?.items
   const slots = () => props.apiDoc?.slots ?? []
+  const extraApiDocs = () => props.extraApiDocs ?? []
 
-  const hasProps = () => {
-    const data = propsDoc()
-    return data.own.length > 0 || data.inherited.length > 0 || Boolean(itemsDoc())
+  const hasProps = (data: ComponentPropsDoc, items?: ItemsDoc) => {
+    return data.own.length > 0 || data.inherited.length > 0 || Boolean(items)
   }
 
   return (
@@ -89,7 +93,7 @@ export const DemoPage = (props: DemoPageProps) => {
           </section>
         </Show>
 
-        <Show when={hasProps()}>
+        <Show when={hasProps(propsDoc(), itemsDoc())}>
           <section>
             <h2 class="text-xs text-muted-foreground tracking-[0.16em] font-semibold mb-4 uppercase">
               Props
@@ -97,6 +101,49 @@ export const DemoPage = (props: DemoPageProps) => {
             <PropsTable props={propsDoc()} items={itemsDoc()} />
           </section>
         </Show>
+
+        <For each={extraApiDocs()}>
+          {(doc) => (
+            <>
+              <section>
+                <div class="mb-4 flex flex-wrap gap-2 items-center">
+                  <h2 class="text-xs text-muted-foreground tracking-[0.16em] font-semibold uppercase">
+                    {doc.component.name} API
+                  </h2>
+                  <p class="text-xs text-muted-foreground font-mono">{doc.component.key}</p>
+                </div>
+                <Show when={doc.component.description}>
+                  <p class="text-sm text-muted-foreground max-w-3xl">{doc.component.description}</p>
+                </Show>
+                <Show when={doc.component.sourcePath}>
+                  <p class="text-xs text-muted-foreground font-mono mt-2">
+                    {doc.component.sourcePath}
+                  </p>
+                </Show>
+              </section>
+
+              <Show when={doc.slots.length > 0}>
+                <section>
+                  <h2 class="text-xs text-muted-foreground tracking-[0.16em] font-semibold mb-4 uppercase">
+                    {doc.component.name} Slots
+                  </h2>
+                  <div class="flex flex-wrap gap-2">
+                    <For each={doc.slots}>{(slot) => <Badge>{slot}</Badge>}</For>
+                  </div>
+                </section>
+              </Show>
+
+              <Show when={hasProps(doc.props, doc.items)}>
+                <section>
+                  <h2 class="text-xs text-muted-foreground tracking-[0.16em] font-semibold mb-4 uppercase">
+                    {doc.component.name} Props
+                  </h2>
+                  <PropsTable props={doc.props} items={doc.items} />
+                </section>
+              </Show>
+            </>
+          )}
+        </For>
       </div>
     </main>
   )
