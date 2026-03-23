@@ -71,6 +71,29 @@ interface PropOnlyProps {}
 declare function PropOnly(props: PropOnlyProps): JSX.Element
 `
 
+const D_MTS_ITEMS_COLLECTION = `
+type GenericItems<T> = T[] | T[][]
+
+declare namespace CollectionT {
+  interface Item {
+    /** Label text. */
+    label?: string
+    /** Disabled state. */
+    disabled?: boolean
+  }
+
+  /** Collection-based items doc. */
+  type Items = GenericItems<Item>
+  type Slot = 'root'
+}
+
+interface CollectionProps {
+  items?: CollectionT.Items
+}
+
+declare function Collection(props: CollectionProps): JSX.Element
+`
+
 const D_MTS_EXTERNAL_ALIAS = `
 import type { ExternalProps } from 'opaque-lib'
 
@@ -197,6 +220,37 @@ describe('generateApiDoc', () => {
           required: false,
           type: 'number',
           description: 'Identifier field.',
+        },
+      ],
+    })
+
+    await rm(projectRoot, { recursive: true, force: true })
+  })
+
+  test('extracts item props from collection alias item types', async () => {
+    const projectRoot = await createTempProject()
+    await writeProjectDts(projectRoot, D_MTS_ITEMS_COLLECTION)
+
+    const result = await generateApiDoc(projectRoot)
+    expect(result).not.toBeNull()
+    const data = result!
+
+    const collectionDoc = data.componentDocs.get('collection')
+    expect(collectionDoc).toBeDefined()
+    expect(collectionDoc!.items).toEqual({
+      description: 'Collection-based items doc.',
+      props: [
+        {
+          name: 'disabled',
+          required: false,
+          type: 'boolean',
+          description: 'Disabled state.',
+        },
+        {
+          name: 'label',
+          required: false,
+          type: 'string',
+          description: 'Label text.',
         },
       ],
     })

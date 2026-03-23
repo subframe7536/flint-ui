@@ -4,27 +4,6 @@ import { Button, Tabs } from '../../../src'
 import { DemoPage } from '../../components/demo-page'
 import { DemoSection } from '../../components/demo-section'
 
-const BASE_ITEMS = [
-  {
-    label: 'Overview',
-    value: 'overview',
-    icon: 'i-lucide:layout-dashboard',
-    content: <p class="text-sm text-foreground">Overview panel content.</p>,
-  },
-  {
-    label: 'Settings',
-    value: 'settings',
-    icon: 'i-lucide:settings',
-    content: <p class="text-sm text-foreground">Settings panel content.</p>,
-  },
-  {
-    label: 'Billing',
-    value: 'billing',
-    icon: 'i-lucide:credit-card',
-    content: <p class="text-sm text-foreground">Billing panel content.</p>,
-  },
-] as const
-
 const SIZE_OPTIONS = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 
 export default () => {
@@ -33,9 +12,55 @@ export default () => {
   return (
     <DemoPage componentKey="tabs">
       <DemoSection title="Variants" description="Pill and link visual variants for the tab list.">
-        <div class="gap-4 grid lg:grid-cols-2">
-          <Tabs defaultValue="overview" variant="pill" items={[...BASE_ITEMS]} />
-          <Tabs defaultValue="settings" variant="link" items={[...BASE_ITEMS]} />
+        <div class="flex flex-col gap-8 w-xl">
+          <Tabs
+            defaultValue="overview"
+            variant="pill"
+            items={[
+              {
+                label: 'Overview',
+                value: 'overview',
+                icon: 'i-lucide:layout-dashboard',
+                content: <p class="text-sm text-foreground">Overview panel content.</p>,
+              },
+              {
+                label: 'Settings',
+                value: 'settings',
+                icon: 'i-lucide:settings',
+                content: <p class="text-sm text-foreground">Settings panel content.</p>,
+              },
+              {
+                label: 'Billing',
+                value: 'billing',
+                icon: 'i-lucide:credit-card',
+                content: <p class="text-sm text-foreground">Billing panel content.</p>,
+              },
+            ]}
+          />
+          <Tabs
+            defaultValue="settings"
+            variant="link"
+            items={[
+              {
+                label: 'Overview',
+                value: 'overview',
+                icon: 'i-lucide:layout-dashboard',
+                content: <p class="text-sm text-foreground">Overview panel content.</p>,
+              },
+              {
+                label: 'Settings',
+                value: 'settings',
+                icon: 'i-lucide:settings',
+                content: <p class="text-sm text-foreground">Settings panel content.</p>,
+              },
+              {
+                label: 'Billing',
+                value: 'billing',
+                icon: 'i-lucide:credit-card',
+                content: <p class="text-sm text-foreground">Billing panel content.</p>,
+              },
+            ]}
+          />
         </div>
       </DemoSection>
 
@@ -43,8 +68,31 @@ export default () => {
         title="Orientation"
         description="Horizontal and vertical orientation with the same items contract."
       >
-        <div class="gap-4 grid lg:grid-cols-2">
-          <Tabs defaultValue="overview" orientation="horizontal" items={[...BASE_ITEMS]} />
+        <div class="flex gap-8 w-2xl">
+          <Tabs
+            defaultValue="overview"
+            orientation="horizontal"
+            items={[
+              {
+                label: 'Overview',
+                value: 'overview',
+                icon: 'i-lucide:layout-dashboard',
+                content: <p class="text-sm text-foreground">Overview panel content.</p>,
+              },
+              {
+                label: 'Settings',
+                value: 'settings',
+                icon: 'i-lucide:settings',
+                content: <p class="text-sm text-foreground">Settings panel content.</p>,
+              },
+              {
+                label: 'Billing',
+                value: 'billing',
+                icon: 'i-lucide:credit-card',
+                content: <p class="text-sm text-foreground">Billing panel content.</p>,
+              },
+            ]}
+          />
           <Tabs
             defaultValue="settings"
             orientation="vertical"
@@ -52,13 +100,32 @@ export default () => {
               root: 'max-w-md',
               list: 'w-40',
             }}
-            items={[...BASE_ITEMS]}
+            items={[
+              {
+                label: 'Overview',
+                value: 'overview',
+                icon: 'i-lucide:layout-dashboard',
+                content: <p class="text-sm text-foreground w-sm">Overview panel content.</p>,
+              },
+              {
+                label: 'Settings',
+                value: 'settings',
+                icon: 'i-lucide:settings',
+                content: <p class="text-sm text-foreground w-sm">Settings panel content.</p>,
+              },
+              {
+                label: 'Billing',
+                value: 'billing',
+                icon: 'i-lucide:credit-card',
+                content: <p class="text-sm text-foreground w-sm">Billing panel content.</p>,
+              },
+            ]}
           />
         </div>
       </DemoSection>
 
       <DemoSection title="Sizes" description="Trigger size scale from xs to xl.">
-        <div class="space-y-4">
+        <div class="w-xl space-y-4">
           <For each={SIZE_OPTIONS}>
             {(size) => (
               <div class="space-y-1">

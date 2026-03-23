@@ -44,7 +44,6 @@ export default () => {
             step={1}
             onValueChange={setSingleValue}
             onChange={setSingleCommit}
-            highlight
           />
           <p class="text-xs text-muted-foreground">
             Current value: {formatSliderValue(singleValue())}
@@ -97,7 +96,7 @@ export default () => {
       </DemoSection>
 
       <DemoSection title="Sizes" description="Track and thumb sizing from xs to xl.">
-        <div class="space-y-4">
+        <div class="w-lg space-y-4">
           <For each={SIZES}>
             {(size) => (
               <div class="space-y-2">

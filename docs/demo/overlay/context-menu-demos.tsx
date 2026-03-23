@@ -273,7 +273,90 @@ export default () => {
         title="File Explorer"
         description="A file-row context menu with move flows, shortcuts, mixed labels, and destructive actions."
       >
-        <ContextMenu items={fileItems}>
+        <ContextMenu
+          items={[
+            [
+              {
+                type: 'label',
+                label: (
+                  <div class="flex gap-2 items-center">
+                    <span>Issue: Improve menu transitions</span>
+                    <span class={badgeClass}>P1</span>
+                  </div>
+                ),
+              },
+              {
+                label: 'Open Issue',
+                icon: 'i-lucide-external-link',
+                onSelect: () => setLastAction('Open issue'),
+              },
+              {
+                label: 'Assign',
+                icon: 'i-lucide-user-round-plus',
+                children: [
+                  [
+                    {
+                      label: 'Alex Morgan',
+                      description: 'Design systems',
+                      icon: 'i-lucide-user',
+                      onSelect: () => setLastAction('Assign Alex Morgan'),
+                    },
+                    {
+                      label: 'Jamie Chen',
+                      description: 'Overlay primitives',
+                      icon: 'i-lucide-user',
+                      onSelect: () => setLastAction('Assign Jamie Chen'),
+                    },
+                  ],
+                ],
+              },
+              {
+                label: 'Move to Sprint',
+                icon: 'i-lucide-calendar-range',
+                children: [
+                  [
+                    {
+                      label: 'Sprint 18',
+                      onSelect: () => setLastAction('Move to Sprint 18'),
+                    },
+                    {
+                      label: 'Sprint 19',
+                      onSelect: () => setLastAction('Move to Sprint 19'),
+                    },
+                    {
+                      label: 'Backlog',
+                      onSelect: () => setLastAction('Move to backlog'),
+                    },
+                  ],
+                ],
+              },
+            ],
+            [
+              {
+                label: 'Edit Details',
+                icon: 'i-lucide-pencil',
+                onSelect: () => setLastAction('Edit details'),
+              },
+              {
+                label: 'Share Update',
+                icon: 'i-lucide-share-2',
+                onSelect: () => setLastAction('Share update'),
+              },
+              { type: 'separator' },
+              {
+                label: 'Archive',
+                icon: 'i-lucide-archive',
+                onSelect: () => setLastAction('Archive issue'),
+              },
+              {
+                label: 'Delete Issue',
+                icon: 'i-lucide-trash-2',
+                color: 'destructive',
+                onSelect: () => setLastAction('Delete issue'),
+              },
+            ],
+          ]}
+        >
           <div class={panelClass}>
             <div class="flex gap-3 items-center justify-between">
               <div>

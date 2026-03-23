@@ -98,7 +98,7 @@ export const Sidebar = (props: SidebarProps) => {
                           'text-sm text-muted-foreground px-2.5 py-1.5 text-left rounded-lg',
                           props.activePage() === page.key
                             ? 'text-foreground bg-accent/80'
-                            : 'hover:(text-foreground bg-muted)',
+                            : 'hover:(text-muted-foreground bg-muted)',
                         )}
                         onClick={() => props.setActivePage(page.key)}
                       >

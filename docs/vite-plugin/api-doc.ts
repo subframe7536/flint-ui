@@ -219,7 +219,9 @@ function extractItemsDoc(
       : checker.getTypeFromTypeNode(stmt.type)
     const symbol = checker.getSymbolAtLocation(stmt.name)
     const description = displayText(symbol?.getDocumentationComment(checker)).trim() || undefined
-    const props = extractOwnPropDocsFromType(checker, sourceFile, itemsType, stmt)
+    const props = ts.isInterfaceDeclaration(stmt)
+      ? extractOwnPropDocsFromType(checker, sourceFile, itemsType, stmt)
+      : extractItemsAliasPropDocs(checker, sourceFile, stmt.type)
 
     if (!description && props.length === 0) {
       return undefined
@@ -227,6 +229,45 @@ function extractItemsDoc(
     return { props, ...(description ? { description } : {}) }
   }
   return undefined
+}
+
+function extractItemsAliasPropDocs(
+  checker: ts.TypeChecker,
+  sourceFile: ts.SourceFile,
+  typeNode: ts.TypeNode,
+  visited = new Set<string>(),
+): PropDoc[] {
+  const visitKey = `${typeNode.pos}:${typeNode.end}:${typeNode.kind}`
+  if (visited.has(visitKey)) {
+    return []
+  }
+  visited.add(visitKey)
+
+  if (ts.isTypeReferenceNode(typeNode) && typeNode.typeArguments && typeNode.typeArguments.length > 0) {
+    const firstArgProps = extractItemsAliasPropDocs(checker, sourceFile, typeNode.typeArguments[0], visited)
+    if (firstArgProps.length > 0) {
+      return firstArgProps
+    }
+  }
+
+  if (ts.isArrayTypeNode(typeNode)) {
+    const elementProps = extractItemsAliasPropDocs(checker, sourceFile, typeNode.elementType, visited)
+    if (elementProps.length > 0) {
+      return elementProps
+    }
+  }
+
+  if (ts.isUnionTypeNode(typeNode)) {
+    for (const unionTypeNode of typeNode.types) {
+      const unionProps = extractItemsAliasPropDocs(checker, sourceFile, unionTypeNode, visited)
+      if (unionProps.length > 0) {
+        return unionProps
+      }
+    }
+  }
+
+  const resolvedType = checker.getTypeFromTypeNode(typeNode)
+  return extractOwnPropDocsFromType(checker, sourceFile, resolvedType, typeNode)
 }
 
 function createPropDoc(checker: ts.TypeChecker, propSymbol: ts.Symbol, location: ts.Node): PropDoc {

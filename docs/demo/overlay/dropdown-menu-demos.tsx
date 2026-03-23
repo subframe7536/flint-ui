@@ -19,98 +19,6 @@ export default () => {
   const [autoSave, setAutoSave] = createSignal(true)
   const [theme, setTheme] = createSignal<'light' | 'dark' | 'system'>('dark')
 
-  const accountItems: DropdownMenuT.Items = [
-    [
-      { type: 'label', label: 'Account' },
-      {
-        label: (
-          <div class="flex gap-2 items-center">
-            <span class="font-medium">Alex Morgan</span>
-            <span class={badgeClass}>Owner</span>
-          </div>
-        ),
-        description: 'alex@rockui.dev',
-        icon: <span class={avatarClass}>AM</span>,
-        onSelect: () => setLastAction('Open account profile'),
-      },
-      { type: 'separator' },
-      {
-        label: 'Switch Workspace',
-        icon: 'i-lucide-building-2',
-        children: [
-          [
-            { type: 'label', label: 'Recent Workspaces' },
-            {
-              label: 'Design System',
-              description: '12 teammates · shared tokens',
-              icon: 'i-lucide-palette',
-              onSelect: () => setLastAction('Switch to Design System'),
-            },
-            {
-              label: 'Platform Ops',
-              description: '8 teammates · deploy tooling',
-              icon: 'i-lucide-server',
-              onSelect: () => setLastAction('Switch to Platform Ops'),
-            },
-            {
-              label: 'Support Workspace',
-              description: '5 teammates · customer issues',
-              icon: 'i-lucide-life-buoy',
-              onSelect: () => setLastAction('Switch to Support Workspace'),
-            },
-          ],
-          [
-            { type: 'label', label: 'Actions' },
-            {
-              label: 'Create Workspace',
-              icon: 'i-lucide-plus',
-              onSelect: () => setLastAction('Create workspace'),
-            },
-          ],
-        ],
-      },
-      {
-        label: 'Invite Teammates',
-        icon: 'i-lucide-user-plus',
-        kbds: ['⌘', 'I'],
-        onSelect: () => setLastAction('Invite teammates'),
-      },
-      {
-        label: 'Billing & Usage',
-        icon: 'i-lucide-credit-card',
-        onSelect: () => setLastAction('Billing & usage'),
-      },
-    ],
-    [
-      { type: 'label', label: 'Preferences' },
-      {
-        label: 'Account Settings',
-        icon: 'i-lucide-settings-2',
-        kbds: ['⌘', ','],
-        onSelect: () => setLastAction('Account settings'),
-      },
-      {
-        label: 'Keyboard Shortcuts',
-        icon: 'i-lucide-command',
-        kbds: ['⌘', 'K'],
-        onSelect: () => setLastAction('Keyboard shortcuts'),
-      },
-      {
-        label: 'Support Inbox',
-        icon: 'i-lucide-life-buoy',
-        onSelect: () => setLastAction('Support inbox'),
-      },
-    ],
-    [
-      {
-        label: 'Sign Out',
-        icon: 'i-lucide-log-out',
-        color: 'destructive',
-        onSelect: () => setLastAction('Sign out'),
-      },
-    ],
-  ]
-
   const editorItems = createMemo<DropdownMenuT.Items>(() => [
     [
       { type: 'label', label: 'Editor' },
@@ -363,7 +271,99 @@ export default () => {
         description="An account dropdown with grouped actions, workspace switching, shortcut hints, and a destructive sign-out row."
       >
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <DropdownMenu items={accountItems}>
+          <DropdownMenu
+            items={[
+              [
+                { type: 'label', label: 'Account' },
+                {
+                  label: (
+                    <div class="flex gap-2 items-center">
+                      <span class="font-medium">Alex Morgan</span>
+                      <span class={badgeClass}>Owner</span>
+                    </div>
+                  ),
+                  description: 'alex@rockui.dev',
+                  icon: <span class={avatarClass}>AM</span>,
+                  onSelect: () => setLastAction('Open account profile'),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Switch Workspace',
+                  icon: 'i-lucide-building-2',
+                  children: [
+                    [
+                      { type: 'label', label: 'Recent Workspaces' },
+                      {
+                        label: 'Design System',
+                        description: '12 teammates · shared tokens',
+                        icon: 'i-lucide-palette',
+                        onSelect: () => setLastAction('Switch to Design System'),
+                      },
+                      {
+                        label: 'Platform Ops',
+                        description: '8 teammates · deploy tooling',
+                        icon: 'i-lucide-server',
+                        onSelect: () => setLastAction('Switch to Platform Ops'),
+                      },
+                      {
+                        label: 'Support Workspace',
+                        description: '5 teammates · customer issues',
+                        icon: 'i-lucide-life-buoy',
+                        onSelect: () => setLastAction('Switch to Support Workspace'),
+                      },
+                    ],
+                    [
+                      { type: 'label', label: 'Actions' },
+                      {
+                        label: 'Create Workspace',
+                        icon: 'i-lucide-plus',
+                        onSelect: () => setLastAction('Create workspace'),
+                      },
+                    ],
+                  ],
+                },
+                {
+                  label: 'Invite Teammates',
+                  icon: 'i-lucide-user-plus',
+                  kbds: ['⌘', 'I'],
+                  onSelect: () => setLastAction('Invite teammates'),
+                },
+                {
+                  label: 'Billing & Usage',
+                  icon: 'i-lucide-credit-card',
+                  onSelect: () => setLastAction('Billing & usage'),
+                },
+              ],
+              [
+                { type: 'label', label: 'Preferences' },
+                {
+                  label: 'Account Settings',
+                  icon: 'i-lucide-settings-2',
+                  kbds: ['⌘', ','],
+                  onSelect: () => setLastAction('Account settings'),
+                },
+                {
+                  label: 'Keyboard Shortcuts',
+                  icon: 'i-lucide-command',
+                  kbds: ['⌘', 'K'],
+                  onSelect: () => setLastAction('Keyboard shortcuts'),
+                },
+                {
+                  label: 'Support Inbox',
+                  icon: 'i-lucide-life-buoy',
+                  onSelect: () => setLastAction('Support inbox'),
+                },
+              ],
+              [
+                {
+                  label: 'Sign Out',
+                  icon: 'i-lucide-log-out',
+                  color: 'destructive',
+                  onSelect: () => setLastAction('Sign out'),
+                },
+              ],
+            ]}
+          >
             <Button variant="outline">Open account menu</Button>
           </DropdownMenu>
           <p class="text-sm text-muted-foreground">

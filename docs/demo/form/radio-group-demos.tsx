@@ -38,7 +38,7 @@ export default () => {
               legend="Table"
               items={ITEMS}
               variant="table"
-              orientation="horizontal"
+              orientation="vertical"
               defaultValue="enterprise"
             />
           </div>

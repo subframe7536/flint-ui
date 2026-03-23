@@ -46,7 +46,7 @@ export const CHECKABLE_INDICATOR_VARIANT = {
 export const CHECKABLE_WRAPPER_ALIGN_VARIANT = {
   start: 'ms-2',
   end: 'me-2',
-  hidden: 'text-center',
+  hidden: '',
 } as const
 
 export const TABLE_EDGE_ORIENTATION_VARIANT = {
