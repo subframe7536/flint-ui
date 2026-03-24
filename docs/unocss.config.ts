@@ -27,6 +27,12 @@ export default defineConfig<PresetWind4Theme>({
       },
     }),
   ],
+  theme: {
+    font: {
+      sans: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+      mono: 'Maple Mono NF CN, Maple Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+    },
+  },
   content: {
     pipeline: {
       include: [
@@ -74,9 +80,6 @@ export default defineConfig<PresetWind4Theme>({
   --sidebar-accent-foreground: hsl(221.2 83.2% 53.3%);
   --sidebar-border: hsl(214.3 31.8% 91.4%);
   --sidebar-ring: hsl(221.2 83.2% 53.3%);
-  --font-sans: Inter, system-ui, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Maple Mono NF CN, Maple Mono, monospace;
   --radius: 0.5rem;
   --shadow-x: 0;
   --shadow-y: 1px;
