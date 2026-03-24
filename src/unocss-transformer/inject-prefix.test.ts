@@ -43,6 +43,27 @@ describe('transformer-inject-rock-prefix', () => {
     expect(output).not.toContain('hover:(')
   })
 
+  test('supports ids with query strings', async () => {
+    const output = await runTransform(
+      `const view = <div class="hover:(bg-red text-white) text-sm" />`,
+      'src/example.tsx?t=12345',
+    )
+
+    expect(output).toContain(
+      `class="${TEST_PREFIX}hover:bg-red ${TEST_PREFIX}hover:text-white ${TEST_PREFIX}text-sm"`,
+    )
+  })
+
+  test('normalizes id before applying custom idFilter', async () => {
+    const transformer = transformerInjectPrefix({
+      prefix: TEST_PREFIX,
+      idFilter: (id) => id.endsWith('.tsx'),
+    })
+
+    expect(transformer.idFilter?.('src/example.tsx?t=12345')).toBe(true)
+    expect(transformer.idFilter?.('src/example.ts?worker')).toBe(false)
+  })
+
   test('prefixes class strings in cva base, variants and compoundVariants.class only', async () => {
     const output = await runTransform(
       `

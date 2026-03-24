@@ -18,6 +18,7 @@ export default defineConfig<PresetWind4Theme>({
     presetAnimations() as any,
     presetTheme({
       enableComponentLayer: {
+        strategy: 'hash',
         idFilter(id: string) {
           return id.includes('/src/') && (id.endsWith('.class.ts') || id.endsWith('.tsx'))
         },

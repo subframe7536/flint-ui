@@ -33,16 +33,29 @@ async function copyCode(html: string): Promise<void> {
   await wait(COPY_SUCCESS_TIMEOUT_MS)
 }
 
+export type ShikiCodeBlockVariant = 'plain' | 'source'
+
 export interface ShikiCodeBlockProps {
   html?: string
   class?: string
   style?: JSX.CSSProperties
+  variant?: ShikiCodeBlockVariant
   children?: JSX.Element
 }
 
 export const ShikiCodeBlock = (props: ShikiCodeBlockProps) => {
+  const isSource = () => props.variant === 'source'
+
   return (
-    <div class={cn('relative', props.class)} style={props.style}>
+    <div
+      class={cn(
+        isSource()
+          ? 'group b-(1 border) rounded-xl bg-muted/70 relative overflow-hidden'
+          : 'relative',
+        props.class,
+      )}
+      style={props.style}
+    >
       <Show
         when={props.html}
         fallback={
@@ -58,7 +71,11 @@ export const ShikiCodeBlock = (props: ShikiCodeBlockProps) => {
               loadingIcon="i-lucide:check"
               size="md"
               classes={{
-                root: 'absolute end-2 top-2 z-1 text-muted-foreground hover:(bg-muted text-foreground) p-1.5',
+                root: [
+                  'text-muted-foreground p-1.5 end-2 top-2 absolute z-1 hover:(text-foreground bg-muted)',
+                  isSource() &&
+                    'opacity-0 pointer-events-none transition-[opacity,colors] focus-visible:(opacity-100 pointer-events-auto) group-hover:(opacity-100 pointer-events-auto)',
+                ],
               }}
               loadingAuto
               onClick={() => copyCode(html())}
@@ -66,7 +83,7 @@ export const ShikiCodeBlock = (props: ShikiCodeBlockProps) => {
 
             {/* eslint-disable-next-line solid/no-innerhtml -- shiki HTML generated at build time */}
             <div
-              class="text-xs leading-relaxed overflow-x-auto [&_code]:(font-mono) [&_pre]:(m-0 p-4 bg-transparent)"
+              class="text-xs leading-relaxed overflow-x-auto [&_code]:font-mono [&_pre]:(m-0 p-4)"
               // oxlint-disable-next-line solid/no-innerhtml
               innerHTML={html()}
             />
@@ -74,5 +91,21 @@ export const ShikiCodeBlock = (props: ShikiCodeBlockProps) => {
         )}
       </Show>
     </div>
+  )
+}
+
+export interface SourceCodeProps {
+  lang?: string
+  html?: string
+  class?: string
+  style?: JSX.CSSProperties
+  children: JSX.Element
+}
+
+export const SourceCode = (props: SourceCodeProps) => {
+  return (
+    <ShikiCodeBlock html={props.html} class={props.class} style={props.style} variant="source">
+      {props.children}
+    </ShikiCodeBlock>
   )
 }

@@ -233,21 +233,21 @@ export default () => (
     const projectRoot = await createTempProject()
     const toHTML = vi.fn((source: string, lang: 'tsx' | 'bash') => `<pre ${lang}>${source}</pre>`)
     const source = await readFile(
-      path.join(process.cwd(), 'docs/demo/overlay/tooltip-demos.tsx'),
+      path.join(process.cwd(), 'docs/pages/overlay/tooltip-demos.tsx'),
       'utf8',
     )
 
     const transformed = await transformDemoSource(
       source,
-      '/tmp/docs/demo/overlay/tooltip-demos.tsx',
+      '/tmp/docs/pages/overlay/tooltip-demos.tsx',
       toHTML,
       projectRoot,
     )
 
     expect(transformed).not.toBeNull()
-    expect(transformed).toContain('demo={PlacementsDemo}')
+    expect(transformed).toContain('demo={Placements}')
     expect(transformed).toContain('code={')
-    expect(toHTML).toHaveBeenCalledWith(expect.stringContaining('function PlacementsDemo'), 'tsx')
+    expect(toHTML).toHaveBeenCalledWith(expect.stringContaining('function Placements'), 'tsx')
 
     await rm(projectRoot, { recursive: true, force: true })
   })

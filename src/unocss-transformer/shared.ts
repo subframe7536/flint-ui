@@ -38,12 +38,16 @@ const TSX_SUFFIX = '.tsx'
 const CLASS_TS_SUFFIX = '.class.ts'
 const VARIANT_CONST_SUFFIX = 'VARIANT'
 
+export function normalizeId(id: string): string {
+  return id.replace(/[?#].*$/, '')
+}
+
 function isClassFile(id: string): boolean {
-  return id.endsWith(CLASS_TS_SUFFIX)
+  return normalizeId(id).endsWith(CLASS_TS_SUFFIX)
 }
 
 function isTsxFile(id: string): boolean {
-  return id.endsWith(TSX_SUFFIX)
+  return normalizeId(id).endsWith(TSX_SUFFIX)
 }
 
 function unwrapExpression(node: Node | null | undefined): Node | null | undefined {

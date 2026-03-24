@@ -16,7 +16,11 @@ describe('scanDemoPages', () => {
     await mkdir(path.join(projectRoot, 'docs/pages/form'), { recursive: true })
     await mkdir(path.join(projectRoot, 'docs/pages/overlay'), { recursive: true })
 
-    await writeFile(path.join(projectRoot, 'docs/pages/intro.tsx'), 'export default () => null', 'utf8')
+    await writeFile(
+      path.join(projectRoot, 'docs/pages/intro.tsx'),
+      'export default () => null',
+      'utf8',
+    )
     await writeFile(
       path.join(projectRoot, 'docs/pages/form/input-number-demos.tsx'),
       'export default () => null',
@@ -48,10 +52,10 @@ describe('buildDemoPagesModuleCode', () => {
     ])
 
     expect(code).toContain("import { lazy } from 'solid-js'")
-    expect(code).toContain("export const demoMap")
+    expect(code).toContain('export const demoMap')
     expect(code).toContain("'intro': lazy(() => import('./pages/intro'))")
     expect(code).toContain("'input': lazy(() => import('./pages/form/input-demos'))")
-    expect(code).toContain("export const pages")
+    expect(code).toContain('export const pages')
     expect(code).toContain("{ key: 'intro' }")
     expect(code).toContain("{ key: 'input', group: 'form' }")
   })

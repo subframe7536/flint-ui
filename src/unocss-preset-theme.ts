@@ -1,5 +1,6 @@
-import type { Preset } from 'unocss'
+import type { Preset, SourceCodeTransformer } from 'unocss'
 
+import { transformerInjectCompileClass } from './unocss-transformer/inject-compile-class'
 import { transformerInjectPrefix } from './unocss-transformer/inject-prefix'
 import type { TransformerInjectPrefixOption } from './unocss-transformer/inject-prefix'
 
@@ -48,29 +49,89 @@ export const DEFAULT_ICONS = {
   warning: 'i-lucide-triangle-alert',
 } as const
 
+export type ComponentLayerStrategy = 'hash' | 'prefix'
+
+export interface ComponentLayerOptions extends Partial<
+  Omit<TransformerInjectPrefixOption, 'prefix'>
+> {
+  /**
+   * Controls how component-owned utilities are isolated from consumer utilities.
+   *
+   * - `prefix`: prefixes component utilities with `utilityPrefix` and keeps them in the
+   *   dedicated `rock-component` layer.
+   * - `hash`: compiles component utilities into internal hash classes in the
+   *   `rock-component` layer.
+   *
+   * `prefix` is the default because it keeps the generated output readable while still
+   * making component styles override-safe out of the box.
+   *
+   * @default 'prefix'
+   */
+  strategy?: ComponentLayerStrategy
+  /**
+   * Prefix used for component-owned utilities when `strategy` is `prefix`.
+   * @default 'rk-'
+   */
+  utilityPrefix?: `${string}-`
+}
+
 export interface PresetThemeOptions extends Pick<TransformerInjectPrefixOption, 'beforeTransform'> {
   wind3?: boolean
   icons?: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
-  enableComponentLayer?:
-    | boolean
-    | 'preservePrefix'
-    | (Partial<TransformerInjectPrefixOption> & { preservePrefix?: boolean })
+  enableComponentLayer?: boolean | ComponentLayerOptions
 }
 
 const ROCK_COMPONENT_LAYER = 'rock-component'
-const ROCK_PREFIX = 'rk-'
-const RE_ROCK_PREFIX = new RegExp(ROCK_PREFIX, 'g')
-const RE_ROCK_PREFIX_CLEAN = new RegExp(`\\\\?${ROCK_PREFIX}`, 'g')
+const DEFAULT_COMPONENT_UTILITY_PREFIX = 'rk-'
+const ROCK_HASH_TRIGGER = ':uno-rock:'
+const ROCK_HASH_CLASS_PREFIX = 'rkc-'
 
 const RE_ATTR = /^(data|aria)-(\w+):/
 interface ResolvedPresetThemeOptions {
   wind3: boolean
   icons: Partial<Record<keyof typeof DEFAULT_ICONS, string>>
   enableComponentLayer: boolean
-  preservePrefix: boolean
-  prefix: string
+  strategy: ComponentLayerStrategy
+  utilityPrefix: `${string}-`
   idFilter: (id: string) => boolean
   beforeTransform?: TransformerInjectPrefixOption['beforeTransform']
+}
+
+let compileClassTransformerPromise: Promise<SourceCodeTransformer> | undefined
+
+async function loadHashClassTransformer(): Promise<SourceCodeTransformer> {
+  try {
+    compileClassTransformerPromise ??= import('@unocss/transformer-compile-class').then(
+      ({ default: transformerCompileClass }) =>
+        transformerCompileClass({
+          trigger: ROCK_HASH_TRIGGER,
+          classPrefix: ROCK_HASH_CLASS_PREFIX,
+          layer: ROCK_COMPONENT_LAYER,
+        }),
+    )
+
+    return await compileClassTransformerPromise
+  } catch (error) {
+    compileClassTransformerPromise = undefined
+
+    throw new Error(
+      '[preset-theme-rock] `enableComponentLayer.strategy: "hash"` requires `@unocss/transformer-compile-class`. Install it or switch to `strategy: "prefix"`.',
+      { cause: error },
+    )
+  }
+}
+
+function createHashClassTransformer(idFilter: (id: string) => boolean): SourceCodeTransformer {
+  return {
+    name: 'transformer-rock-hash-class',
+    enforce: 'pre',
+    idFilter,
+    async transform(code, id, context) {
+      const transformer = await loadHashClassTransformer()
+
+      return transformer.transform?.(code, id, context)
+    },
+  }
 }
 
 export function resolvePresetThemeOptions(
@@ -80,26 +141,23 @@ export function resolvePresetThemeOptions(
   const isObj = typeof layerOpt === 'object' && layerOpt !== null
 
   let enableComponentLayer = false
-  let preservePrefix = false
+  let strategy: ComponentLayerStrategy = 'prefix'
+  let utilityPrefix: `${string}-` = DEFAULT_COMPONENT_UTILITY_PREFIX
 
   if (isObj) {
     enableComponentLayer = true
-    if (layerOpt.preservePrefix) {
-      preservePrefix = true
-    }
+    strategy = layerOpt.strategy ?? 'prefix'
+    utilityPrefix = layerOpt.utilityPrefix ?? DEFAULT_COMPONENT_UTILITY_PREFIX
   } else if (layerOpt) {
     enableComponentLayer = true
-    if (layerOpt === 'preservePrefix') {
-      preservePrefix = true
-    }
   }
 
   return {
     wind3: options?.wind3 ?? false,
     icons: options?.icons ?? {},
     enableComponentLayer,
-    preservePrefix,
-    prefix: (isObj && layerOpt.prefix) || ROCK_PREFIX,
+    strategy,
+    utilityPrefix,
     idFilter:
       (isObj && layerOpt.idFilter) || ((id: string) => id.includes('node_modules/rock-ui/')),
     beforeTransform: (isObj && layerOpt.beforeTransform) || options?.beforeTransform,
@@ -111,27 +169,23 @@ export function presetTheme(options?: PresetThemeOptions): Preset {
 
   const transformers: Preset['transformers'] = []
   if (normalized.enableComponentLayer) {
-    transformers.push(
-      transformerInjectPrefix({
-        prefix: normalized.prefix,
-        idFilter: normalized.idFilter,
-        beforeTransform: normalized.beforeTransform,
-      }),
-    )
-
-    if (!normalized.preservePrefix) {
-      transformers.push({
-        name: 'transformer-rock',
-        enforce: 'post',
-        idFilter: normalized.idFilter,
-        transform(code) {
-          const source = code.toString()
-          const nextSource = source.replace(RE_ROCK_PREFIX, '')
-          if (nextSource !== source) {
-            code.overwrite(0, code.original.length, nextSource)
-          }
-        },
-      })
+    if (normalized.strategy === 'hash') {
+      transformers.push(createHashClassTransformer(normalized.idFilter))
+      transformers.unshift(
+        transformerInjectCompileClass({
+          trigger: ROCK_HASH_TRIGGER,
+          idFilter: normalized.idFilter,
+          beforeTransform: normalized.beforeTransform,
+        }),
+      )
+    } else {
+      transformers.push(
+        transformerInjectPrefix({
+          prefix: normalized.utilityPrefix,
+          idFilter: normalized.idFilter,
+          beforeTransform: normalized.beforeTransform,
+        }),
+      )
     }
   }
 
@@ -151,14 +205,14 @@ export function presetTheme(options?: PresetThemeOptions): Preset {
     },
   ]
 
-  if (normalized.enableComponentLayer) {
+  if (normalized.enableComponentLayer && normalized.strategy === 'prefix') {
     variants.push((matcher) => {
-      if (!matcher.startsWith(ROCK_PREFIX)) {
+      if (!matcher.startsWith(normalized.utilityPrefix)) {
         return matcher
       }
 
       return {
-        matcher: matcher.slice(ROCK_PREFIX.length),
+        matcher: matcher.slice(normalized.utilityPrefix.length),
         layer: ROCK_COMPONENT_LAYER,
       }
     })
@@ -242,21 +296,6 @@ export function presetTheme(options?: PresetThemeOptions): Preset {
     },
     transformers,
     variants,
-    postprocess:
-      normalized.enableComponentLayer && !normalized.preservePrefix
-        ? [
-            (util) => {
-              if (util.layer !== ROCK_COMPONENT_LAYER) {
-                return
-              }
-
-              util.selector = util.selector.replace(RE_ROCK_PREFIX_CLEAN, '')
-              if (util.parent) {
-                util.parent = util.parent.replace(RE_ROCK_PREFIX_CLEAN, '')
-              }
-            },
-          ]
-        : undefined,
     shortcuts: [
       ['effect-fv', 'outline-none ring-3px ring-ring/30'],
       ['effect-fv-border', 'outline-none border-ring ring-3px ring-ring/30'],

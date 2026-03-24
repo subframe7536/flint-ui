@@ -877,89 +877,37 @@ describe('Resizable', () => {
     expect(screen.container.querySelectorAll('[data-slot="collapsible"]')).toHaveLength(0)
   })
 
-  test('keeps transition disabled while initial root size is stabilizing', async () => {
-    const globalObject = globalThis as Record<string, unknown>
-    const originalResizeObserver = globalObject.ResizeObserver
-    const resizeCallbacks: ResizeObserverCallback[] = []
-    const mutableDefaultRect = defaultRect as { right: number; width: number }
-    const originalRight = mutableDefaultRect.right
-    const originalWidth = mutableDefaultRect.width
-
-    globalObject.ResizeObserver = class {
-      constructor(callback: ResizeObserverCallback) {
-        resizeCallbacks.push(callback)
-      }
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    }
-
-    mutableDefaultRect.right = 0
-    mutableDefaultRect.width = 0
-
-    try {
-      const screen = render(() => (
-        <Resizable
-          panels={[
-            { content: 'A', size: 300 },
-            { content: 'B', defaultSize: '40%' },
-            { content: 'C' },
-          ]}
-        />
-      ))
-
-      const root = screen.container.querySelector('[data-slot="root"]') as HTMLDivElement
-      const firstPanel = screen.container.querySelector('[data-slot="panel"]') as HTMLDivElement
-      const divider = screen.container.querySelector('[data-slot="divider"]') as HTMLDivElement
-
-      expect(root).toBeTruthy()
-      expect(divider.getAttribute('aria-disabled')).toBe('true')
-      expect(divider.getAttribute('tabindex')).toBe('-1')
-      expect(firstPanel.className).toContain('transition-none')
-      expect(firstPanel.className).toContain(
-        'data-transitioning:(transition-flex-grow duration-200)',
-      )
-      expect(firstPanel.getAttribute('data-transitioning')).toBeNull()
-      expect(firstPanel.style.flexBasis).toBe('auto')
-      expect(firstPanel.style.flexGrow).toBe('1')
-
-      mutableDefaultRect.right = 1000
-      mutableDefaultRect.width = 1000
-      resizeCallbacks.forEach((callback) => callback([], {} as ResizeObserver))
-
-      expect(divider.getAttribute('aria-disabled')).toBeNull()
-      expect(divider.getAttribute('tabindex')).toBe('0')
-      expect(firstPanel.className).toContain('transition-none')
-      expect(firstPanel.className).toContain(
-        'data-transitioning:(transition-flex-grow duration-200)',
-      )
-      expect(firstPanel.getAttribute('data-transitioning')).toBeNull()
-      expect(firstPanel.style.flexBasis).toBe('0px')
-
-      await waitForLayoutInitialization()
-    } finally {
-      mutableDefaultRect.right = originalRight
-      mutableDefaultRect.width = originalWidth
-      globalObject.ResizeObserver = originalResizeObserver
-    }
-  })
-
-  test('keeps transition disabled after initialization without collapse triggers', async () => {
+  test('enables transition when collapse or expand is triggered', async () => {
     const screen = render(() => (
-      <Resizable panels={[{ content: 'Left', defaultSize: '35%' }, { content: 'Right' }]} />
+      <Resizable
+        handleAction="collapse"
+        panels={[
+          {
+            content: 'Sidebar',
+            defaultSize: '30%',
+            min: '20%',
+            collapsible: true,
+            collapsibleMin: '10%',
+          },
+          { content: 'Content', defaultSize: '70%', min: '20%' },
+        ]}
+      />
     ))
 
-    const panel = screen.container.querySelector('[data-slot="panel"]') as HTMLDivElement
+    const handle = screen.container.querySelector('[data-slot="handle"]') as HTMLElement
+    const panel = screen.container.querySelectorAll('[data-slot="panel"]')[0] as HTMLDivElement
 
-    expect(panel.className).toContain('transition-none')
     expect(panel.className).toContain('data-transitioning:(transition-flex-grow duration-200)')
     expect(panel.getAttribute('data-transitioning')).toBeNull()
 
-    await waitForLayoutInitialization()
+    await fireEvent.click(handle)
+    expect(panel.getAttribute('data-transitioning')).toBe('')
 
-    expect(panel.className).toContain('transition-none')
-    expect(panel.className).toContain('data-transitioning:(transition-flex-grow duration-200)')
+    await fireEvent.transitionEnd(panel, { propertyName: 'flex-grow' })
     expect(panel.getAttribute('data-transitioning')).toBeNull()
+
+    await fireEvent.click(handle)
+    expect(panel.getAttribute('data-transitioning')).toBe('')
   })
 
   test('does not mark transition during controlled size updates', async () => {

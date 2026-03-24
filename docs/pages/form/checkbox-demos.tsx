@@ -7,7 +7,7 @@ import { DemoSection } from '../../components/demo-section'
 
 function VariantsIndicator() {
   return (
-    <div class="gap-4 grid sm:grid-cols-2">
+    <div class="gap-8 grid sm:grid-cols-2">
       <div class="space-y-3">
         <Checkbox label="List / start" description="Default list style" defaultChecked />
         <Checkbox

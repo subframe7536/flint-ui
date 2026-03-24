@@ -2,36 +2,32 @@ import type { SourceCodeTransformer } from 'unocss'
 
 import { normalizeId, runTransform } from './shared'
 
-export function prefixClassList(value: string, prefix: string): string {
-  const tokens = value.match(/\S+/g)
+export function injectCompileClassTrigger(value: string, trigger: string): string {
+  const trimmed = value.trim()
 
-  if (!tokens) {
+  if (!trimmed || trimmed.startsWith(trigger)) {
     return value
   }
 
-  return tokens.map((token) => (token.startsWith(prefix) ? token : `${prefix}${token}`)).join(' ')
+  const leading = value.slice(0, value.length - value.trimStart().length)
+  const trailing = value.slice(value.trimEnd().length)
+
+  return `${leading}${trigger} ${trimmed}${trailing}`
 }
 
-export interface TransformerInjectPrefixOption {
-  prefix: string
-  /**
-   * Custom filter function
-   * @param id file path
-   * @default id => id.includes('node_modules/rock-ui/')
-   */
+export interface TransformerInjectCompileClassOption {
+  trigger: string
   idFilter?: (id: string) => boolean
-  /**
-   * Hooks before inject prefix
-   */
   beforeTransform?: (...args: Parameters<SourceCodeTransformer['transform']>) => void
 }
 
-export function transformerInjectPrefix(
-  options: TransformerInjectPrefixOption,
+export function transformerInjectCompileClass(
+  options: TransformerInjectCompileClassOption,
 ): SourceCodeTransformer {
-  const { prefix, idFilter, beforeTransform } = options
+  const { trigger, idFilter, beforeTransform } = options
+
   return {
-    name: 'transformer-inject-prefix',
+    name: 'transformer-inject-compile-class',
     enforce: 'pre',
     idFilter: idFilter ? (id) => idFilter(normalizeId(id)) : undefined,
     async transform(code, id, context) {
@@ -39,7 +35,7 @@ export function transformerInjectPrefix(
 
       beforeTransform?.(code, normalizedId, context)
       runTransform(code, normalizedId, (start, end, text, source) => {
-        const nextValue = prefixClassList(text, prefix)
+        const nextValue = injectCompileClassTrigger(text, trigger)
         const originalSlice = source.slice(start, end)
 
         if (nextValue === originalSlice) {

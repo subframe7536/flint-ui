@@ -1,0 +1,43 @@
+declare module 'virtual:api-doc' {
+  interface ComponentIndexEntry {
+    key: string
+    name: string
+    category: string
+    description?: string
+    sourcePath?: string
+    polymorphic: boolean
+  }
+
+  interface IndexDoc {
+    components: ComponentIndexEntry[]
+  }
+
+  const data: IndexDoc
+  export default data
+}
+
+declare module 'virtual:demo-pages' {
+  import type { Component } from 'solid-js'
+
+  export interface DemoPageEntry {
+    key: string
+    group?: string
+  }
+
+  export const demoMap: Record<string, Component>
+  export const pages: DemoPageEntry[]
+}
+
+declare module 'virtual:demo-source' {
+  import type { JSX } from 'solid-js'
+
+  export interface SourceCodeProps {
+    lang?: string
+    html?: string
+    class?: string
+    style?: JSX.CSSProperties
+    children: JSX.Element
+  }
+
+  export function SourceCode(props: SourceCodeProps): JSX.Element
+}

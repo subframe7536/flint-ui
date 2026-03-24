@@ -683,7 +683,7 @@ export async function demoSourcePlugin(projectRoot?: string): Promise<Plugin> {
       if (id !== RESOLVED_VIRTUAL_DEMO_SOURCE) {
         return null
       }
-      const sourcePath = path.resolve(resolvedRoot, 'docs/components/source-code.tsx')
+      const sourcePath = path.resolve(resolvedRoot, 'docs/components/shiki-code-block.tsx')
       return `export { SourceCode } from ${JSON.stringify(sourcePath)}`
     },
 

@@ -34,8 +34,9 @@
   },
   "scripts": {
     "build": "bun --bun tsdown",
-    "dev": "bun --bun tsdown --watch",
-    "docs": "bun run build && bun --bun vite serve docs",
+    "dev": "bun run docs:dev",
+    "docs": "bun run build && bun run docs:dev",
+    "docs:dev": "bun --bun vite serve docs",
     "docs:build": "bun run build && bun --bun vite build docs",
     "test": "bun --bun vitest",
     "lint": "bun --bun oxlint",
