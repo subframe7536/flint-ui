@@ -18,6 +18,7 @@
 - [x] unify `<IconButton>` and `<Button><Icon>`
 - [x] unify docs: preview different variants, options; card / island to shadcn / nuxt-ui like doc ; visually render count
 - [x] add toast using `solid-toaster`
+- [ ] style guide docs
 - [ ] check `props.highlight` actual usage and style effect, optimize `surface-highlight` and `surface-outline` and `surface-overlay`, unify text size / line height / spacing / border color , border implement style (directly border or box-shadow)
 
 # V1
