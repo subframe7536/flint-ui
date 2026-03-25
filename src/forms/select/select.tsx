@@ -26,7 +26,6 @@ import {
   createComboboxInputHandlers,
   createFindOptionByValue,
   createSelectComponents,
-  createListboxScrollHandler,
   flattenOptions,
   mapNormalizedToRawValue,
   normalizeOptions,
@@ -180,9 +179,9 @@ export namespace SelectT {
     closeIcon?: IconT.Name
 
     /** Called when the user scrolls near the bottom of the listbox. Use for infinite loading. */
-    onScrollEnd?: () => void
-    /** Distance (px) from the bottom at which onScrollEnd fires. Default: 20. */
-    scrollEndThreshold?: number
+    onScrollBottom?: () => void
+    /** Distance (px) from the bottom at which onScrollBottom fires. Default: 20. */
+    scrollBottomThreshold?: number
   }
 
   /**
@@ -251,11 +250,6 @@ export function Select(props: SelectProps): JSX.Element {
     allOptions: allFlatOptions,
     inputValue: currentInputText,
   })
-
-  const handleListboxScroll = createListboxScrollHandler(
-    () => commonProps.onScrollEnd,
-    () => commonProps.scrollEndThreshold,
-  )
 
   // ---- Value lookup ----
   const findOptionByValue = createFindOptionByValue(() => allFlatOptions())
@@ -465,7 +459,8 @@ export function Select(props: SelectProps): JSX.Element {
         listboxClass={styleProps.classes?.listbox}
         onContentInteractOutside={menuControl.onContentInteractOutside}
         onContentCloseAutoFocus={menuControl.onContentCloseAutoFocus}
-        onListboxScrollEnd={handleListboxScroll}
+        onListboxScrollBottom={commonProps.onScrollBottom}
+        scrollBottomThreshold={commonProps.scrollBottomThreshold}
         sectionComponent={SectionComponent}
         itemComponent={ItemComponent}
       />

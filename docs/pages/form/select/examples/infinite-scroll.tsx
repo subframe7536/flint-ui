@@ -21,7 +21,7 @@ export function InfiniteScroll() {
         classes={{
           listbox: 'max-h-100',
         }}
-        onScrollEnd={() => {
+        onScrollBottom={() => {
           if (loadingMore()) {
             return
           }
@@ -32,7 +32,7 @@ export function InfiniteScroll() {
             setLoadingMore(false)
           }, 1000)
         }}
-        scrollEndThreshold={30}
+        scrollBottomThreshold={30}
         loading={loadingMore()}
         placeholder="Scroll to load more..."
       />

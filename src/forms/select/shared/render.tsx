@@ -57,7 +57,8 @@ interface SelectComboboxFrameProps<TItems> {
   listboxClass?: ClassValue
   onContentInteractOutside?: (event: Event) => void
   onContentCloseAutoFocus?: (event: Event) => void
-  onListboxScrollEnd?: (event: Event) => void
+  onListboxScrollBottom?: () => void
+  scrollBottomThreshold?: number
   sectionComponent: (
     props: ComboboxRootSectionComponentProps<NormalizedGroup<TItems>>,
   ) => JSX.Element
@@ -288,6 +289,28 @@ export function RenderSelectEmptyNode<TContext>(
 export function RenderSelectComboboxFrame<TItems>(
   props: SelectComboboxFrameProps<TItems>,
 ): JSX.Element {
+  let hasReachedScrollBottom = false
+
+  function handleListboxScroll(event: Event): void {
+    const target = event.currentTarget as HTMLElement | null
+    if (!target) {
+      return
+    }
+
+    const threshold = props.scrollBottomThreshold ?? 20
+    const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - threshold
+    if (isAtBottom) {
+      if (hasReachedScrollBottom) {
+        return
+      }
+      hasReachedScrollBottom = true
+      props.onListboxScrollBottom?.()
+      return
+    }
+
+    hasReachedScrollBottom = false
+  }
+
   return (
     <>
       <Combobox.Control<NormalizedOption<TItems>>
@@ -318,7 +341,7 @@ export function RenderSelectComboboxFrame<TItems>(
                 props.virtualized && 'p-1',
                 props.listboxClass,
               )}
-              onScrollEnd={props.onListboxScrollEnd}
+              onScroll={handleListboxScroll}
             >
               {(items) => (
                 <Show when={props.virtualized}>

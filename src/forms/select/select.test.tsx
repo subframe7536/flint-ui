@@ -795,3 +795,45 @@ describe('Select - enriched emptyRender context', () => {
     })
   })
 })
+
+describe('Select - scroll bottom', () => {
+  test('calls onScrollBottom once before leaving threshold', async () => {
+    const onScrollBottom = vi.fn()
+
+    render(() => (
+      <Select
+        options={FRUITS}
+        defaultOpen
+        onScrollBottom={onScrollBottom}
+        scrollBottomThreshold={30}
+        placeholder="Pick"
+      />
+    ))
+
+    await waitFor(() => {
+      expect(queryBody('[data-slot="listbox"]')).not.toBeNull()
+    })
+
+    const listbox = queryBody('[data-slot="listbox"]') as HTMLElement
+    Object.defineProperties(listbox, {
+      clientHeight: { value: 100, configurable: true },
+      scrollHeight: { value: 200, configurable: true },
+      scrollTop: { value: 0, writable: true, configurable: true },
+    })
+
+    listbox.scrollTop = 70
+    await fireEvent.scroll(listbox)
+    await fireEvent.scroll(listbox)
+    await fireEvent.scroll(listbox)
+
+    expect(onScrollBottom).toHaveBeenCalledTimes(1)
+
+    listbox.scrollTop = 20
+    await fireEvent.scroll(listbox)
+
+    listbox.scrollTop = 70
+    await fireEvent.scroll(listbox)
+
+    expect(onScrollBottom).toHaveBeenCalledTimes(2)
+  })
+})

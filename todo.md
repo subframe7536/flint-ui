@@ -22,8 +22,8 @@
 - [x] markdown doc
 - [x] multiselect line height when from single to multiple line
 - [x] when select is trigger-mode, cursor should not be pointer on control
-- [ ] infinity scroll select should trigger load-more instantly
-- [ ] optimize switch spacing and cursor
+- [x] infinity scroll select should trigger load-more instantly instead of waiting for scroll end
+- [ ] optimize switch spacing in different size variants and cursor
 - [ ] fix component layer hash strategy style incorrect
 - [ ] check `props.highlight` actual usage and style effect, optimize `surface-highlight` and `surface-outline` and `surface-overlay`, unify text size / line height / spacing / border color , border implement style (directly border or box-shadow)
 

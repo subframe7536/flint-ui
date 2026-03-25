@@ -137,28 +137,6 @@ export function useSelectMenuControl(props: () => UseSelectMenuControlProps) {
   }
 }
 
-export function createListboxScrollHandler(
-  getOnScrollEnd: () => (() => void) | undefined,
-  getScrollEndThreshold?: () => number | undefined,
-): (event: Event) => void {
-  return (event: Event): void => {
-    const onScrollEnd = getOnScrollEnd()
-    if (!onScrollEnd) {
-      return
-    }
-
-    const target = event.target as HTMLElement | null
-    if (!target) {
-      return
-    }
-
-    const threshold = getScrollEndThreshold?.() ?? 20
-    if (target.scrollTop + target.clientHeight >= target.scrollHeight - threshold) {
-      onScrollEnd()
-    }
-  }
-}
-
 export function syncSelectSearchInputValue(
   props: { searchValue?: string },
   getInputRef: () => HTMLInputElement | undefined,
