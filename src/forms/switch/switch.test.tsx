@@ -231,14 +231,25 @@ describe('Switch', () => {
   test('applies xl size classes on base and wrapper', () => {
     const screen = render(() => <Switch label="Classes" size="xl" />)
 
+    const root = screen.container.querySelector('[data-slot="root"]')
     const input = screen.container.querySelector('[data-slot="input"]')
     const base = screen.container.querySelector('[data-slot="track"]')
     const wrapper = screen.container.querySelector('[data-slot="wrapper"]')
 
+    expect(root?.className).toContain('cursor-pointer')
     expect(input?.className).toContain('peer')
     expect(base?.className).toContain('peer-focus-visible:effect-fv-border')
     expect(base?.className).toContain('w-11')
+    expect(wrapper?.className).toContain('ms-3')
     expect(wrapper?.className).toContain('text-base')
+  })
+
+  test('applies compact wrapper spacing on xs size', () => {
+    const screen = render(() => <Switch label="Compact" size="xs" />)
+    const wrapper = screen.container.querySelector('[data-slot="wrapper"]')
+
+    expect(wrapper?.className).toContain('ms-1.5')
+    expect(wrapper?.className).toContain('text-xs')
   })
 
   test('applies styles.root override', () => {

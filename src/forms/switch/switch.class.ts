@@ -1,6 +1,6 @@
 import type { VariantProps } from 'cls-variant'
 
-import { CHECKABLE_CONTAINER_SIZE_VARIANT, TEXT_SIZE_VARIANT } from '../../shared/cva-common.class'
+import { CHECKABLE_CONTAINER_SIZE_VARIANT } from '../../shared/cva-common.class'
 import { cva } from '../../shared/utils'
 
 export const switchContainerVariants = cva('flex items-center', {
@@ -13,7 +13,7 @@ export const switchContainerVariants = cva('flex items-center', {
 })
 
 export const switchBaseVariants = cva(
-  'p-px outline-none b-(1 transparent) rounded-full bg-input inline-flex shrink-0 transition-[color,box-shadow] items-center peer-focus-visible:effect-fv-border data-invalid:effect-invalid dark:bg-input/80 data-checked:bg-primary',
+  'p-px outline-none b-(1 transparent) rounded-full bg-input inline-flex shrink-0 cursor-pointer transition-[color,box-shadow] items-center peer-focus-visible:effect-fv-border data-invalid:effect-invalid dark:bg-input/80 data-checked:bg-primary',
   {
     defaultVariants: {
       size: 'md',
@@ -51,12 +51,18 @@ export const switchThumbVariants = cva(
 export const switchIconClass =
   'absolute size-10/12 transition-opacity text-primary data-checked:opacity-100 data-unchecked:(opacity-90 text-muted-foreground) data-loading:(opacity-80 animate-loading)'
 
-export const switchWrapperVariants = cva('ms-2', {
+export const switchWrapperVariants = cva('', {
   defaultVariants: {
     size: 'md',
   },
   variants: {
-    size: TEXT_SIZE_VARIANT,
+    size: {
+      xs: 'text-xs ms-1.5',
+      sm: 'text-xs ms-2',
+      md: 'text-sm ms-2',
+      lg: 'text-sm ms-2.5',
+      xl: 'text-base ms-3',
+    },
   },
 })
 

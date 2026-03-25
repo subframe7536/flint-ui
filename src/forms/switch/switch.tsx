@@ -332,7 +332,7 @@ export function Switch<TTrue = boolean, TFalse = boolean>(
                     data-slot="label"
                     style={merged.styles?.label}
                     class={cn(
-                      'text-foreground font-medium block',
+                      'text-foreground font-medium block cursor-pointer',
                       restProps.required && "after:(text-destructive ms-0.5 content-['*'])",
                       styleProps.classes?.label,
                     )}
