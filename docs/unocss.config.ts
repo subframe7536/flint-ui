@@ -1,6 +1,12 @@
 import lucideIcons from '@iconify-json/lucide/icons.json' with { type: 'json' }
 import type { PresetWind4Theme } from 'unocss'
-import { defineConfig, presetIcons, presetWind4, transformerVariantGroup } from 'unocss'
+import {
+  defineConfig,
+  presetIcons,
+  presetWind4,
+  transformerVariantGroup,
+  presetTypography,
+} from 'unocss'
 import { presetAnimations } from 'unocss-preset-animations'
 
 import { presetTheme } from '../src/unocss-preset-theme'
@@ -15,10 +21,11 @@ export default defineConfig<PresetWind4Theme>({
         lucide: () => lucideIcons,
       },
     }),
+    presetTypography(),
     presetAnimations() as any,
     presetTheme({
       enableComponentLayer: {
-        strategy: 'hash',
+        strategy: 'prefix',
         idFilter(id: string) {
           return id.includes('/src/') && (id.endsWith('.class.ts') || id.endsWith('.tsx'))
         },
@@ -38,6 +45,7 @@ export default defineConfig<PresetWind4Theme>({
     pipeline: {
       include: [
         './**/*.tsx',
+        './**/*.md',
         './**/*.class.ts',
         '../src/**/*.tsx',
         '../src/**/*.class.ts',

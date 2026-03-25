@@ -16,14 +16,15 @@ declare module 'virtual:api-doc' {
   export default data
 }
 
-declare module 'virtual:demo-pages' {
+declare module 'virtual:example-pages' {
   import type { Component } from 'solid-js'
 
-  export interface DemoPageEntry {
+  export interface ExamplePageEntry {
     key: string
     group?: string
+    label: string
   }
 
-  export const demoMap: Record<string, Component>
-  export const pages: DemoPageEntry[]
+  export const exampleMap: Record<string, Component>
+  export const pages: ExamplePageEntry[]
 }

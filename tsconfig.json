@@ -5,6 +5,11 @@
     "jsxImportSource": "solid-js",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@src": ["./src/index.ts"],
+      "@src/*": ["./src/*"]
+    },
     "types": ["vite/client", "@testing-library/dom", "@types/node"],
     "allowJs": true,
     "strict": true,

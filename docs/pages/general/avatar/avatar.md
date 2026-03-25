@@ -1,0 +1,31 @@
+## Single Avatar
+
+Fallback first, then image crossfades in after preload.
+
+:::example
+name: SingleAvatar
+:::
+
+## Fallback Modes
+
+Text, initials-from-alt and fallback icon.
+
+:::example
+name: FallbackModes
+:::
+
+## Badge Positions
+
+Top/bottom + left/right corner badge.
+
+:::example
+name: BadgePositions
+:::
+
+## Merged Group Mode
+
+Use the same Avatar component with items.
+
+:::example
+name: MergedGroupMode
+:::

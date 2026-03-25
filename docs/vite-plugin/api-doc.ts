@@ -581,6 +581,6 @@ export function componentApiPlugin(): Plugin {
   }
 }
 
-// Re-export for use by demo-source plugin
+// Re-export for use by example markdown/source plugins
 export { generateApiDoc, writeJsonFiles }
 export type { ComponentDoc, IndexDoc, ComponentIndexEntry, PropDoc, InheritedGroupDoc, ItemsDoc }

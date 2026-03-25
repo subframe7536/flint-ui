@@ -2,8 +2,7 @@ import 'uno.css'
 
 import { Show, createEffect, createMemo, createSignal, onMount } from 'solid-js'
 import { Dynamic, render } from 'solid-js/web'
-import apiIndex from 'virtual:api-doc'
-import { demoMap, pages as demoPages } from 'virtual:demo-pages'
+import { exampleMap, pages } from 'virtual:example-pages'
 
 import { Resizable } from '../src/elements/resizable'
 
@@ -22,29 +21,8 @@ function applyTheme(theme: ThemeMode): void {
   root.style.colorScheme = isDark ? 'dark' : 'light'
 }
 
-function toTitleCaseFromKey(key: string): string {
-  return key
-    .split('-')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-}
-
-const componentMap = new Map(apiIndex.components.map((entry) => [entry.key, entry.name]))
 function App() {
   const [theme, setTheme] = createSignal<ThemeMode>('light')
-
-  const pages = createMemo(() =>
-    demoPages.map((page) =>
-      Object.assign(
-        {
-          key: page.key,
-          label: componentMap.get(page.key) ?? toTitleCaseFromKey(page.key),
-        },
-        page.group ? { group: page.group } : {},
-      ),
-    ),
-  )
 
   const [page, setPage] = createSignal(location.hash.slice(1) || 'intro')
 
@@ -60,11 +38,11 @@ function App() {
 
   createEffect(() => {
     const current = page()
-    const hasDemo = Boolean(demoMap[current])
-    if (hasDemo) {
+    const hasExample = Boolean(exampleMap[current])
+    if (hasExample) {
       return
     }
-    const first = pages()[0]?.key
+    const first = pages[0]?.key
     if (first) {
       setPage(first)
       location.hash = first
@@ -89,7 +67,7 @@ function App() {
     run()
   }
 
-  const ActiveDemo = createMemo(() => demoMap[page()])
+  const ActiveExample = createMemo(() => exampleMap[page()])
 
   return (
     <Resizable
@@ -97,7 +75,7 @@ function App() {
         {
           content: (
             <Sidebar
-              pages={pages()}
+              pages={pages}
               activePage={page}
               setActivePage={navigate}
               theme={theme}
@@ -112,10 +90,10 @@ function App() {
           content: (
             <div class="overflow-y-auto">
               <Show
-                when={ActiveDemo()}
-                fallback={<div class="text-sm text-muted-foreground p-6">Demo not found.</div>}
+                when={ActiveExample()}
+                fallback={<div class="text-sm text-muted-foreground p-6">Example not found.</div>}
               >
-                <Dynamic component={ActiveDemo()!} />
+                <Dynamic component={ActiveExample()!} />
               </Show>
             </div>
           ),

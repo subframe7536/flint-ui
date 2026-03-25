@@ -18,7 +18,13 @@
 - [x] unify `<IconButton>` and `<Button><Icon>`
 - [x] unify docs: preview different variants, options; card / island to shadcn / nuxt-ui like doc ; visually render count
 - [x] add toast using `solid-toaster`
-- [ ] style guide docs
+- [x] style guide docs
+- [x] markdown doc
+- [ ] multiselect line height when from single to multiple line
+- [ ] when trigger-only, cursor should not be pointer
+- [ ] infinity scroll select should trigger load-more instantly
+- [ ] optimize switch spacing and cursor
+- [ ] fix component layer hash strategy style incorrect
 - [ ] check `props.highlight` actual usage and style effect, optimize `surface-highlight` and `surface-outline` and `surface-overlay`, unify text size / line height / spacing / border color , border implement style (directly border or box-shadow)
 
 # V1
