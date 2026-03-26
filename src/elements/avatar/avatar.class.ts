@@ -24,16 +24,9 @@ export const avatarImageVariants = cva(
   'rounded-full size-full transition-opacity ease-out inset-0 absolute object-cover',
   {
     defaultVariants: {
-      status: 'idle',
       transition: 'normal',
     },
     variants: {
-      status: {
-        idle: 'hidden-hitless opacity-0',
-        loading: 'hidden-hitless opacity-0',
-        loaded: 'opacity-100',
-        error: 'hidden-hitless opacity-0',
-      },
       transition: {
         none: 'duration-0',
         fast: 'duration-150',

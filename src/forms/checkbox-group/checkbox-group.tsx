@@ -36,10 +36,7 @@ export namespace CheckboxGroupT {
     | 'description'
 
   export type Variant = CheckboxGroupVariantProps
-
-  export type Value = string
-
-  export interface Items<TTrue = boolean, TFalse = boolean> {
+  export interface Item<TTrue = boolean, TFalse = boolean> {
     /**
      * Value of the group item.
      */
@@ -75,29 +72,25 @@ export namespace CheckboxGroupT {
   /**
    * Class overrides for CheckboxGroup and its items.
    */
-  export interface Classes<TTrue = boolean, TFalse = boolean> {
+  export interface Classes<TTrue = boolean, TFalse = boolean> extends Omit<
+    NonNullable<CheckboxProps<TTrue, TFalse>['classes']>,
+    'root'
+  > {
     root?: string
     fieldset?: string
     legend?: string
     item?: string
-    container?: CheckboxGroupItemClasses<TTrue, TFalse>['container']
-    control?: CheckboxGroupItemClasses<TTrue, TFalse>['control']
-    indicator?: CheckboxGroupItemClasses<TTrue, TFalse>['indicator']
-    icon?: CheckboxGroupItemClasses<TTrue, TFalse>['icon']
-    wrapper?: CheckboxGroupItemClasses<TTrue, TFalse>['wrapper']
-    label?: CheckboxGroupItemClasses<TTrue, TFalse>['label']
-    description?: CheckboxGroupItemClasses<TTrue, TFalse>['description']
   }
 
   export interface Styles extends SlotStyles<Slot> {}
 
-  export type Item<TTrue = boolean, TFalse = boolean> = string | Items<TTrue, TFalse>
+  export type Items<TTrue = boolean, TFalse = boolean> = string | Item<TTrue, TFalse>
 
   /**
    * Base props for the CheckboxGroup component.
    */
   export interface Base<TTrue = boolean, TFalse = boolean>
-    extends FormIdentityOptions, FormValueOptions<Value[]>, FormRequiredOption, FormDisableOption {
+    extends FormIdentityOptions, FormValueOptions<string[]>, FormRequiredOption, FormDisableOption {
     /**
      * Legend for the checkbox group.
      */
@@ -106,7 +99,7 @@ export namespace CheckboxGroupT {
     /**
      * Array of items to render in the group.
      */
-    items?: Item<TTrue, TFalse>[]
+    items?: Items<TTrue, TFalse>[]
 
     /**
      * Default indicator position for all items.
@@ -126,7 +119,7 @@ export namespace CheckboxGroupT {
     /**
      * Callback when the selected values change.
      */
-    onChange?: (value: Value[]) => void
+    onChange?: (value: string[]) => void
   }
 
   /**
@@ -140,13 +133,6 @@ export namespace CheckboxGroupT {
   > {}
 }
 
-type CheckboxGroupValue = CheckboxGroupT.Value
-
-type CheckboxGroupItemClasses<TTrue = boolean, TFalse = boolean> = Omit<
-  NonNullable<CheckboxProps<TTrue, TFalse>['classes']>,
-  'root'
->
-
 /**
  * Props for the CheckboxGroup component.
  */
@@ -157,7 +143,7 @@ export interface CheckboxGroupProps<TTrue = boolean, TFalse = boolean> extends C
 
 interface NormalizedCheckboxGroupItem<TTrue = boolean, TFalse = boolean> {
   id: string
-  value: CheckboxGroupValue
+  value: string
   label?: JSX.Element
   description?: JSX.Element
   disabled: boolean
@@ -175,7 +161,7 @@ export function CheckboxGroup<TTrue = boolean, TFalse = boolean>(
       orientation: 'vertical' as const,
       variant: 'list' as const,
       size: 'md' as const,
-      defaultValue: [] as CheckboxGroupValue[],
+      defaultValue: [] as string[],
     },
     props,
   )
@@ -202,7 +188,7 @@ export function CheckboxGroup<TTrue = boolean, TFalse = boolean>(
     }),
   )
 
-  const [uncontrolledValue, setUncontrolledValue] = createSignal<CheckboxGroupValue[]>(
+  const [uncontrolledValue, setUncontrolledValue] = createSignal<string[]>(
     formProps.defaultValue ?? [],
   )
 
@@ -237,7 +223,7 @@ export function CheckboxGroup<TTrue = boolean, TFalse = boolean>(
     })
   })
 
-  function onItemCheckedChange(value: CheckboxGroupValue, checked: boolean): void {
+  function onItemCheckedChange(value: string, checked: boolean): void {
     const nextValues = checked
       ? selectedValues().includes(value)
         ? selectedValues()

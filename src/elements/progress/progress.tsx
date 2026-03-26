@@ -90,8 +90,6 @@ export namespace ProgressT {
   > {}
 }
 
-type ProgressStepState = ProgressT.StepRenderContext['state']
-
 /**
  * Props for the Progress component.
  */
@@ -194,7 +192,7 @@ export function Progress(props: ProgressProps): JSX.Element {
       }
     })
 
-    function stepState(index: number): ProgressStepState {
+    function stepState(index: number): ProgressT.StepRenderContext['state'] {
       const value = context.value()
       const activeIndex = Number.isFinite(value) ? Math.round(value) : 0
       const isActive = !isIndeterminate() && index === activeIndex
