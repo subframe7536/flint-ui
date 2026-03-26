@@ -12,12 +12,12 @@ export const overlayMenuItemVariants = cva(
     variants: {
       color: {
         default: 'text-foreground',
-        destructive: 'text-destructive data-highlighted:(text-destructive bg-destructive/10)',
+        destructive: 'text-destructive data-highlighted:(text-destructive bg-destructive/20)',
       },
       size: {
         sm: 'text-xs min-h-7',
-        md: 'text-sm min-h-8 sm:min-h-7',
-        lg: 'text-sm min-h-9',
+        md: 'text-sm min-h-8',
+        lg: 'min-h-9',
       },
     },
   },

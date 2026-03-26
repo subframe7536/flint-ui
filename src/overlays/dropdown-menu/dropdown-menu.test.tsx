@@ -92,30 +92,33 @@ describe('DropdownMenu', () => {
         contentTop={contentTop}
         contentBottom={contentBottom}
         items={[
-          [
-            { type: 'label', label: 'Account' },
-            { type: 'separator' },
-            {
-              label: 'Profile',
-              description: 'View profile',
-              icon: 'icon-user',
-              kbds: ['meta', 'p'],
-            },
-            {
-              label: 'Avatar row',
-              icon: <span data-testid="avatar-node">A</span>,
-            },
-            {
-              type: 'checkbox',
-              label: 'Pinned',
-              checked: true,
-            },
-            {
-              label: 'More',
-              defaultOpen: true,
-              children: [{ label: 'Nested action' }],
-            },
-          ],
+          {
+            type: 'group',
+            label: 'Account',
+            children: [
+              { type: 'separator' },
+              {
+                label: 'Profile',
+                description: 'View profile',
+                icon: 'icon-user',
+                kbds: ['meta', 'p'],
+              },
+              {
+                label: 'Avatar row',
+                icon: <span data-testid="avatar-node">A</span>,
+              },
+              {
+                type: 'checkbox',
+                label: 'Pinned',
+                checked: true,
+              },
+              {
+                label: 'More',
+                defaultOpen: true,
+                children: [{ label: 'Nested action' }],
+              },
+            ],
+          },
         ]}
       >
         <button type="button">Actions</button>

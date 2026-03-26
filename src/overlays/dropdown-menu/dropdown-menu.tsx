@@ -14,7 +14,6 @@ import type {
 } from '../shared-overlay-menu/types'
 import type {
   OverlayMenuContentSlot,
-  OverlayMenuItems,
   OverlayMenuPlacement,
 } from '../shared-overlay-menu/utils'
 import { resolveOverlayMenuSide } from '../shared-overlay-menu/utils'
@@ -82,7 +81,7 @@ export namespace DropdownMenuT {
     /**
      * Items to display in the dropdown menu.
      */
-    items?: OverlayMenuItems<Items>
+    items?: Items[]
 
     /**
      * Icon name for checked selection states.

@@ -16,8 +16,6 @@ export type OverlayMenuPlacement =
   | 'left-start'
   | 'left-end'
 
-export type OverlayMenuItems<TItem> = TItem[] | TItem[][]
-
 export type OverlayMenuContentSlot = (context: { sub: boolean }) => JSX.Element
 
 export function resolveOverlayMenuSide(placement?: string): OverlayMenuSide {
@@ -36,22 +34,6 @@ export function resolveOverlayMenuSide(placement?: string): OverlayMenuSide {
   return 'top'
 }
 
-function isGroupedItems<TItem>(items: OverlayMenuItems<TItem>): items is TItem[][] {
-  return Array.isArray(items[0])
-}
-
-export function normalizeOverlayMenuGroups<TItem>(items?: OverlayMenuItems<TItem>): TItem[][] {
-  if (!items || items.length === 0) {
-    return []
-  }
-
-  if (isGroupedItems(items)) {
-    return items
-  }
-
-  return [items]
-}
-
 export function getOverlayMenuTextValue(item: {
   label?: JSX.Element
   description?: JSX.Element
@@ -65,4 +47,45 @@ export function getOverlayMenuTextValue(item: {
   }
 
   return undefined
+}
+
+interface OverlayMenuGroup<TItem> {
+  label?: JSX.Element
+  items: TItem[]
+}
+export function resolveMenuGroups<
+  TItem extends { type?: string; children?: any[]; label?: JSX.Element },
+>(items?: TItem[]): OverlayMenuGroup<TItem>[] {
+  if (!items || items.length === 0) {
+    return []
+  }
+
+  const groups: OverlayMenuGroup<TItem>[] = []
+  let defaultGroup: TItem[] = []
+
+  for (const item of items) {
+    if (item.type === 'group') {
+      if (defaultGroup.length > 0) {
+        groups.push({ items: defaultGroup })
+        defaultGroup = []
+      }
+
+      if (item.children?.length) {
+        groups.push({
+          label: item.label,
+          items: item.children,
+        })
+      }
+
+      continue
+    }
+
+    defaultGroup.push(item)
+  }
+
+  if (defaultGroup.length > 0) {
+    groups.push({ items: defaultGroup })
+  }
+
+  return groups
 }

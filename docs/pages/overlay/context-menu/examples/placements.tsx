@@ -8,82 +8,91 @@ export function Placements() {
   const badgeClass =
     'rounded-md b-1 b-border border-border bg-muted px-1.5 py-0.5 font-medium text-[11px] text-foreground'
 
-  const fileItems: NonNullable<ContextMenuT.Base['items']> = [
-    [
-      { type: 'label', label: 'File Actions' },
-      {
-        label: 'Open File',
-        icon: 'i-lucide-file-code-2',
-        kbds: ['↵'],
-      },
-      {
-        label: 'Open in Split View',
-        icon: 'i-lucide-split-square-horizontal',
-        kbds: ['⌘', '\\'],
-      },
-      {
-        label: 'Reveal in Explorer',
-        icon: 'i-lucide-folder-search-2',
-      },
-      { type: 'separator' },
-      {
-        label: 'Move To…',
-        icon: 'i-lucide-folder-input',
-        children: [
-          [
+  const fileItems: ContextMenuT.Items[] = [
+    {
+      type: 'group',
+      label: 'File Actions',
+      children: [
+        {
+          label: 'Open File',
+          icon: 'i-lucide-file-code-2',
+          kbds: ['↵'],
+        },
+        {
+          label: 'Open in Split View',
+          icon: 'i-lucide-split-square-horizontal',
+          kbds: ['⌘', '\\'],
+        },
+        {
+          label: 'Reveal in Explorer',
+          icon: 'i-lucide-folder-search-2',
+        },
+        { type: 'separator' },
+        {
+          label: 'Move To…',
+          icon: 'i-lucide-folder-input',
+          children: [
             {
-              type: 'label',
+              type: 'group',
               label: 'Recent Folders',
-            },
-            {
-              label: 'src/overlays',
-              icon: 'i-lucide-folder-open',
-            },
-            {
-              label: 'src/navigation',
-              icon: 'i-lucide-folder-open',
-            },
-            {
-              label: 'More Destinations',
-              icon: 'i-lucide-more-horizontal',
               children: [
-                [
-                  {
-                    label: 'docs/components',
-                    icon: 'i-lucide-folder-open',
-                  },
-                  {
-                    label: 'docs/content',
-                    icon: 'i-lucide-folder-open',
-                  },
-                ],
+                {
+                  label: 'src/overlays',
+                  icon: 'i-lucide-folder-open',
+                },
+                {
+                  label: 'src/navigation',
+                  icon: 'i-lucide-folder-open',
+                },
+                {
+                  label: 'More Destinations',
+                  icon: 'i-lucide-more-horizontal',
+                  children: [
+                    {
+                      type: 'group',
+                      children: [
+                        {
+                          label: 'docs/components',
+                          icon: 'i-lucide-folder-open',
+                        },
+                        {
+                          label: 'docs/content',
+                          icon: 'i-lucide-folder-open',
+                        },
+                      ],
+                    },
+                  ],
+                },
               ],
             },
           ],
-        ],
-      },
-      {
-        label: 'Copy Path',
-        icon: 'i-lucide-copy',
-        kbds: ['⌘', '⌥', 'C'],
-      },
-    ],
-    [
-      {
-        label: (
-          <div class="flex gap-2 items-center">
-            <span>Rename</span>
-            <span class={badgeClass}>F2</span>
-          </div>
-        ),
-        icon: 'i-lucide-pencil',
-      },
-      {
-        label: 'Delete',
-        icon: 'i-lucide-trash-2',
-        color: 'destructive',
-      },
-    ],
+        },
+        {
+          label: 'Copy Path',
+          icon: 'i-lucide-copy',
+          kbds: ['⌘', '⌥', 'C'],
+        },
+      ],
+    },
+    {
+      type: 'group',
+      children: [
+        {
+          label: (
+            <div class="flex gap-2 items-center">
+              <span>Rename</span>
+              <span class={badgeClass}>F2</span>
+            </div>
+          ),
+          icon: 'i-lucide-pencil',
+        },
+        {
+          label: 'Delete',
+          icon: 'i-lucide-trash-2',
+          color: 'destructive',
+        },
+      ],
+    },
   ]
 
   return (

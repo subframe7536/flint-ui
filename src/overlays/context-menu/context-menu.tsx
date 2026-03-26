@@ -22,7 +22,6 @@ import type {
 } from '../shared-overlay-menu/types'
 import type {
   OverlayMenuContentSlot,
-  OverlayMenuItems,
   OverlayMenuPlacement,
 } from '../shared-overlay-menu/utils'
 import { resolveOverlayMenuSide } from '../shared-overlay-menu/utils'
@@ -90,7 +89,7 @@ export namespace ContextMenuT {
     /**
      * Items to display in the context menu.
      */
-    items?: OverlayMenuItems<Items>
+    items?: Items[]
 
     /**
      * Icon name used for checked menu items.

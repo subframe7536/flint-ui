@@ -8,77 +8,86 @@ export function ProjectIssueActions() {
   const panelClass =
     'flex min-h-28 w-full flex-col justify-between rounded-lg b-1 b-border border-border bg-background p-4 text-sm text-foreground'
 
-  const projectItems: NonNullable<ContextMenuT.Base['items']> = [
-    [
-      {
-        type: 'label',
-        label: (
-          <div class="flex gap-2 items-center">
-            <span>Issue: Improve menu transitions</span>
-            <span class={badgeClass}>P1</span>
-          </div>
-        ),
-      },
-      {
-        label: 'Open Issue',
-        icon: 'i-lucide-external-link',
-      },
-      {
-        label: 'Assign',
-        icon: 'i-lucide-user-round-plus',
-        children: [
-          [
+  const projectItems: ContextMenuT.Items[] = [
+    {
+      type: 'group',
+      label: (
+        <div class="flex gap-2 items-center">
+          <span>Issue: Improve menu transitions</span>
+          <span class={badgeClass}>P1</span>
+        </div>
+      ),
+      children: [
+        {
+          label: 'Open Issue',
+          icon: 'i-lucide-external-link',
+        },
+        {
+          label: 'Assign',
+          icon: 'i-lucide-user-round-plus',
+          children: [
             {
-              label: 'Alex Morgan',
-              description: 'Design systems',
-              icon: 'i-lucide-user',
-            },
-            {
-              label: 'Jamie Chen',
-              description: 'Overlay primitives',
-              icon: 'i-lucide-user',
-            },
-          ],
-        ],
-      },
-      {
-        label: 'Move to Sprint',
-        icon: 'i-lucide-calendar-range',
-        children: [
-          [
-            {
-              label: 'Sprint 18',
-            },
-            {
-              label: 'Sprint 19',
-            },
-            {
-              label: 'Backlog',
+              type: 'group',
+              children: [
+                {
+                  label: 'Alex Morgan',
+                  description: 'Design systems',
+                  icon: 'i-lucide-user',
+                },
+                {
+                  label: 'Jamie Chen',
+                  description: 'Overlay primitives',
+                  icon: 'i-lucide-user',
+                },
+              ],
             },
           ],
-        ],
-      },
-    ],
-    [
-      {
-        label: 'Edit Details',
-        icon: 'i-lucide-pencil',
-      },
-      {
-        label: 'Share Update',
-        icon: 'i-lucide-share-2',
-      },
-      { type: 'separator' },
-      {
-        label: 'Archive',
-        icon: 'i-lucide-archive',
-      },
-      {
-        label: 'Delete Issue',
-        icon: 'i-lucide-trash-2',
-        color: 'destructive',
-      },
-    ],
+        },
+        {
+          label: 'Move to Sprint',
+          icon: 'i-lucide-calendar-range',
+          children: [
+            {
+              type: 'group',
+              children: [
+                {
+                  label: 'Sprint 18',
+                },
+                {
+                  label: 'Sprint 19',
+                },
+                {
+                  label: 'Backlog',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: 'group',
+      children: [
+        {
+          label: 'Edit Details',
+          icon: 'i-lucide-pencil',
+        },
+        {
+          label: 'Share Update',
+          icon: 'i-lucide-share-2',
+        },
+        { type: 'separator' },
+        {
+          label: 'Archive',
+          icon: 'i-lucide-archive',
+        },
+        {
+          label: 'Delete Issue',
+          icon: 'i-lucide-trash-2',
+          color: 'destructive',
+        },
+      ],
+    },
   ]
 
   return (

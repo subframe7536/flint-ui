@@ -9,125 +9,143 @@ export function EditorViewOptions() {
   const [autoSave, setAutoSave] = createSignal(true)
   const [theme, setTheme] = createSignal<'light' | 'dark' | 'system'>('dark')
 
-  const editorItems = createMemo<NonNullable<DropdownMenuT.Base['items']>>(() => [
-    [
-      { type: 'label', label: 'Editor' },
-      {
-        label: 'Command Palette',
-        description: 'Jump to commands, files, and symbols',
-        icon: 'i-lucide-search',
-        kbds: ['⌘', 'K'],
-      },
-      {
-        label: 'Go to File…',
-        icon: 'i-lucide-file-search',
-        kbds: ['⌘', 'P'],
-      },
-      {
-        label: 'Open Recent',
-        icon: 'i-lucide-history',
-        children: [
-          [
-            { type: 'label', label: 'Recent Files' },
+  const editorItems = createMemo<DropdownMenuT.Items[]>(() => [
+    {
+      type: 'group',
+      label: 'Editor',
+      children: [
+        {
+          label: 'Command Palette',
+          description: 'Jump to commands, files, and symbols',
+          icon: 'i-lucide-search',
+          kbds: ['⌘', 'K'],
+        },
+        {
+          label: 'Go to File…',
+          icon: 'i-lucide-file-search',
+          kbds: ['⌘', 'P'],
+        },
+        {
+          label: 'Open Recent',
+          icon: 'i-lucide-history',
+          children: [
             {
-              label: 'src/overlays/dropdown-menu/dropdown-menu.tsx',
-              icon: 'i-lucide-file-code-2',
-            },
-            {
-              label: 'docs/components/context-menu-demos.tsx',
-              icon: 'i-lucide-file-code-2',
-            },
-            {
-              label: 'Pinned Workspaces',
-              icon: 'i-lucide-star',
+              type: 'group',
+              label: 'Recent Files',
               children: [
-                [
-                  {
-                    label: 'Flint UI',
-                    description: 'packages + docs',
-                    icon: 'i-lucide-folder-kanban',
-                  },
-                  {
-                    label: 'Docs Site',
-                    description: 'marketing + guides',
-                    icon: 'i-lucide-book-open',
-                  },
-                ],
+                {
+                  label: 'src/overlays/dropdown-menu/dropdown-menu.tsx',
+                  icon: 'i-lucide-file-code-2',
+                },
+                {
+                  label: 'docs/components/context-menu-demos.tsx',
+                  icon: 'i-lucide-file-code-2',
+                },
+                {
+                  label: 'Pinned Workspaces',
+                  icon: 'i-lucide-star',
+                  children: [
+                    {
+                      type: 'group',
+                      children: [
+                        {
+                          label: 'Flint UI',
+                          description: 'packages + docs',
+                          icon: 'i-lucide-folder-kanban',
+                        },
+                        {
+                          label: 'Docs Site',
+                          description: 'marketing + guides',
+                          icon: 'i-lucide-book-open',
+                        },
+                      ],
+                    },
+                  ],
+                },
               ],
             },
           ],
-        ],
-      },
-    ],
-    [
-      { type: 'label', label: 'View' },
-      {
-        type: 'checkbox',
-        label: 'Line Numbers',
-        icon: 'i-lucide-list',
-        checked: showLineNumbers(),
-        onCheckedChange: (checked: boolean) => setShowLineNumbers(checked),
-      },
-      {
-        type: 'checkbox',
-        label: 'Minimap',
-        icon: 'i-lucide-map',
-        checked: showMinimap(),
-        onCheckedChange: (checked: boolean) => setShowMinimap(checked),
-      },
-      {
-        type: 'checkbox',
-        label: 'Preview Tabs',
-        icon: 'i-lucide-panel-top',
-        checked: previewTabs(),
-        onCheckedChange: (checked: boolean) => setPreviewTabs(checked),
-      },
-      {
-        type: 'checkbox',
-        label: 'Auto Save',
-        icon: 'i-lucide-save',
-        checked: autoSave(),
-        onCheckedChange: (checked: boolean) => setAutoSave(checked),
-      },
-      { type: 'separator' },
-      {
-        label: 'Theme',
-        icon: 'i-lucide-palette',
-        children: [
-          [
-            { type: 'label', label: 'Appearance' },
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'View',
+      children: [
+        {
+          type: 'checkbox',
+          label: 'Line Numbers',
+          icon: 'i-lucide-list',
+          checked: showLineNumbers(),
+          onCheckedChange: (checked: boolean) => setShowLineNumbers(checked),
+        },
+        {
+          type: 'checkbox',
+          label: 'Minimap',
+          icon: 'i-lucide-map',
+          checked: showMinimap(),
+          onCheckedChange: (checked: boolean) => setShowMinimap(checked),
+        },
+        {
+          type: 'checkbox',
+          label: 'Preview Tabs',
+          icon: 'i-lucide-panel-top',
+          checked: previewTabs(),
+          onCheckedChange: (checked: boolean) => setPreviewTabs(checked),
+        },
+        {
+          type: 'checkbox',
+          label: 'Auto Save',
+          icon: 'i-lucide-save',
+          checked: autoSave(),
+          onCheckedChange: (checked: boolean) => setAutoSave(checked),
+        },
+        { type: 'separator' },
+        {
+          label: 'Theme',
+          icon: 'i-lucide-palette',
+          children: [
             {
-              label: 'Light',
-              icon: theme() === 'light' ? 'i-lucide-check' : 'i-lucide-sun',
-              onSelect: () => setTheme('light'),
-            },
-            {
-              label: 'Dark',
-              icon: theme() === 'dark' ? 'i-lucide-check' : 'i-lucide-moon',
-              onSelect: () => setTheme('dark'),
-            },
-            {
-              label: 'System',
-              icon: theme() === 'system' ? 'i-lucide-check' : 'i-lucide-monitor',
-              onSelect: () => setTheme('system'),
+              type: 'group',
+              label: 'Appearance',
+              children: [
+                {
+                  label: 'Light',
+                  icon: theme() === 'light' ? 'i-lucide-check' : 'i-lucide-sun',
+                  onSelect: () => setTheme('light'),
+                },
+                {
+                  label: 'Dark',
+                  icon: theme() === 'dark' ? 'i-lucide-check' : 'i-lucide-moon',
+                  onSelect: () => setTheme('dark'),
+                },
+                {
+                  label: 'System',
+                  icon: theme() === 'system' ? 'i-lucide-check' : 'i-lucide-monitor',
+                  onSelect: () => setTheme('system'),
+                },
+              ],
             },
           ],
-        ],
-      },
-    ],
-    [
-      { type: 'label', label: 'Panels' },
-      {
-        label: 'Toggle Terminal',
-        icon: 'i-lucide-square-terminal',
-        kbds: ['⌃', '`'],
-      },
-      {
-        label: 'Focus Problems',
-        icon: 'i-lucide-triangle-alert',
-        kbds: ['⇧', '⌘', 'M'],
-      },
-    ],
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'Panels',
+      children: [
+        {
+          label: 'Toggle Terminal',
+          icon: 'i-lucide-square-terminal',
+          kbds: ['⌃', '`'],
+        },
+        {
+          label: 'Focus Problems',
+          icon: 'i-lucide-triangle-alert',
+          kbds: ['⇧', '⌘', 'M'],
+        },
+      ],
+    },
   ])
 
   return (

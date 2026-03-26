@@ -8,75 +8,84 @@ export function EditorSelection() {
   const [showInlineHints, setShowInlineHints] = createSignal(false)
   const [editorTheme, setEditorTheme] = createSignal<'light' | 'dark' | 'system'>('dark')
 
-  const editorItems = createMemo<NonNullable<ContextMenuT.Base['items']>>(() => [
-    [
-      { type: 'label', label: 'Editor Selection' },
-      {
-        label: 'Quick Fix…',
-        icon: 'i-lucide-wand-sparkles',
-        kbds: ['⌘', '.'],
-      },
-      {
-        label: 'Refactor',
-        icon: 'i-lucide-git-branch-plus',
-        children: [
-          [
+  const editorItems = createMemo<ContextMenuT.Items[]>(() => [
+    {
+      type: 'group',
+      label: 'Editor Selection',
+      children: [
+        {
+          label: 'Quick Fix…',
+          icon: 'i-lucide-wand-sparkles',
+          kbds: ['⌘', '.'],
+        },
+        {
+          label: 'Refactor',
+          icon: 'i-lucide-git-branch-plus',
+          children: [
             {
-              label: 'Extract Variable',
-              icon: 'i-lucide-variable',
-            },
-            {
-              label: 'Extract Function',
-              icon: 'i-lucide-braces',
-            },
-            {
-              label: 'Move to File…',
-              icon: 'i-lucide-file-output',
+              type: 'group',
+              children: [
+                {
+                  label: 'Extract Variable',
+                  icon: 'i-lucide-variable',
+                },
+                {
+                  label: 'Extract Function',
+                  icon: 'i-lucide-braces',
+                },
+                {
+                  label: 'Move to File…',
+                  icon: 'i-lucide-file-output',
+                },
+              ],
             },
           ],
-        ],
-      },
-      { type: 'separator' },
-      {
-        type: 'checkbox',
-        label: 'Show Minimap',
-        icon: 'i-lucide-map',
-        checked: showMinimap(),
-        onCheckedChange: (checked: boolean) => setShowMinimap(checked),
-      },
-      {
-        type: 'checkbox',
-        label: 'Sticky Scroll',
-        icon: 'i-lucide-panel-top',
-        checked: showStickyScroll(),
-        onCheckedChange: (checked: boolean) => setShowStickyScroll(checked),
-      },
-      {
-        type: 'checkbox',
-        label: 'Inline Hints',
-        icon: 'i-lucide-message-square-quote',
-        checked: showInlineHints(),
-        onCheckedChange: (checked: boolean) => setShowInlineHints(checked),
-      },
-    ],
-    [
-      { type: 'label', label: 'Theme' },
-      {
-        label: 'Light',
-        icon: editorTheme() === 'light' ? 'i-lucide-check' : 'i-lucide-sun',
-        onSelect: () => setEditorTheme('light'),
-      },
-      {
-        label: 'Dark',
-        icon: editorTheme() === 'dark' ? 'i-lucide-check' : 'i-lucide-moon',
-        onSelect: () => setEditorTheme('dark'),
-      },
-      {
-        label: 'System',
-        icon: editorTheme() === 'system' ? 'i-lucide-check' : 'i-lucide-monitor',
-        onSelect: () => setEditorTheme('system'),
-      },
-    ],
+        },
+        { type: 'separator' },
+        {
+          type: 'checkbox',
+          label: 'Show Minimap',
+          icon: 'i-lucide-map',
+          checked: showMinimap(),
+          onCheckedChange: (checked: boolean) => setShowMinimap(checked),
+        },
+        {
+          type: 'checkbox',
+          label: 'Sticky Scroll',
+          icon: 'i-lucide-panel-top',
+          checked: showStickyScroll(),
+          onCheckedChange: (checked: boolean) => setShowStickyScroll(checked),
+        },
+        {
+          type: 'checkbox',
+          label: 'Inline Hints',
+          icon: 'i-lucide-message-square-quote',
+          checked: showInlineHints(),
+          onCheckedChange: (checked: boolean) => setShowInlineHints(checked),
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'Theme',
+      children: [
+        {
+          label: 'Light',
+          icon: editorTheme() === 'light' ? 'i-lucide-check' : 'i-lucide-sun',
+          onSelect: () => setEditorTheme('light'),
+        },
+        {
+          label: 'Dark',
+          icon: editorTheme() === 'dark' ? 'i-lucide-check' : 'i-lucide-moon',
+          onSelect: () => setEditorTheme('dark'),
+        },
+        {
+          label: 'System',
+          icon: editorTheme() === 'system' ? 'i-lucide-check' : 'i-lucide-monitor',
+          onSelect: () => setEditorTheme('system'),
+        },
+      ],
+    },
   ])
 
   return (

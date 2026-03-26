@@ -27,8 +27,8 @@ import type {
   OverlayMenuSharedItemRenderContext,
   OverlayMenuSharedStyles,
 } from './types'
-import { getOverlayMenuTextValue, normalizeOverlayMenuGroups } from './utils'
-import type { OverlayMenuContentSlot, OverlayMenuItems, OverlayMenuSide } from './utils'
+import { getOverlayMenuTextValue, resolveMenuGroups } from './utils'
+import type { OverlayMenuContentSlot, OverlayMenuSide } from './utils'
 
 type OverlayMenuColor = NonNullable<OverlayMenuItemVariantProps['color']>
 type OverlayMenuSize = NonNullable<OverlayMenuItemVariantProps['size']>
@@ -37,7 +37,7 @@ export interface OverlayMenuBaseContentProps<
   TItem extends OverlayMenuSharedItem<OverlayMenuColor, TItem>,
 > {
   content: Component<any>
-  items?: OverlayMenuItems<TItem>
+  items?: TItem[]
   size?: OverlayMenuSize
   classes?: OverlayMenuSharedClasses
   styles?: OverlayMenuSharedStyles
@@ -162,7 +162,14 @@ export function OverlayMenuBaseContent<
   function RenderItemNode(nodeProps: { item: TItem; depth: number }): JSX.Element {
     return (
       <Show
-        when={normalizeOverlayMenuGroups(nodeProps.item.children).length > 0}
+        when={
+          nodeProps.item.type !== 'group' &&
+          Boolean(
+            nodeProps.item.children?.some(
+              (item) => item.type !== 'group' || Boolean(item.children?.length),
+            ),
+          )
+        }
         fallback={
           <Switch
             fallback={
@@ -189,19 +196,6 @@ export function OverlayMenuBaseContent<
                 style={props.styles?.separator}
                 class={cn('mx--1 my-1 b-t-border h-px', props.classes?.separator)}
               />
-            </Match>
-
-            <Match when={nodeProps.item.type === 'label'}>
-              <GroupLabel
-                data-slot="label"
-                style={props.styles?.label}
-                class={cn(
-                  'text-xs text-muted-foreground font-medium px-1.5 py-1 inline-flex',
-                  props.classes?.label,
-                )}
-              >
-                {nodeProps.item.label}
-              </GroupLabel>
             </Match>
 
             <Match when={nodeProps.item.type === 'checkbox'}>
@@ -271,14 +265,27 @@ export function OverlayMenuBaseContent<
   }
 
   function RenderGroups(groupProps: {
-    sourceItems: OverlayMenuItems<TItem> | undefined
+    sourceItems: TItem[] | undefined
     depth: number
   }): JSX.Element {
     return (
-      <For each={normalizeOverlayMenuGroups(groupProps.sourceItems)}>
+      <For each={resolveMenuGroups(groupProps.sourceItems)}>
         {(group) => (
           <Group data-slot="group" style={props.styles?.group} class={cn(props.classes?.group)}>
-            <For each={group}>
+            <Show when={group.label}>
+              <GroupLabel
+                data-slot="label"
+                style={props.styles?.label}
+                class={cn(
+                  'text-xs text-muted-foreground font-medium px-1.5 py-1 inline-flex',
+                  props.classes?.label,
+                )}
+              >
+                {group.label}
+              </GroupLabel>
+            </Show>
+
+            <For each={group.items}>
               {(item) => <RenderItemNode item={item} depth={groupProps.depth} />}
             </For>
           </Group>

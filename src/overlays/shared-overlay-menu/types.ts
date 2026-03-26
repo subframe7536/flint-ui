@@ -3,9 +3,7 @@ import type { JSX } from 'solid-js'
 import type { IconT } from '../../elements/icon'
 import type { SlotClasses, SlotStyles } from '../../shared/types'
 
-import type { OverlayMenuItems } from './utils'
-
-export type OverlayMenuItemType = 'item' | 'label' | 'separator' | 'checkbox'
+export type OverlayMenuItemType = 'item' | 'separator' | 'checkbox' | 'group'
 
 /**
  * Shared interface for menu items used in overlays like ContextMenu and DropdownMenu.
@@ -71,7 +69,7 @@ export interface OverlayMenuSharedItem<TColor extends string, TItem> {
   /**
    * Nested menu items for creating submenus.
    */
-  children?: OverlayMenuItems<TItem>
+  children?: TItem[]
 
   /**
    * Event handler called when the item is activated.
