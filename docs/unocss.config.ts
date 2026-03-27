@@ -123,9 +123,9 @@ export default defineConfig<PresetWind4Theme>({
   --accent-foreground: hsl(210 40% 98%);
   --destructive: hsl(358.77 100% 69.84%);
   --destructive-foreground: hsl(358.88 74.66% 50.36%);
-  --border: hsl(217.2 32.6% 17.5%);
+  --border: hsl(217.2 32.6% 24.5%);
   --input: hsl(217.2 32.6% 17.5%);
-  --ring: hsl(224.3 76.3% 48%);
+  --ring: hsl(224.3 76.3% 58%);
   --chart-1: hsl(224.3 76.3% 48%);
   --chart-2: hsl(221 83% 53%);
   --chart-3: hsl(199 89% 48%);

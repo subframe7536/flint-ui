@@ -38,7 +38,7 @@ async function applyPreTransformers(
 
 async function generateComponentLayerCss(
   strategy: 'hash' | 'prefix',
-  utilityPrefix: `${string}-` = 'mr-',
+  utilityPrefix: `${string}-` = 'mo-',
 ): Promise<{
   componentCode: string
   consumerCode: string
@@ -86,11 +86,11 @@ async function generateComponentLayerCss(
 }
 
 describe('presetTheme component layer', () => {
-  test('defaults enableComponentLayer to prefix strategy with fl- utility prefix', () => {
+  test('defaults enableComponentLayer to prefix strategy with mo- utility prefix', () => {
     expect(resolvePresetThemeOptions({ enableComponentLayer: true })).toMatchObject({
       enableComponentLayer: true,
       strategy: 'prefix',
-      utilityPrefix: 'mr-',
+      utilityPrefix: 'mo-',
     })
   })
 
@@ -99,7 +99,7 @@ describe('presetTheme component layer', () => {
 
     expect(componentCode).toContain('ui-bg-transparent')
     expect(consumerCode).toContain("classes={{ root: 'bg-background' }}")
-    expect(css).toContain('/* layer: moraine-component */')
+    expect(css).toContain('/* layer: mo-component */')
     expect(css).toContain('.ui-bg-transparent{background-color:transparent;}')
     expect(css).toContain('/* layer: default */')
     expect(css).toContain(
@@ -111,12 +111,12 @@ describe('presetTheme component layer', () => {
   test('hash strategy hashes only component-owned utilities and leaves user overrides raw', async () => {
     const { componentCode, consumerCode, css } = await generateComponentLayerCss('hash')
 
-    expect(componentCode).toMatch(/mrc-[a-z0-9]+/)
+    expect(componentCode).toMatch(/moc-[a-z0-9]+/)
     expect(componentCode).not.toContain('bg-transparent')
     console.log(componentCode)
     expect(consumerCode).toContain("classes={{ root: 'bg-background' }}")
-    expect(css).toContain('/* layer: moraine-component */')
-    expect(css).toMatch(/\.mrc-[a-z0-9]+\{background-color:transparent;\}/)
+    expect(css).toContain('/* layer: mo-component */')
+    expect(css).toMatch(/\.moc-[a-z0-9]+\{background-color:transparent;\}/)
     expect(css).toContain('/* layer: default */')
     expect(css).toContain(
       '.bg-background{background-color:color-mix(in srgb, var(--background) var(--un-bg-opacity), transparent);}',
@@ -144,8 +144,8 @@ describe('presetTheme component layer', () => {
       { preflights: true },
     )
 
-    expect(css).toContain('@keyframes moraine-enter')
-    expect(css).toContain('@keyframes moraine-exit')
+    expect(css).toContain('@keyframes mo-enter')
+    expect(css).toContain('@keyframes mo-exit')
     expect(css).toContain('.animate-overlay-in')
     expect(css).toContain('.animate-popup-in')
     expect(css).toContain('.animate-menu-in')
@@ -155,18 +155,18 @@ describe('presetTheme component layer', () => {
     expect(css).toContain('.animate-popover-in')
     expect(css).toContain('.animate-popover-side-left')
     expect(css).toContain(
-      'animation:moraine-enter var(--moraine-animation-duration,150ms) ease-in-out 1',
+      'animation:mo-enter var(--mo-anim-duration,150ms) ease-in-out 1',
     )
     expect(css).toContain(
-      'animation:moraine-exit var(--moraine-animation-duration,150ms) ease-in-out 1',
+      'animation:mo-exit var(--mo-anim-duration,150ms) ease-in-out 1',
     )
-    expect(css).toContain('--moraine-enter-opacity:0')
-    expect(css).toContain('--moraine-enter-scale:0.9')
-    expect(css).toContain('--moraine-enter-translate-y:0.5rem')
-    expect(css).toContain('--moraine-exit-translate-x:2.5rem')
-    expect(css).toContain('--moraine-exit-scale:0.9')
-    expect(css).not.toContain('animation:moraine-enter;}')
-    expect(css).not.toContain('animation:moraine-exit;}')
+    expect(css).toContain('--mo-enter-opacity:0')
+    expect(css).toContain('--mo-enter-scale:0.9')
+    expect(css).toContain('--mo-enter-translate-y:0.5rem')
+    expect(css).toContain('--mo-exit-translate-x:2.5rem')
+    expect(css).toContain('--mo-exit-scale:0.9')
+    expect(css).not.toContain('animation:mo-enter;}')
+    expect(css).not.toContain('animation:mo-exit;}')
     expect(css).not.toContain('@keyframes surface-in')
     expect(css).not.toContain('@keyframes menu-in')
     expect(css).not.toContain('@keyframes sheet-out')
@@ -199,10 +199,10 @@ describe('presetTheme component layer', () => {
     expect(css).toContain('.animate-menu-in')
     expect(css).toContain('.animate-menu-out')
     expect(css).toContain('.animate-menu-side-left')
-    expect(css).toContain('--moraine-enter-scale:0.9')
-    expect(css).toContain('--moraine-enter-translate-x:0.5rem')
-    expect(css).toContain('--moraine-exit-scale:0.9')
-    expect(css).toContain('--moraine-exit-translate-x:0.5rem')
+    expect(css).toContain('--mo-enter-scale:0.9')
+    expect(css).toContain('--mo-enter-translate-x:0.5rem')
+    expect(css).toContain('--mo-exit-scale:0.9')
+    expect(css).toContain('--mo-exit-translate-x:0.5rem')
     expect(css).toContain('.animate-popover-in')
     expect(css).toContain('.animate-popover-out')
     expect(css).toContain('.animate-popover-side-top')
@@ -214,13 +214,13 @@ describe('presetTheme component layer', () => {
     expect(css).toContain('.animate-sheet-out')
     expect(css).toContain('.animate-sheet-side-right')
     expect(css).toContain(
-      'animation:moraine-enter var(--moraine-animation-duration,150ms) ease-in-out 1',
+      'animation:mo-enter var(--mo-anim-duration,150ms) ease-in-out 1',
     )
     expect(css).toContain(
-      'animation:moraine-exit var(--moraine-animation-duration,150ms) ease-in-out 1',
+      'animation:mo-exit var(--mo-anim-duration,150ms) ease-in-out 1',
     )
-    expect(css).toContain('--moraine-enter-translate-x:2.5rem')
-    expect(css).toContain('--moraine-exit-translate-x:2.5rem')
+    expect(css).toContain('--mo-enter-translate-x:2.5rem')
+    expect(css).toContain('--mo-exit-translate-x:2.5rem')
     expect(css).not.toContain('.animate-menu-in-from-left{')
     expect(css).not.toContain('.animate-menu-out-to-left{')
     expect(css).not.toContain('.animate-popover-in-from-top{')
@@ -281,17 +281,17 @@ describe('presetTheme component layer', () => {
 
     expect(css).toContain('.animate-menu-side-left')
     expect(css).toContain('.animate-menu-side-right')
-    expect(css).toContain('--moraine-enter-translate-x:0.5rem')
-    expect(css).toContain('--moraine-enter-translate-x:-0.5rem')
+    expect(css).toContain('--mo-enter-translate-x:0.5rem')
+    expect(css).toContain('--mo-enter-translate-x:-0.5rem')
     expect(css).toContain('.animate-popover-side-left')
     expect(css).toContain('.animate-popover-side-right')
     expect(css).toContain('.animate-tooltip-side-left')
     expect(css).toContain('.animate-tooltip-side-right')
-    expect(css).toContain('--moraine-enter-translate-x:0.25rem')
-    expect(css).toContain('--moraine-enter-translate-x:-0.25rem')
+    expect(css).toContain('--mo-enter-translate-x:0.25rem')
+    expect(css).toContain('--mo-enter-translate-x:-0.25rem')
     expect(css).toContain('.animate-sheet-side-left')
-    expect(css).toContain('--moraine-enter-translate-x:-2.5rem')
+    expect(css).toContain('--mo-enter-translate-x:-2.5rem')
     expect(css).toContain('.animate-sheet-side-right')
-    expect(css).toContain('--moraine-enter-translate-x:2.5rem')
+    expect(css).toContain('--mo-enter-translate-x:2.5rem')
   })
 })

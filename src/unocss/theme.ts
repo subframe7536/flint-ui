@@ -58,9 +58,9 @@ export interface ComponentLayerOptions extends Partial<
    * Controls how component-owned utilities are isolated from consumer utilities.
    *
    * - `prefix`: prefixes component utilities with `utilityPrefix` and keeps them in the
-   *   dedicated `moraine-component` layer.
+   *   dedicated `mo-component` layer.
    * - `hash`: compiles component utilities into internal hash classes in the
-   *   `moraine-component` layer.
+   *   `mo-component` layer.
    *
    * `prefix` is the default because it keeps the generated output readable while still
    * making component styles override-safe out of the box.
@@ -70,7 +70,7 @@ export interface ComponentLayerOptions extends Partial<
   strategy?: ComponentLayerStrategy
   /**
    * Prefix used for component-owned utilities when `strategy` is `prefix`.
-   * @default 'mr-'
+   * @default 'mo-'
    */
   utilityPrefix?: `${string}-`
 }
@@ -81,21 +81,21 @@ export interface PresetThemeOptions extends Pick<TransformerInjectPrefixOption, 
   enableComponentLayer?: boolean | ComponentLayerOptions
 }
 
-const MORAINE_COMPONENT_LAYER = 'moraine-component'
-const DEFAULT_COMPONENT_UTILITY_PREFIX = 'mr-'
-const MORAINE_HASH_TRIGGER = ':uno-moraine:'
-const MORAINE_HASH_CLASS_PREFIX = 'mrc-'
-const MORAINE_ENTER_ANIMATION_NAME = 'moraine-enter'
-const MORAINE_EXIT_ANIMATION_NAME = 'moraine-exit'
-const MORAINE_ANIMATION_DURATION_VAR = 'var(--moraine-animation-duration,150ms)'
+const MORAINE_COMPONENT_LAYER = 'mo-component'
+const DEFAULT_COMPONENT_UTILITY_PREFIX = 'mo-'
+const MORAINE_HASH_TRIGGER = ':uno-mo:'
+const MORAINE_HASH_CLASS_PREFIX = 'moc-'
+const MORAINE_ENTER_ANIMATION_NAME = 'mo-enter'
+const MORAINE_EXIT_ANIMATION_NAME = 'mo-exit'
+const MORAINE_ANIMATION_DURATION_VAR = 'var(--mo-anim-duration,150ms)'
 const ANIMATION_SIDES = ['top', 'right', 'bottom', 'left'] as const
 
 const RE_ATTR = /^(data|aria)-(\w+):/
 const CORE_ANIMATION_KEYFRAMES = {
   [MORAINE_ENTER_ANIMATION_NAME]:
-    '{ from { opacity: var(--moraine-enter-opacity, 1); transform: translate3d(var(--moraine-enter-translate-x, 0), var(--moraine-enter-translate-y, 0), 0) scale3d(var(--moraine-enter-scale, 1), var(--moraine-enter-scale, 1), var(--moraine-enter-scale, 1)) rotate(var(--moraine-enter-rotate, 0)) } }',
+    '{ from { opacity: var(--mo-enter-opacity, 1); transform: translate3d(var(--mo-enter-translate-x, 0), var(--mo-enter-translate-y, 0), 0) scale(var(--mo-enter-scale, 1)) rotate(var(--mo-enter-rotate, 0)) } }',
   [MORAINE_EXIT_ANIMATION_NAME]:
-    '{ to { opacity: var(--moraine-exit-opacity, 1); transform: translate3d(var(--moraine-exit-translate-x, 0), var(--moraine-exit-translate-y, 0), 0) scale3d(var(--moraine-exit-scale, 1), var(--moraine-exit-scale, 1), var(--moraine-exit-scale, 1)) rotate(var(--moraine-exit-rotate, 0)) } }',
+    '{ to { opacity: var(--mo-exit-opacity, 1); transform: translate3d(var(--mo-exit-translate-x, 0), var(--mo-exit-translate-y, 0), 0) scale(var(--mo-exit-scale, 1)) rotate(var(--mo-exit-rotate, 0)) } }',
   'accordion-down': '{ from { height: 0 } to { height: var(--kb-accordion-content-height) } }',
   'accordion-up': '{ from { height: var(--kb-accordion-content-height) } to { height: 0 } }',
   carousel: '{ 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }',
@@ -177,8 +177,8 @@ function createSemanticAnimationShortcuts(
   name: SemanticAnimationTarget,
   config: SemanticAnimationConfig,
 ): Record<string, string> {
-  const inScale = config.scale ? ` [--moraine-enter-scale:${config.scale}]` : ''
-  const outScale = config.scale ? ` [--moraine-exit-scale:${config.scale}]` : ''
+  const inScale = config.scale ? ` [--mo-enter-scale:${config.scale}]` : ''
+  const outScale = config.scale ? ` [--mo-exit-scale:${config.scale}]` : ''
   const sideShortcuts =
     config.withSide === false || !config.offsetRem
       ? {}
@@ -190,14 +190,14 @@ function createSemanticAnimationShortcuts(
             const value = `${sign}${config.offsetRem}rem`
             return [
               `animate-${name}-side-${side}`,
-              `[--moraine-enter-translate-${axis}:${value}] [--moraine-exit-translate-${axis}:${value}]`,
+              `[--mo-enter-translate-${axis}:${value}] [--mo-exit-translate-${axis}:${value}]`,
             ] as const
           }),
         )
 
   return {
-    [`animate-${name}-in`]: `animate-${MORAINE_ENTER_ANIMATION_NAME} [--moraine-enter-opacity:0]${inScale}`,
-    [`animate-${name}-out`]: `animate-${MORAINE_EXIT_ANIMATION_NAME} [--moraine-exit-opacity:0]${outScale}`,
+    [`animate-${name}-in`]: `animate-${MORAINE_ENTER_ANIMATION_NAME} [--mo-enter-opacity:0]${inScale}`,
+    [`animate-${name}-out`]: `animate-${MORAINE_EXIT_ANIMATION_NAME} [--mo-exit-opacity:0]${outScale}`,
     ...sideShortcuts,
   }
 }
@@ -417,8 +417,7 @@ export function presetTheme(options?: PresetThemeOptions): Preset {
         'style-accordion-content',
         '[&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
       ],
-      ['surface-outline', 'ring-1 ring-border'],
-      ['surface-outline-inset', 'ring ring-inset ring-border'],
+      ['surface-border', 'b-(1 border)'],
       ['surface-overlay', 'ring-1 ring-foreground/10'],
       ['hidden-hitless', 'opacity-0 pointer-events-none'],
       ...Object.entries(SEMANTIC_ANIMATION_SHORTCUTS).map(

@@ -265,6 +265,44 @@ describe('Slider', () => {
     expect(secondThumbAfter).toBe(secondThumbBefore)
   })
 
+  test('controlled range keeps thumb updates stable with thumb style overrides', async () => {
+    const screen = render(() => {
+      const [value, setValue] = createSignal<number[]>([20, 80])
+
+      return (
+        <Slider
+          value={value()}
+          styles={{ thumb: { width: '20px' } }}
+          onValueChange={(nextValue) => {
+            if (Array.isArray(nextValue)) {
+              setValue(nextValue)
+            }
+          }}
+        />
+      )
+    })
+
+    const [firstThumbBefore, secondThumbBefore] = getThumbs(screen.container)
+
+    expect(firstThumbBefore?.style.width).toBe('20px')
+    expect(secondThumbBefore?.style.width).toBe('20px')
+
+    await fireEvent.focus(firstThumbBefore as HTMLElement)
+    await fireEvent.keyDown(firstThumbBefore as HTMLElement, { key: 'ArrowRight' })
+
+    await waitFor(() => {
+      const [firstThumb, secondThumb] = getThumbs(screen.container)
+      expect(firstThumb?.getAttribute('aria-valuenow')).toBe('21')
+      expect(secondThumb?.getAttribute('aria-valuenow')).toBe('80')
+      expect(firstThumb?.style.width).toBe('20px')
+      expect(secondThumb?.style.width).toBe('20px')
+    })
+
+    const [firstThumbAfter, secondThumbAfter] = getThumbs(screen.container)
+    expect(firstThumbAfter).toBe(firstThumbBefore)
+    expect(secondThumbAfter).toBe(secondThumbBefore)
+  })
+
   test('integrates with form validation on change', async () => {
     const { screen, thumb } = createForm(['change'])
 

@@ -12,7 +12,7 @@ export const badgeVariants = cva(
     variants: {
       variant: {
         default: 'text-accent-foreground bg-accent/50',
-        outline: 'text-foreground bg-background surface-outline-inset',
+        outline: 'text-foreground surface-border bg-background',
         solid: 'text-primary-foreground bg-primary shadow-xs',
       },
       size: {

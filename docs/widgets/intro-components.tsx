@@ -38,7 +38,7 @@ export const IntroComponentsWidget = () => {
                   {(component) => (
                     <a
                       href={`#${component.key}`}
-                      class="p-3 border border-border rounded-lg bg-background block transition hover:bg-muted"
+                      class="p-3 b-1 b-border rounded-lg bg-background block transition hover:bg-muted"
                     >
                       <p class="text-sm text-foreground font-medium">{component.name}</p>
                       <p class="text-xs text-muted-foreground mt-2">{component.description}</p>

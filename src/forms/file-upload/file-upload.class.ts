@@ -108,7 +108,7 @@ export const fileUploadFilesVariants = cva('flex flex-col', {
 })
 
 export const fileUploadFileVariants = cva(
-  'b-(1 border) rounded-md bg-background flex items-center relative',
+  'surface-border rounded-md bg-background flex items-center relative',
   {
     defaultVariants: {
       size: 'md',

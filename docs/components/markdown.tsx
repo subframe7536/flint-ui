@@ -83,14 +83,14 @@ export function Markdown(input: RenderExampleMarkdownPageInput) {
       case 'markdown':
         return (
           <div
-            class="max-w-none prose prose-neutral prose-headings:(text-foreground font-semibold mb-3 mt-8) prose-p:(text-muted-foreground leading-6) prose-pre:(border border-border rounded-xl bg-muted) dark:prose-invert"
+            class="max-w-none prose prose-neutral prose-headings:(text-foreground font-semibold mb-3 mt-8) prose-p:(text-muted-foreground leading-6) prose-pre:(b-1 b-border rounded-xl bg-muted) dark:prose-invert"
             // oxlint-disable-next-line solid/no-innerhtml
             innerHTML={segment.html}
           />
         )
       case 'example':
         return (
-          <section class="border border-border rounded-2xl bg-background shadow-sm overflow-hidden">
+          <section class="b-1 b-border rounded-2xl bg-background shadow-sm overflow-hidden">
             <div class="p-6 flex items-center justify-center">
               <Dynamic component={segment.component} />
             </div>
@@ -106,7 +106,7 @@ export function Markdown(input: RenderExampleMarkdownPageInput) {
           <Show
             when={Widget}
             fallback={
-              <div class="text-sm text-muted-foreground p-4 border border-border rounded-xl border-dashed">
+              <div class="text-sm text-muted-foreground p-4 b-1 b-border rounded-xl border-dashed">
                 Widget not found: {segment.widgetName}
               </div>
             }
@@ -135,7 +135,7 @@ export function Markdown(input: RenderExampleMarkdownPageInput) {
         )
       default:
         return (
-          <div class="text-sm text-muted-foreground p-4 border border-border rounded-xl border-dashed">
+          <div class="text-sm text-muted-foreground p-4 b-1 b-border rounded-xl border-dashed">
             Unsupported segment type
           </div>
         )
