@@ -101,12 +101,6 @@ const CORE_ANIMATION_KEYFRAMES = {
   'carousel-rtl': '{ 0% { transform: translateX(100%) } 100% { transform: translateX(-100%) } }',
   'carousel-vertical':
     '{ 0% { transform: translateY(100%) } 100% { transform: translateY(-100%) } }',
-  'carousel-inverse':
-    '{ 0% { transform: translateX(100%) } 100% { transform: translateX(-100%) } }',
-  'carousel-inverse-rtl':
-    '{ 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }',
-  'carousel-inverse-vertical':
-    '{ 0% { transform: translateY(-100%) } 100% { transform: translateY(100%) } }',
   swing: '{ 0%, 100% { transform: translateX(-60%) } 50% { transform: translateX(60%) } }',
   'swing-vertical':
     '{ 0%, 100% { transform: translateY(60%) } 50% { transform: translateY(-60%) } }',
@@ -127,24 +121,17 @@ function getAnimType(name: string): 'moraine' | 'looping' | 'default' {
   return 'default'
 }
 
-const CORE_ANIMATION_DURATIONS = Object.fromEntries(
-  Object.keys(CORE_ANIMATION_KEYFRAMES).map((name) => {
-    const type = getAnimType(name)
-    return [
-      name,
-      type === 'moraine' ? MORAINE_ANIMATION_DURATION_VAR : type === 'looping' ? '2s' : '150ms',
-    ]
-  }),
-)
-const CORE_ANIMATION_TIMING_FNS = Object.fromEntries(
-  Object.keys(CORE_ANIMATION_KEYFRAMES).map((name) => [name, 'ease-in-out']),
-)
-const CORE_ANIMATION_COUNTS = Object.fromEntries(
-  Object.keys(CORE_ANIMATION_KEYFRAMES).map((name) => [
-    name,
-    getAnimType(name) === 'looping' ? 'infinite' : '1',
-  ]),
-)
+const CORE_ANIMATION_DURATIONS: Record<string, string> = {}
+const CORE_ANIMATION_TIMING_FNS: Record<string, string> = {}
+const CORE_ANIMATION_COUNTS: Record<string, string> = {}
+
+for (const name of Object.keys(CORE_ANIMATION_KEYFRAMES)) {
+  const type = getAnimType(name)
+  CORE_ANIMATION_DURATIONS[name] =
+    type === 'moraine' ? MORAINE_ANIMATION_DURATION_VAR : type === 'looping' ? '2s' : '150ms'
+  CORE_ANIMATION_TIMING_FNS[name] = 'ease-in-out'
+  CORE_ANIMATION_COUNTS[name] = type === 'looping' ? 'infinite' : '1'
+}
 const SEMANTIC_ANIMATION_SHORTCUTS = {
   'animate-overlay-in': `animate-${MORAINE_ENTER_ANIMATION_NAME} [--moraine-enter-opacity:0]`,
   'animate-overlay-out': `animate-${MORAINE_EXIT_ANIMATION_NAME} [--moraine-exit-opacity:0]`,

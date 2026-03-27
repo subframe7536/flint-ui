@@ -56,7 +56,7 @@ export const progressBaseVariants = cva(
 )
 
 export const progressIndicatorVariants = cva(
-  'will-change-transform rounded-full bg-primary size-full transition-transform duration-200 ease-out inset-0 absolute data-indeterminate:animate-(duration-2s ease-in-out iteration-infinite)',
+  'will-change-transform rounded-full bg-primary size-full transition-transform duration-200 ease-out inset-0 absolute data-indeterminate:(opacity-100 animate-duration-2s animate-ease-in-out animate-iteration-infinite)',
   {
     defaultVariants: {
       orientation: 'horizontal',
@@ -68,10 +68,10 @@ export const progressIndicatorVariants = cva(
         vertical: 'origin-bottom',
       },
       animation: {
-        carousel: 'data-indeterminate:opacity-100',
-        'carousel-inverse': 'data-indeterminate:opacity-100',
-        swing: 'data-indeterminate:opacity-100',
-        elastic: 'data-indeterminate:opacity-100',
+        carousel: '',
+        reverse: '',
+        swing: '',
+        elastic: '',
       },
     },
     compoundVariants: [
@@ -87,14 +87,14 @@ export const progressIndicatorVariants = cva(
       },
       {
         orientation: 'horizontal',
-        animation: 'carousel-inverse',
-        class:
-          'data-indeterminate:animate-carousel-inverse data-indeterminate:rtl:animate-carousel-inverse-rtl',
+        animation: 'reverse',
+        class: 'data-indeterminate:animate-carousel-rtl data-indeterminate:rtl:animate-carousel',
       },
       {
         orientation: 'vertical',
-        animation: 'carousel-inverse',
-        class: 'data-indeterminate:animate-carousel-inverse-vertical',
+        animation: 'reverse',
+        class:
+          'data-indeterminate:animate-carousel-vertical data-indeterminate:animate-direction-reverse',
       },
       {
         orientation: 'horizontal',

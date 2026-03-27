@@ -90,7 +90,7 @@ describe('presetTheme component layer', () => {
     expect(resolvePresetThemeOptions({ enableComponentLayer: true })).toMatchObject({
       enableComponentLayer: true,
       strategy: 'prefix',
-      utilityPrefix: 'mo-',
+      utilityPrefix: 'mr-',
     })
   })
 
@@ -203,6 +203,37 @@ describe('presetTheme component layer', () => {
     expect(css).toContain('--moraine-enter-translate-x:2.5rem')
     expect(css).toContain('--moraine-exit-translate-x:2.5rem')
     expect(css).not.toContain('--moraine-enter-scale:0.9;--moraine-enter-translate-x:2.5rem')
+  })
+
+  test('removes carousel inverse utilities while keeping base carousel utilities', async () => {
+    const generator = await createGenerator({
+      presets: [presetWind4(), presetTheme()],
+    })
+
+    const { css } = await generator.generate(
+      new Set([
+        'animate-carousel',
+        'animate-carousel-rtl',
+        'animate-carousel-vertical',
+        'animate-carousel-inverse',
+        'animate-carousel-inverse-rtl',
+        'animate-carousel-inverse-vertical',
+      ]),
+      { preflights: true },
+    )
+
+    expect(css).toContain('.animate-carousel{')
+    expect(css).toContain('.animate-carousel-rtl{')
+    expect(css).toContain('.animate-carousel-vertical{')
+    expect(css).toContain('@keyframes carousel')
+    expect(css).toContain('@keyframes carousel-rtl')
+    expect(css).toContain('@keyframes carousel-vertical')
+    expect(css).not.toContain('.animate-carousel-inverse{')
+    expect(css).not.toContain('.animate-carousel-inverse-rtl{')
+    expect(css).not.toContain('.animate-carousel-inverse-vertical{')
+    expect(css).not.toContain('@keyframes carousel-inverse')
+    expect(css).not.toContain('@keyframes carousel-inverse-rtl')
+    expect(css).not.toContain('@keyframes carousel-inverse-vertical')
   })
 
   test('matches old preset horizontal direction signs for semantic enter animations', async () => {
